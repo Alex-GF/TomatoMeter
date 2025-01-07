@@ -1,0 +1,44 @@
+{
+    "expenses": [
+      {
+        "id": 1,
+        "name": "Pizza by Layers",
+        "time": "12:11",
+        "amount": 976.29,
+        "category": "Food & Drinks",
+        "budget": 0.9
+      },
+      {
+        "id": 2,
+        "name": "Qeducation",
+        "time": "22:17",
+        "amount": 567.63,
+        "category": "Uncategorized",
+        "budget": 0.6
+      },
+      {
+        "id": 3,
+        "name": "Grocery Max",
+        "time": "07:35",
+        "amount": 251.16,
+        "category": "Grocery",
+        "budget": 0.3
+      },
+      {
+        "id": 4,
+        "name": "Pizza by Layers",
+        "time": "11:22",
+        "amount": 290.14,
+        "category": "Food & Drinks",
+        "budget": 0.5
+      },
+      {
+        "id": 5,
+        "name": "Qeducation",
+        "time": "15:25",
+        "amount": 755.10,
+        "category": "Uncategorized",
+        "budget": 0.8
+      }
+    ]
+  }

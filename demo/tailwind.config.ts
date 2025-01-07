@@ -20,7 +20,12 @@ export default {
       // => @media (min-width: 1536px) { ... }
       'fold': '300px',
     },
-    extend: {},
+    extend: {
+      colors: {
+        "demo-primary": "#0F172A",
+        "demo-secondary": "#A855F7"
+      }
+    }
   },
   plugins: [require('prettier-plugin-tailwindcss')],
   darkMode: 'class',
