@@ -1,6 +1,7 @@
 import ExpenseItem from '../demoExpenseItem';
 import { ExpenseItemProps } from '../../types';
 import { useState } from 'react';
+import { FEATURES } from '../../components/featureFlag';
 
 const ExpenseList = ({expenses}: {expenses: ExpenseItemProps[]}) => {
   
@@ -18,20 +19,20 @@ const ExpenseList = ({expenses}: {expenses: ExpenseItemProps[]}) => {
           </tr>
         </thead>
         <tbody>
-          {expenses.map((expense, index) => {
+            {expenses.slice(0, FEATURES["expensesLimit"] as number).map((expense, index) => {
             return (
               <ExpenseItem
-                key={`expense-${index}`}
-                name={expense.name}
-                time={expense.time}
-                amount={expense.amount}
-                category={expense.category}
-                budget={expense.budget}
-                categoryColors={categoryColors}
-                setCategoryColors={setCategoryColors}
+              key={`expense-${index}`}
+              name={expense.name}
+              time={expense.time}
+              amount={expense.amount}
+              category={expense.category}
+              budget={expense.budget}
+              categoryColors={categoryColors}
+              setCategoryColors={setCategoryColors}
               />
             );
-          })}
+            })}
         </tbody>
       </table>
       {/* <ul className='w-full bg-gray-200 flex justify-between p-4 rounded-t-3xl'>
