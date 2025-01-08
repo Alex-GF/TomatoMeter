@@ -1,24 +1,52 @@
-import React from 'react';
+import { faker } from '@faker-js/faker';
+import { useEffect, useRef } from 'react';
 
-interface ExpenseItemProps {
+const ExpenseItem = ({
+  name,
+  time,
+  amount,
+  category,
+  budget,
+  categoryColors,
+  setCategoryColors,
+}: {
   name: string;
   time: string;
   amount: number;
   category: string;
   budget: number;
-}
+  categoryColors: Record<string, number[]>;
+  setCategoryColors: (value: Record<string, number[]>) => void;
+}) => {
+  const categoryTag = useRef<HTMLSpanElement>(null);
 
-const ExpenseItem: React.FC<ExpenseItemProps> = ({ name, time, amount, category, budget }) => {
-  const categoryColors: { [key: string]: string } = {
-    'Food & Drinks': 'bg-red-100 text-red-500',
-    Grocery: 'bg-green-100 text-green-500',
-    Uncategorized: 'bg-gray-100 text-gray-500',
-  };
+  useEffect(() => {
+    if (categoryTag.current) {
+      let categoryColor;
+
+      // console.log(categoryColors);
+      // console.log(category);
+
+      if (!categoryColors[category]) {
+        const color = faker.color.rgb({format: 'decimal'});
+        categoryColor = color;
+        setCategoryColors({
+          ...categoryColors,
+          [category]: color,
+        });
+      } else {
+        categoryColor = categoryColors[category];
+      }
+
+      categoryTag.current.style.backgroundColor = `rgba(${categoryColor.join(', ')}, 0.2)`;
+      categoryTag.current.style.color = `rgba(${categoryColor.join(', ')}, 1)`;
+    }
+  }, [category, categoryColors]);
 
   return (
-    <div className="flex items-center justify-between bg-white shadow-md rounded-lg p-4">
-      <div className="flex items-center">
-        <div className="w-10 h-10 bg-purple-100 text-purple-500 flex items-center justify-center rounded-full mr-4">
+    <div className="flex items-center justify-between rounded-lg bg-white p-4 shadow-md">
+      <div className="flex items-center w-1/3">
+        <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 text-purple-500">
           {name.charAt(0).toUpperCase()}
         </div>
         <div>
@@ -26,17 +54,15 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ name, time, amount, category,
           <p className="text-sm text-gray-500">{time}</p>
         </div>
       </div>
-      <div className="text-right">
+      <div className="flex flex-col items-center">
         <p className="text-lg font-semibold text-gray-800">${amount.toFixed(2)}</p>
-        <span
-          className={`text-xs px-2 py-1 rounded-full ${categoryColors[category] || 'bg-gray-100 text-gray-500'}`}
-        >
+        <span className="rounded-full px-3 py-1 text-xs text-center" ref={categoryTag}>
           {category}
         </span>
       </div>
-      <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="h-2 w-24 overflow-hidden rounded-full bg-gray-200">
         <div
-          className="h-full bg-purple-500 rounded-full"
+          className="h-full rounded-full bg-purple-500"
           style={{ width: `${budget * 100}%` }}
         ></div>
       </div>

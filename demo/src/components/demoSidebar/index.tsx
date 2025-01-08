@@ -2,7 +2,7 @@ import React from 'react';
 
 const Sidebar: React.FC = () => {
   return (
-    <div className="bg-gray-900 text-white w-64 h-screen flex flex-col items-center py-10 px-4">
+    <div className="bg-gray-900 text-white w-64 h-full flex flex-col items-center py-10 px-4">
       <div className="text-center mb-8">
         <div className="bg-white text-black rounded-full w-32 h-32 flex items-center justify-center mx-auto">
           <span className="font-bold text-[40px]">U</span>
