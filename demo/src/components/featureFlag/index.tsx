@@ -1,17 +1,19 @@
-export const FEATURES: Record<string, { value: boolean; usageLimits?: Record<string, number> }> = {
-  expenses: {
-    value: true,
-    usageLimits: {
-      maxExpenses: 5,
-    },
-  },
-  expensesCategories: {
-    value: true,
-  },
-  expensesGraph: {
-    value: true,
-  },
-};
+import { useFeatureToggling } from "../../hooks/useFeatureToggling";
+
+// export const FEATURES: Record<string, { value: boolean; usageLimits?: Record<string, number> }> = {
+//   expenses: {
+//     value: true,
+//     usageLimits: {
+//       maxExpenses: 5,
+//     },
+//   },
+//   expensesCategories: {
+//     value: true,
+//   },
+//   expensesGraph: {
+//     value: true,
+//   },
+// };
 
 export default function FeatureFlag({
   featureName,
@@ -20,15 +22,10 @@ export default function FeatureFlag({
   featureName: string;
   children: React.ReactNode;
 }) {
+
+  const {isFeatureEnabled} = useFeatureToggling();
+
   const isEnabled = isFeatureEnabled(featureName);
 
-  function isFeatureEnabled(featureName: string) {
-    if (typeof FEATURES[featureName].value === 'boolean') {
-      return FEATURES[featureName].value;
-    } else {
-      return false;
-    }
-  }
-
-  return <>{isEnabled ? <>{children}</> : <></>}</>;
+  return isEnabled ? <>{children}</> : <></>;
 }

@@ -1,7 +1,6 @@
 import ExpenseItem from '../demoExpenseItem';
 import { ExpenseItemProps } from '../../types';
 import { useState } from 'react';
-import { FEATURES } from '../../components/featureFlag';
 
 const ExpenseList = ({expenses}: {expenses: ExpenseItemProps[]}) => {
   
@@ -19,7 +18,7 @@ const ExpenseList = ({expenses}: {expenses: ExpenseItemProps[]}) => {
           </tr>
         </thead>
         <tbody>
-            {expenses.slice(0, FEATURES["expenses"].usageLimits!["maxExpenses"] as number).map((expense, index) => {
+            {expenses.map((expense, index) => {
             return (
               <ExpenseItem
               key={`expense-${index}`}
