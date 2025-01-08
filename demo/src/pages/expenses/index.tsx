@@ -21,7 +21,7 @@ const ExpensesPage: React.FC = () => {
           </FeatureFlag>
           <div>
             <h2 className="mb-4 text-lg font-semibold text-gray-800">January ({monthlyExpenses.length} payments)</h2>
-            <FeatureFlag featureName="expensesList">
+            <FeatureFlag featureName="expenses">
               <ExpenseList expenses={monthlyExpenses} />
             </FeatureFlag>
           </div>

@@ -19,7 +19,7 @@ const ExpenseList = ({expenses}: {expenses: ExpenseItemProps[]}) => {
           </tr>
         </thead>
         <tbody>
-            {expenses.slice(0, FEATURES["expensesLimit"] as number).map((expense, index) => {
+            {expenses.slice(0, FEATURES["expenses"].usageLimits!["maxExpenses"] as number).map((expense, index) => {
             return (
               <ExpenseItem
               key={`expense-${index}`}

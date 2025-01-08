@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { useEffect, useRef } from 'react';
+import FeatureFlag from '../featureFlag';
 
 const ExpenseItem = ({
   name,
@@ -54,11 +55,13 @@ const ExpenseItem = ({
         </div>
       </td>
       <td className="px-4 py-2 text-lg text-center font-semibold text-gray-800">${amount.toFixed(2)}</td>
-      <td className="px-4 py-2 text-center">
-        <span className="rounded-full px-3 py-1 text-center text-xs" ref={categoryTag}>
-          {category}
-        </span>
-      </td>
+      <FeatureFlag featureName="expensesCategories">
+        <td className="px-4 py-2 text-center">
+          <span className="rounded-full px-3 py-1 text-center text-xs" ref={categoryTag}>
+            {category}
+          </span>
+        </td>
+      </FeatureFlag>
       <td className="px-4 py-2">
         <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
           <div
