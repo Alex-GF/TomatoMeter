@@ -9,8 +9,17 @@ export default defineConfig({
     {
       name: "markdown-loader",
       transform(code, id) {
-        if (id.slice(-3) === ".md") {
+        if (id.endsWith(".md")) {
           // For .md files, get the raw content
+          return `export default ${JSON.stringify(code)};`;
+        }
+      }
+    },
+    {
+      name: "yaml-loader",
+      transform(code, id) {
+        if (id.endsWith(".yml") || id.endsWith(".yaml")) {
+          // For .yml or .yaml files, get the raw content
           return `export default ${JSON.stringify(code)};`;
         }
       }

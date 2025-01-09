@@ -3,7 +3,7 @@ import FeatureTogglingProvider from "./contexts/featureFlagContext";
 
 export default function App() {
   return (
-    <FeatureTogglingProvider initialLibrary="unleash">
+    <FeatureTogglingProvider initialLibrary="ad-hoc">
       <DemoApp />
     </FeatureTogglingProvider>
   );

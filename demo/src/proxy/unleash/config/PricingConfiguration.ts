@@ -1,6 +1,11 @@
 import { PricingContext } from 'pricing4ts/server';
 
 export class PricingConfiguration extends PricingContext{
+
+    constructor() {
+        super();
+    }
+
     getConfigFilePath(): string {
         return "../resources/pricing.yml";
     }

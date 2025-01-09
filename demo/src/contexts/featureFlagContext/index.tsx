@@ -5,6 +5,9 @@ import {
   FeatureTogglingContextType,
 } from '../../types';
 
+import { UnleashClientManager } from '../../proxy/unleash/src/proxy';
+import { initializeAdHoc } from '../../proxy/ad-hoc/src/proxy';
+
 export const FeatureTogglingContext = createContext<FeatureTogglingContextType | undefined>(
   undefined
 );
@@ -31,8 +34,11 @@ export default function FeatureTogglingProvider({
 
     switch (libraryName) {
       case 'unleash':
-        const { UnleashClientManager } = await import('../../../tools/unleash/src/unleash-proxy');
+        // const { UnleashClientManager } = await import('../../../tools/unleash/src/unleash-proxy');
         client = await UnleashClientManager.initializeUnleash();
+        break;
+      case 'ad-hoc':
+        client = initializeAdHoc();
         break;
       default:
         throw new Error(`Library ${libraryName} is not supported`);
@@ -46,27 +52,23 @@ export default function FeatureTogglingProvider({
     loadLibrary(currentLibrary);
   }, [currentLibrary]);
 
-
-
   const isFeatureEnabled = (key: string) => {
     if (!clientInstance) {
       throw new Error('Feature toggling library not loaded');
     }
 
     return clientInstance?.getFeature(key) || false;
-  }
+  };
 
   const setLibrary = (libraryName: FeatureTogglingLibrary) => {
     setCurrentLibrary(libraryName);
   };
 
-  return (
-    clientInstance ? (
-      <FeatureTogglingContext.Provider value={{ isFeatureEnabled, setLibrary }}>
-        {children}
-      </FeatureTogglingContext.Provider>
-    )
-    :
+  return clientInstance ? (
+    <FeatureTogglingContext.Provider value={{ isFeatureEnabled, setLibrary }}>
+      {children}
+    </FeatureTogglingContext.Provider>
+  ) : (
     <></>
   );
 }
