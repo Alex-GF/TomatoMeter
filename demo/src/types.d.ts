@@ -9,7 +9,7 @@ export interface ExpenseItemProps {
 // FeatureTogglingContext
 
 // Type to represent supported libraries
-export type FeatureTogglingLibrary = 'unleash' | 'ad-hoc';
+export type FeatureTogglingLibrary = 'unleash' | 'ad-hoc' | 'devcycle';
 
 // Common interface for all feature toggling solutions
 export interface FeatureTogglingClient {
