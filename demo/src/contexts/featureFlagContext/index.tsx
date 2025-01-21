@@ -14,12 +14,6 @@ export const FeatureTogglingContext = createContext<FeatureTogglingContextType |
   undefined
 );
 
-// // Provider
-// interface FeatureTogglingProviderProps {
-//   initialLibrary: FeatureTogglingLibrary;
-//   children: ReactNode;
-// }
-
 const FeatureTogglingProvider = ({
   initialLibrary,
   children,
@@ -43,7 +37,9 @@ const FeatureTogglingProvider = ({
         client = initializeAdHoc();
         break;
       case 'devcycle':
-        client = DevCycleClientManager.initializeDevCycle();
+        // const devCycleClient = useDevCycleClient();
+        // console.log(devCycleClient);
+        client = await DevCycleClientManager.initializeDevCycle();
         break;
       default:
         throw new Error(`Library ${libraryName} is not supported`);
@@ -70,7 +66,7 @@ const FeatureTogglingProvider = ({
   };
 
   return clientInstance ? (
-    <FeatureTogglingContext.Provider value={{ isFeatureEnabled, setLibrary }}>
+    <FeatureTogglingContext.Provider value={{ isFeatureEnabled, currentLibrary, setLibrary }}>
       {children}
     </FeatureTogglingContext.Provider>
   ) : (

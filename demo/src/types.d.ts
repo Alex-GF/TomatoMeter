@@ -19,5 +19,6 @@ export interface FeatureTogglingClient {
 // Provider's context
 export interface FeatureTogglingContextType {
   isFeatureEnabled: (key: string) => boolean; // Ask for the state of a feature (enabled/disabled)
+  currentLibrary: FeatureTogglingLibrary; // The current library in use
   setLibrary: (libraryName: FeatureFlagLibrary) => void; // Set the library to use
 }
