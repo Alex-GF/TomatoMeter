@@ -1,9 +1,9 @@
-import { DemoApp } from "./apps/demo";
-import FeatureTogglingProvider from "./contexts/featureFlagContext";
+import { DemoApp } from './apps/demo';
+import FeatureTogglingProvider from './contexts/featureFlagContext';
 
 export default function App() {
   return (
-    <FeatureTogglingProvider initialLibrary="devcycle">
+    <FeatureTogglingProvider initialLibrary="openFeatureProvider">
       <DemoApp />
     </FeatureTogglingProvider>
   );

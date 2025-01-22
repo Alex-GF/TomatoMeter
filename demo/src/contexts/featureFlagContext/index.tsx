@@ -9,18 +9,20 @@ import { UnleashClientManager } from '../../proxy/unleash/src/proxy';
 import { initializeAdHoc } from '../../proxy/ad-hoc/src/proxy';
 import { withDevCycleProvider } from "@devcycle/react-client-sdk";
 import { DevCycleClientManager } from '../../proxy/devcycle/src/proxy';
+import { OpenFeatureProvider } from '@openfeature/react-sdk';
+import { initializeOpenFeature } from '../../proxy/open-feature/src/proxy';
 
 export const FeatureTogglingContext = createContext<FeatureTogglingContextType | undefined>(
   undefined
 );
 
-const FeatureTogglingProvider = ({
+function FeatureTogglingProvider ({
   initialLibrary,
   children,
 }: {
   initialLibrary: FeatureTogglingLibrary;
   children: React.ReactNode;
-}): JSX.Element => {
+}): JSX.Element {
   const [currentLibrary, setCurrentLibrary] = useState<FeatureTogglingLibrary>(initialLibrary);
   const [clientInstance, setClientInstance] = useState<FeatureTogglingClient | null>(null);
 
@@ -40,6 +42,9 @@ const FeatureTogglingProvider = ({
         // const devCycleClient = useDevCycleClient();
         // console.log(devCycleClient);
         client = await DevCycleClientManager.initializeDevCycle();
+        break;
+      case 'openFeatureProvider':
+        client = initializeOpenFeature();
         break;
       default:
         throw new Error(`Library ${libraryName} is not supported`);
@@ -67,7 +72,9 @@ const FeatureTogglingProvider = ({
 
   return clientInstance ? (
     <FeatureTogglingContext.Provider value={{ isFeatureEnabled, currentLibrary, setLibrary }}>
-      {children}
+      <OpenFeatureProvider>
+        {children}
+      </OpenFeatureProvider>
     </FeatureTogglingContext.Provider>
   ) : (
     <></>

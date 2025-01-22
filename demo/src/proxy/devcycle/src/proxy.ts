@@ -7,13 +7,13 @@ export class DevCycleClientManager {
   private static token: string = '';
 
   static async initializeDevCycle() {
-    const pricing: Pricing = retrievePricingFromYaml(pricingYaml);
-    const createdFeatures = this.performRequest(
-      'https://api.devcycle.com/v1/projects/isa-group/features',
-      'GET'
-    ).then(response => console.log(response));
+    // const pricing: Pricing = retrievePricingFromYaml(pricingYaml);
+    // const createdFeatures = await this.performRequest(
+    //   'https://api.devcycle.com/v1/projects/isa-group/features',
+    //   'GET'
+    // ).then(response => console.log(response));
 
-    console.log(createdFeatures);
+    // console.log(createdFeatures);
     return {
       getFeature: (key: string) => {
         return useVariableValue(key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(), false);
@@ -33,9 +33,16 @@ export class DevCycleClientManager {
         Authorization: `Bearer ${this.token}`,
       },
     })
-      .then(response => response.json())
-      .catch(error => {
-        this.generateNewToken();
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        
+        response.json()
+      })
+      .catch(async error => {
+        console.log(error);
+        await this.generateNewToken();
         return fetch(url, {
           method: 'GET',
           headers: {
