@@ -1,11 +1,17 @@
 import express from 'express';
+import { OpenFeature, ProviderEvents } from '@openfeature/server-sdk';
+import {PricingDrivenFeaturesProvider} from "../src/proxy/open-feature/provider/node/PricingDrivenFeaturesProvider";
+import { PricingConfiguration } from './config/PricingConfiguration';
+import { hasFeatureMiddleware } from './middleware/has-feature-middleware';
 
 const app = express();
 const port = 3000;
 
+OpenFeature.setProvider(new PricingDrivenFeaturesProvider(new PricingConfiguration()));
 
-
-app.get('/api/graph-data', (req, res) => {
+app.get('/api/graph-data', 
+  hasFeatureMiddleware('expensesGraph'),
+  (req, res) => {
   const data = {
     monthlyData: [
       { month: 'Jan', value: 20 },

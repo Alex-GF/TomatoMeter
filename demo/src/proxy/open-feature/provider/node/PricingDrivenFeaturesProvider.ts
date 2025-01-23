@@ -1,70 +1,110 @@
-import { ClientProviderStatus, EvaluationContext, Hook, JsonValue, Logger, OpenFeatureEventEmitter, Provider, ResolutionDetails, TrackingEventDetails } from "@openfeature/react-sdk";
-import { PricingContext, PricingContextManager, evaluateFeature } from "pricing4ts/server";
+import {
+  EvaluationContext,
+  Hook,
+  JsonValue,
+  Logger,
+  OpenFeatureEventEmitter,
+  Provider,
+  ResolutionDetails,
+  TrackingEventDetails,
+} from '@openfeature/server-sdk';
+import { PricingContext, PricingContextManager, evaluateFeature } from 'pricing4ts/server';
 
 export class PricingDrivenFeaturesProvider implements Provider {
-    
-    readonly metadata = {
-        name: 'pricing-driven-features',
-        description: 'A provider that enables features based on pricing information'
-    }
+  readonly metadata = {
+    name: 'pricing-driven-features',
+    description: 'A provider that enables features based on pricing information',
+  };
 
-    readonly runsOn = "server";
+  readonly runsOn = 'server';
 
-    events = new OpenFeatureEventEmitter();
-    hooks?: Hook[] | undefined;
-    status?: ClientProviderStatus | undefined;
+  events = new OpenFeatureEventEmitter();
+  hooks?: Hook[] | undefined;
 
-    constructor(pricingContext: PricingContext) {
-        PricingContextManager.registerContext(pricingContext);
-    }
+  constructor(pricingContext: PricingContext) {
+    PricingContextManager.registerContext(pricingContext);
+  }
 
-    onContextChange?(oldContext: EvaluationContext, newContext: EvaluationContext): Promise<void> | void {
-        throw new Error("Method not implemented.");
-    }
+  onContextChange?(
+    oldContext: EvaluationContext,
+    newContext: EvaluationContext
+  ): Promise<void> | void {
+    console.log('Context changed');
+    console.log('Old context:', oldContext);
+    console.log('New context:', newContext);
+    return Promise.resolve();
+  }
 
-    resolveBooleanEvaluation(flagKey: string, defaultValue: boolean, context: EvaluationContext, logger: Logger): ResolutionDetails<boolean> {
-        return {
-            value: this._evaluateFeature(flagKey).value.eval as boolean
-        }
-    }
+  resolveBooleanEvaluation(
+    flagKey: string,
+    defaultValue: boolean,
+    context: EvaluationContext,
+    logger: Logger
+  ): Promise<ResolutionDetails<boolean>> {
+    console.log('Entra');
+    console.log('Result:', this._evaluateFeature(flagKey).value.eval);
+    console.log('Resolve Object', this._evaluateFeature(flagKey));
 
-    resolveStringEvaluation(flagKey: string, defaultValue: string, context: EvaluationContext, logger: Logger): ResolutionDetails<string> {
-        const result: boolean = this._evaluateFeature(flagKey).value.eval as boolean;
-        
-        return {
-            value: result.toString()
-        };
-    }
+    return Promise.resolve({
+      value: this._evaluateFeature(flagKey).value.eval as boolean,
+    });
+  }
 
-    resolveNumberEvaluation(flagKey: string, defaultValue: number, context: EvaluationContext, logger: Logger): ResolutionDetails<number> {
-        const result: boolean = this._evaluateFeature(flagKey).value.eval as boolean;
-        
-        return {
-            value: result ? 1 : 0
-        }
-    }
+  resolveStringEvaluation(
+    flagKey: string,
+    defaultValue: string,
+    context: EvaluationContext,
+    logger: Logger
+  ): Promise<ResolutionDetails<string>> {
+    const result: boolean = this._evaluateFeature(flagKey).value.eval as boolean;
 
-    resolveObjectEvaluation<T extends JsonValue>(flagKey: string, defaultValue: T, context: EvaluationContext, logger: Logger): ResolutionDetails<T> {
-        return this._evaluateFeature(flagKey) as unknown as ResolutionDetails<T>;
-    }
-    
-    onClose?(): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    
-    initialize?(context?: EvaluationContext): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    
-    track?(trackingEventName: string, context: EvaluationContext, trackingEventDetails: TrackingEventDetails): void {
-        throw new Error("Method not implemented.");
-    }
+    return Promise.resolve({
+      value: result.toString(),
+    });
+  }
 
-    _evaluateFeature(flagKey: string): ResolutionDetails<any>{
-        const result = evaluateFeature(flagKey);
-        return {
-            value: result as any
-        };
-    }
+  resolveNumberEvaluation(
+    flagKey: string,
+    defaultValue: number,
+    context: EvaluationContext,
+    logger: Logger
+  ): Promise<ResolutionDetails<number>> {
+    const result: boolean = this._evaluateFeature(flagKey).value.eval as boolean;
 
+    return Promise.resolve({
+      value: result ? 1 : 0,
+    });
+  }
+
+  resolveObjectEvaluation<T extends JsonValue>(
+    flagKey: string,
+    defaultValue: T,
+    context: EvaluationContext,
+    logger: Logger
+  ): Promise<ResolutionDetails<T>> {
+    return Promise.resolve(this._evaluateFeature(flagKey) as unknown as ResolutionDetails<T>);
+  }
+
+  onClose?(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  initialize?(context?: EvaluationContext): Promise<void> {
+    return Promise.resolve();
+  }
+
+  track?(
+    trackingEventName: string,
+    context: EvaluationContext,
+    trackingEventDetails: TrackingEventDetails
+  ): void {
+    console.log(`Tracking event: ${trackingEventName}`);
+  }
+
+  _evaluateFeature(flagKey: string): ResolutionDetails<any> {
+    const result = evaluateFeature(flagKey);
+    return {
+      value: result as any,
+    };
+  }
 }
