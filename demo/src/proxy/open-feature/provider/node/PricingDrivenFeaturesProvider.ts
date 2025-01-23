@@ -1,12 +1,9 @@
 import {
-  EvaluationContext,
   Hook,
   JsonValue,
-  Logger,
   OpenFeatureEventEmitter,
   Provider,
   ResolutionDetails,
-  TrackingEventDetails,
 } from '@openfeature/server-sdk';
 import { PricingContext, PricingContextManager, evaluateFeature } from 'pricing4ts/server';
 
@@ -25,80 +22,70 @@ export class PricingDrivenFeaturesProvider implements Provider {
     PricingContextManager.registerContext(pricingContext);
   }
 
-  onContextChange?(
-    oldContext: EvaluationContext,
-    newContext: EvaluationContext
-  ): Promise<void> | void {
-    console.log('Context changed');
-    console.log('Old context:', oldContext);
-    console.log('New context:', newContext);
-    return Promise.resolve();
-  }
-
   resolveBooleanEvaluation(
     flagKey: string,
-    defaultValue: boolean,
-    context: EvaluationContext,
-    logger: Logger
+    defaultValue: boolean
   ): Promise<ResolutionDetails<boolean>> {
-    console.log('Entra');
-    console.log('Result:', this._evaluateFeature(flagKey).value.eval);
-    console.log('Resolve Object', this._evaluateFeature(flagKey));
-
-    return Promise.resolve({
-      value: this._evaluateFeature(flagKey).value.eval as boolean,
-    });
+    try{
+        return Promise.resolve({
+          value: this._evaluateFeature(flagKey).value.eval as boolean,
+        });
+    }catch(e){
+        console.error("Error occurred during evaluation. ERROR: " + (e as Error).message);
+        return Promise.resolve({
+          value: defaultValue,
+        });
+    }
   }
 
   resolveStringEvaluation(
     flagKey: string,
-    defaultValue: string,
-    context: EvaluationContext,
-    logger: Logger
+    defaultValue: string
   ): Promise<ResolutionDetails<string>> {
-    const result: boolean = this._evaluateFeature(flagKey).value.eval as boolean;
-
-    return Promise.resolve({
-      value: result.toString(),
-    });
+    try{
+        const result: boolean = this._evaluateFeature(flagKey).value.eval as boolean;
+    
+        return Promise.resolve({
+          value: result.toString(),
+        });
+    }catch(e){
+        console.error("Error occurred during evaluation. ERROR: " + (e as Error).message);
+        return Promise.resolve({
+          value: defaultValue,
+        });
+    }
   }
 
   resolveNumberEvaluation(
     flagKey: string,
-    defaultValue: number,
-    context: EvaluationContext,
-    logger: Logger
+    defaultValue: number
   ): Promise<ResolutionDetails<number>> {
-    const result: boolean = this._evaluateFeature(flagKey).value.eval as boolean;
-
-    return Promise.resolve({
-      value: result ? 1 : 0,
-    });
+    try{
+        const result: boolean = this._evaluateFeature(flagKey).value.eval as boolean;
+    
+        return Promise.resolve({
+          value: result ? 1 : 0,
+        });
+    }catch(e){
+        console.error("Error occurred during evaluation. ERROR: " + (e as Error).message);
+        return Promise.resolve({
+          value: defaultValue,
+        });
+    }
   }
 
   resolveObjectEvaluation<T extends JsonValue>(
     flagKey: string,
-    defaultValue: T,
-    context: EvaluationContext,
-    logger: Logger
+    defaultValue: T
   ): Promise<ResolutionDetails<T>> {
-    return Promise.resolve(this._evaluateFeature(flagKey) as unknown as ResolutionDetails<T>);
-  }
-
-  onClose?(): Promise<void> {
-    return Promise.resolve();
-  }
-
-  initialize?(context?: EvaluationContext): Promise<void> {
-    return Promise.resolve();
-  }
-
-  track?(
-    trackingEventName: string,
-    context: EvaluationContext,
-    trackingEventDetails: TrackingEventDetails
-  ): void {
-    console.log(`Tracking event: ${trackingEventName}`);
+    try{
+        return Promise.resolve(this._evaluateFeature(flagKey) as unknown as ResolutionDetails<T>);
+    }catch(e){
+        console.error("Error occurred during evaluation. ERROR: " + (e as Error).message);
+        return Promise.resolve({
+          value: defaultValue,
+        });
+    }
   }
 
   _evaluateFeature(flagKey: string): ResolutionDetails<any> {

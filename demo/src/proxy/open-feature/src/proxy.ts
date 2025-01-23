@@ -1,60 +1,12 @@
 import {
-  EvaluationContext,
-  InMemoryProvider,
   OpenFeature,
   useBooleanFlagValue,
   useFlag,
 } from '@openfeature/react-sdk';
-import { PricingDrivenFeaturesProvider } from '../provider/node/PricingDrivenFeaturesProvider';
-import { PricingConfiguration } from '../config/PricingConfiguration';
-
-const flagConfig = {
-  'expenses': {
-    disabled: false,
-    variants: {
-      on: true,
-      off: false,
-    },
-    defaultVariant: "on",
-    contextEvaluator: (context: EvaluationContext) => {
-      if (context.silly) {
-        return 'on';
-      }
-      return 'off'
-    }
-  },
-  'expensesCategories': {
-    disabled: false,
-    variants: {
-      on: true,
-      off: false,
-    },
-    defaultVariant: "on",
-    contextEvaluator: (context: EvaluationContext) => {
-      if (context.silly) {
-        return 'on';
-      }
-      return 'off'
-    }
-  },
-  'expensesGraph': {
-    disabled: false,
-    variants: {
-      on: true,
-      off: false,
-    },
-    defaultVariant: "on",
-    contextEvaluator: (context: EvaluationContext) => {
-      if (context.silly) {
-        return 'on';
-      }
-      return 'off'
-    }
-  }
-};
+import { PricingDrivenFeaturesProvider } from '../provider/react/PricingDrivenFeaturesReact';
 
 export function initializeOpenFeature() {
-  OpenFeature.setProvider(new InMemoryProvider(flagConfig));
+  OpenFeature.setProvider(new PricingDrivenFeaturesProvider("http://sphere.score.us.es/static/pricings/uploadedDataset/Pricing-driven%20Feature%20Toggling%20Demo/2025-1-8.yml"), {"test": "1"});
 
   return {
     getFeature: (key: string) => {
