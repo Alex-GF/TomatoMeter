@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const Graph: React.FC = () => {
+const Graph = ({currentPlan}: {currentPlan: string}) => {
 
   const [monthlyData, setMonthlyData] = useState([]);
 
   useEffect(() => {
     fetch("/api/graph-data").then(response => response.json()).then(data => {
       setMonthlyData(data.monthlyData);
+    }).catch(error => {
+      console.error('Error:', error);
     });
-  }, []);
+  }, [currentPlan]);
 
   return (
     <div className="flex items-end justify-between p-6 shadow-md rounded-lg border-demo-secondary border-2">

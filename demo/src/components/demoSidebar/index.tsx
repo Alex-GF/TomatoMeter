@@ -1,23 +1,63 @@
-import React from 'react';
+import { useEffect } from 'react';
+import { OpenFeatureClientManager } from '../../proxy/open-feature/src/proxy';
 
-const Sidebar: React.FC = () => {
+const Sidebar = ({currentPlan, setCurrentPlan}: {currentPlan: string | undefined, setCurrentPlan: Function}) => {
+  const updatePlan = (newPlan: string) => {
+    setCurrentPlan([newPlan]);
+    OpenFeatureClientManager.setSubscription([newPlan]);
+  };
+
+  const handleSubscriptionChange = (newPlan: string) => {
+    fetch('/api/user/plan', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userPlan: newPlan }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        updatePlan(data.userPlan);
+      });
+  };
+
+  useEffect(() => {
+    fetch('/api/user/plan')
+      .then(response => response.json())
+      .then(data => {
+        updatePlan(data.userPlan);
+      });
+  }, []);
+
   return (
-    <div className="bg-gray-900 text-white w-64 h-full flex flex-col items-center py-10 px-4">
-      <div className="text-center mb-8">
-        <div className="bg-white text-black rounded-full w-32 h-32 flex items-center justify-center mx-auto">
-          <span className="font-bold text-[40px]">U</span>
+    <div className="flex h-full w-64 flex-col items-center bg-gray-900 px-4 py-10 text-white">
+      <div className="mb-8 text-center">
+        <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-white text-black">
+          <span className="text-[40px] font-bold">U</span>
         </div>
         <h1 className="mt-4 text-xl font-semibold">Welcome</h1>
-        <p className="text-sm mt-2 text-white rounded-lg bg-purple-500 p-3"><span className='font-bold'>userid:</span> 76773296 </p>
+        <p className="mt-2 rounded-lg bg-purple-500 p-3 text-sm text-white hover:cursor-pointer" onClick={() => handleSubscriptionChange(currentPlan === 'PREMIUM' ? 'FREE' : 'PREMIUM')}>
+          <span className="font-bold">Active Plan:</span> {currentPlan}{' '}
+        </p>
       </div>
-      <div className='h-[0.05rem] w-40 bg-gray-400'></div>
-      <nav className="flex-grow mt-6 w-full">
-        <ul className="space-y-4 ml-4">
-          <li className="text-[20px] font-bold text-gray-400 hover:text-white cursor-pointer">Dashboard</li>
-          <li className="text-[20px] font-bold text-gray-400 hover:text-white cursor-pointer">Summary</li>
-          <li className="text-[20px] font-bold text-white pl-2 relative before:h-full before:absolute before:bg-white before:w-[5px] before:left-[-10px]">Expenses</li>
-          <li className="text-[20px] font-bold text-gray-400 hover:text-white cursor-pointer">Wallet</li>
-          <li className="text-[20px] font-bold text-gray-400 hover:text-white cursor-pointer">Settings</li>
+      <div className="h-[0.05rem] w-40 bg-gray-400"></div>
+      <nav className="mt-6 w-full flex-grow">
+        <ul className="ml-4 space-y-4">
+          <li className="cursor-pointer text-[20px] font-bold text-gray-400 hover:text-white">
+            Dashboard
+          </li>
+          <li className="cursor-pointer text-[20px] font-bold text-gray-400 hover:text-white">
+            Summary
+          </li>
+          <li className="relative pl-2 text-[20px] font-bold text-white before:absolute before:left-[-10px] before:h-full before:w-[5px] before:bg-white">
+            Expenses
+          </li>
+          <li className="cursor-pointer text-[20px] font-bold text-gray-400 hover:text-white">
+            Wallet
+          </li>
+          <li className="cursor-pointer text-[20px] font-bold text-gray-400 hover:text-white">
+            Settings
+          </li>
         </ul>
       </nav>
     </div>

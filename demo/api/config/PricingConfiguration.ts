@@ -2,6 +2,12 @@ import { PricingContext } from 'pricing4ts/server';
 
 export class PricingConfiguration extends PricingContext{
 
+    private userPlan: string = "FREE";
+    private userContext: Record<string, boolean | string | number> = {
+        user: "test",
+        createdExpenses: 2,
+    }
+
     constructor() {
         super();
     }
@@ -13,12 +19,17 @@ export class PricingConfiguration extends PricingContext{
         return "secret";
     }
     getUserContext(): Record<string, boolean | string | number> {
-        return {
-            user: "test",
-            createdExpenses: 2,
-        }
+        return this.userContext;
     }
     getUserPlan(): string {
-        return "PREMIUM";
+        return this.userPlan;
+    }
+
+    setUserPlan(userPlan: string): void {
+        this.userPlan = userPlan;
+    }
+
+    setUserContext(userContext: Record<string, boolean | string | number>): void {
+        this.userContext = userContext;
     }
 }

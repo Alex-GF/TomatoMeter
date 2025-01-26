@@ -1,17 +1,23 @@
 import express from 'express';
-import { OpenFeature, ProviderEvents } from '@openfeature/server-sdk';
-import {PricingDrivenFeaturesProvider} from "../src/proxy/open-feature/provider/node/PricingDrivenFeaturesProvider";
+import { OpenFeature } from '@openfeature/server-sdk';
+import { NodePricingDrivenFeaturesProvider, PricingContextManager } from 'pricing4ts/server';
 import { PricingConfiguration } from './config/PricingConfiguration';
 import { hasFeatureMiddleware } from './middleware/has-feature-middleware';
 
 const app = express();
 const port = 3000;
 
-OpenFeature.setProvider(new PricingDrivenFeaturesProvider(new PricingConfiguration()));
+PricingContextManager.registerContext(new PricingConfiguration());
 
-app.get('/api/graph-data', 
-  hasFeatureMiddleware('expensesGraph'),
-  (req, res) => {
+OpenFeature.setProvider(new NodePricingDrivenFeaturesProvider(PricingContextManager.getContext()));
+
+app.use(express.json());
+
+app.get('/api/health-check', (req, res) => {
+  res.send('OK');
+});
+
+app.get('/api/graph-data', hasFeatureMiddleware('expensesGraph'), (req, res) => {
   const data = {
     monthlyData: [
       { month: 'Jan', value: 20 },
@@ -30,6 +36,25 @@ app.get('/api/graph-data',
   };
   res.json(data);
 });
+
+app.get('/api/plans', (req, res) => {
+  const context = PricingContextManager.getContext();
+  const plans = context.getPricing().plans;
+
+  res.json({plans: plans});
+});
+
+app
+  .route('/api/user/plan')
+  .get((req, res) => {
+    const context = PricingContextManager.getContext();
+    res.status(200).json({ userPlan: context.getUserPlan() });
+  })
+  .post((req, res) => {
+    const context = PricingContextManager.getContext() as PricingConfiguration;
+    context.setUserPlan(req.body.userPlan);
+    res.status(200).json({ userPlan: context.getUserPlan() });
+  });
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
