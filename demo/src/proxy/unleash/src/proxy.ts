@@ -1,6 +1,6 @@
 import { UnleashClient } from 'unleash-proxy-client';
 import { Pricing, retrievePricingFromYaml } from 'pricing4ts';
-import axios from 'axios';
+import axios, { AxiosRequestConfig, Method } from 'axios';
 //@ts-ignore
 import demoPricing from "../resources/pricing.yml";
 
@@ -55,8 +55,8 @@ export class UnleashClientManager {
 
     const features = Object.values(this.pricing.features);
 
-    let config = {
-      method: 'delete',
+    let config: AxiosRequestConfig = {
+      method: 'delete' as Method,
       maxBodyLength: Infinity,
       url: `http://localhost:4242/api/admin/projects/${this.UNLEASH_PROJECT_ID}/features/test`,
       headers: { 

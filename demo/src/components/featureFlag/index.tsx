@@ -1,19 +1,5 @@
-import { useFeatureToggling } from "../../hooks/useFeatureToggling";
-
-// export const FEATURES: Record<string, { value: boolean; usageLimits?: Record<string, number> }> = {
-//   expenses: {
-//     value: true,
-//     usageLimits: {
-//       maxExpenses: 5,
-//     },
-//   },
-//   expensesCategories: {
-//     value: true,
-//   },
-//   expensesGraph: {
-//     value: true,
-//   },
-// };
+import { useContext } from 'react';
+import { FeatureTogglingContext } from '../../contexts/featureFlagContext';
 
 export default function FeatureFlag({
   featureName,
@@ -23,7 +9,7 @@ export default function FeatureFlag({
   children: React.ReactNode;
 }) {
 
-  const {isFeatureEnabled} = useFeatureToggling();
+  const {isFeatureEnabled} = useContext(FeatureTogglingContext)!;
 
   const isEnabled = isFeatureEnabled(featureName);
 
