@@ -10,7 +10,7 @@ import { initializeAdHoc } from '../../proxy/ad-hoc/src/proxy';
 import { withDevCycleProvider } from "@devcycle/react-client-sdk";
 import { DevCycleClientManager } from '../../proxy/devcycle/src/proxy';
 import { OpenFeatureProvider } from '@openfeature/react-sdk';
-import { initializeOpenFeature } from '../../proxy/open-feature/src/proxy';
+import { OpenFeatureClientManager } from '../../proxy/open-feature/src/proxy';
 
 export const FeatureTogglingContext = createContext<FeatureTogglingContextType | undefined>(
   undefined
@@ -44,7 +44,7 @@ function FeatureTogglingProvider ({
         client = await DevCycleClientManager.initializeDevCycle();
         break;
       case 'openFeatureProvider':
-        client = initializeOpenFeature();
+        client = OpenFeatureClientManager.initializeOpenFeature();
         break;
       default:
         throw new Error(`Library ${libraryName} is not supported`);
