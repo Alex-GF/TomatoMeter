@@ -61,7 +61,8 @@ export class UnleashClientManager {
       url: `http://localhost:4242/api/admin/projects/${this.UNLEASH_PROJECT_ID}/features/test`,
       headers: { 
         'Authorization': `*:*.e0fe9eccbbb170dd18a787653b7af2dd38a75ee16ced1b0fc99d58b5`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': '*/*'
       }
     };
 
