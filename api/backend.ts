@@ -1,5 +1,5 @@
 import express from 'express';
-import { NodePricingDrivenFeaturesProvider, PricingContextManager } from 'pricing4ts/server';
+import { PricingContextManager } from 'pricing4ts/server';
 import { PricingConfiguration } from './config/PricingConfiguration';
 
 const app: express.Server = express();

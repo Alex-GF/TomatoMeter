@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
-import Sidebar from '../../components/demoSidebar';
-import Header from '../../components/demoHeader';
-import Graph from '../../components/demoGraph';
-import ExpenseList from '../../components/demoExpensesList';
+import Sidebar from '../../components/sidebar';
+import Header from '../../components/header';
+import Graph from '../../components/graph';
+import ExpenseList from '../../components/expensesList';
 import expensesData from '../../data/expenses.json';
 import { ExpenseItemProps } from '../../types';
 import FeatureFlag from '../../components/featureFlag';

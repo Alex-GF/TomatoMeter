@@ -1,4 +1,4 @@
-import ExpenseItem from '../demoExpenseItem';
+import ExpenseItem from '../expenseItem';
 import { ExpenseItemProps } from '../../types';
 import { useState } from 'react';
 
