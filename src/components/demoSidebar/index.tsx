@@ -1,10 +1,8 @@
 import { useEffect } from 'react';
-import { OpenFeatureClientManager } from '../../proxy/open-feature/src/proxy';
 
 const Sidebar = ({currentPlan, setCurrentPlan}: {currentPlan: string | undefined, setCurrentPlan: Function}) => {
   const updatePlan = (newPlan: string) => {
     setCurrentPlan([newPlan]);
-    OpenFeatureClientManager.setSubscription([newPlan]);
   };
 
   const handleSubscriptionChange = (newPlan: string) => {

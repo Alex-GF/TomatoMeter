@@ -3,9 +3,6 @@ import { FaCreditCard } from 'react-icons/fa';
 import { ExpenseItemProps } from '../../types';
 import { generateExpense } from '../../utils/generators/expensesGenerator';
 import FeatureFlag from '../featureFlag';
-import { OpenFeatureClientManager } from '../../proxy/open-feature/src/proxy';
-import { useContext } from 'react';
-import { FeatureTogglingContext } from '../../contexts/featureFlagContext';
 
 const Header = ({
   monthlyExpenses,
@@ -15,20 +12,11 @@ const Header = ({
   setMonthlyExpenses: Function;
 }) => {
 
-  const {currentLibrary} = useContext(FeatureTogglingContext)!;
-
   function addMonthlyExpense() {
     setMonthlyExpenses([
       generateExpense(),
       ...monthlyExpenses,
     ]);
-
-    if (currentLibrary === 'openFeatureProvider') {
-      OpenFeatureClientManager.setUserContext({
-        ...OpenFeatureClientManager.userContext,
-        createdExpenses: OpenFeatureClientManager.userContext.createdExpenses + 1,
-      })
-    }
   }
 
   return (

@@ -1,15 +1,11 @@
 import express from 'express';
-import { OpenFeature } from '@openfeature/server-sdk';
 import { NodePricingDrivenFeaturesProvider, PricingContextManager } from 'pricing4ts/server';
 import { PricingConfiguration } from './config/PricingConfiguration';
-import { hasFeatureMiddleware } from './middleware/has-feature-middleware';
 
-const app = express();
+const app: express.Server = express();
 const port = 3000;
 
 PricingContextManager.registerContext(new PricingConfiguration());
-
-OpenFeature.setProvider(new NodePricingDrivenFeaturesProvider(PricingContextManager.getContext()));
 
 app.use(express.json());
 
@@ -17,7 +13,7 @@ app.get('/api/health-check', (req, res) => {
   res.send('OK');
 });
 
-app.get('/api/graph-data', hasFeatureMiddleware('expensesGraph'), (req, res) => {
+app.get('/api/graph-data', (req, res) => {
   const data = {
     monthlyData: [
       { month: 'Jan', value: 20 },

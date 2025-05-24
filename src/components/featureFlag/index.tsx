@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import { FeatureTogglingContext } from '../../contexts/featureFlagContext';
 
 export default function FeatureFlag({
   featureName,
@@ -9,7 +8,9 @@ export default function FeatureFlag({
   children: React.ReactNode;
 }) {
 
-  const {isFeatureEnabled} = useContext(FeatureTogglingContext)!;
+  function isFeatureEnabled(feature: string): boolean {
+    return true;
+  }
 
   const isEnabled = isFeatureEnabled(featureName);
 
