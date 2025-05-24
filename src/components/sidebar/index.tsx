@@ -1,16 +1,7 @@
 import { useEffect } from 'react';
-import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
-import ExpensesPage from '../../pages/expenses';
+import { SIDEBAR_ITEMS } from '../../apps/demo';
 
 const Sidebar = ({currentPlan, setCurrentPlan, selectedPage, setSelectedPage}: {currentPlan: string | undefined, setCurrentPlan: Function, selectedPage: string, setSelectedPage: Function}) => {
-  
-  const SIDEBAR_ITEMS = [
-    { name: 'Pomodoro Timer', component: <PomodoroTimer/> },
-    { name: 'Daily Summary', component: <div>Daily Summary</div> },
-    { name: 'Weekly Productivity', component: <ExpensesPage/> },
-    { name: 'Pricing', component: <div>Pricing</div> },
-    { name: 'Settings', component: <div>Settings</div> },
-  ]
   
   const updatePlan = (newPlan: string) => {
     setCurrentPlan([newPlan]);

@@ -2,15 +2,17 @@ import { useState } from 'react';
 import ExpensesPage from '../../pages/expenses';
 import Sidebar from '../../components/sidebar';
 import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
+import WeeklyProductivity from '../../pages/weekly-productivity/weekly-productivity';
+
+export const SIDEBAR_ITEMS = [
+  { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
+  { name: 'Daily Summary', component: <ExpensesPage /> },
+  { name: 'Weekly Productivity', component: <WeeklyProductivity/> },
+  { name: 'Pricing', component: <div>Pricing</div> },
+  { name: 'Settings', component: <div>Settings</div> },
+];
 
 export function DemoApp() {
-  const SIDEBAR_ITEMS = [
-    { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
-    { name: 'Daily Summary', component: <div>Daily Summary</div> },
-    { name: 'Weekly Productivity', component: <ExpensesPage /> },
-    { name: 'Pricing', component: <div>Pricing</div> },
-    { name: 'Settings', component: <div>Settings</div> },
-  ];
 
   const [currentSubscription, setCurrentSubscription] = useState<string[]>(['FREE']);
   const [selectedPage, setSelectedPage] = useState<string>('Pomodoro Timer');
@@ -26,7 +28,7 @@ export function DemoApp() {
             selectedPage={selectedPage}
           />
           <div className="my-6 mr-6 flex flex-grow flex-col overflow-hidden rounded-[25px]">
-            <div className={`flex h-full w-full items-center justify-center bg-white ${selectedPage === "Pomodoro Timer" ? "" : "p-6"}`}>
+            <div className={`flex h-full w-full items-center justify-center bg-white`}>
               <div className="w-full h-full overflow-y-auto">
                 {SIDEBAR_ITEMS.find(item => item.name === selectedPage)!.component}
               </div>
