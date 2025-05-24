@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const Graph = ({currentPlan}: {currentPlan: string}) => {
+const Graph = () => {
 
   const [monthlyData, setMonthlyData] = useState([]);
 
@@ -10,7 +10,7 @@ const Graph = ({currentPlan}: {currentPlan: string}) => {
     }).catch(error => {
       console.error('Error:', error);
     });
-  }, [currentPlan]);
+  }, []);
 
   return (
     <div className="flex items-end justify-between p-6 shadow-md rounded-lg border-demo-secondary border-2">

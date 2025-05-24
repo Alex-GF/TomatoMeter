@@ -37,7 +37,7 @@ app.get('/api/plans', (req, res) => {
   const context = PricingContextManager.getContext();
   const plans = context.getPricing().plans;
 
-  res.json({plans: plans});
+  res.json({ plans: plans });
 });
 
 app
@@ -51,6 +51,29 @@ app
     context.setUserPlan(req.body.userPlan);
     res.status(200).json({ userPlan: context.getUserPlan() });
   });
+
+// Simulated DB for pomodoro sessions and productivity
+const pomodoroSessions: Map<string, number[]> = new Map(); // userId -> [durations]
+const productivityScores: Map<string, number[]> = new Map(); // userId -> [scores]
+
+// Save pomodoro session duration
+app.post('/api/pomodoro/session', (req, res) => {
+  // For demo, use a static userId
+  const userId = 'demo-user';
+  const { duration } = req.body;
+  if (!pomodoroSessions.has(userId)) pomodoroSessions.set(userId, []);
+  pomodoroSessions.get(userId)!.push(duration);
+  res.status(200).json({ success: true });
+});
+
+// Save productivity score
+app.post('/api/pomodoro/productivity', (req, res) => {
+  const userId = 'demo-user';
+  const { score } = req.body;
+  if (!productivityScores.has(userId)) productivityScores.set(userId, []);
+  productivityScores.get(userId)!.push(score);
+  res.status(200).json({ success: true });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

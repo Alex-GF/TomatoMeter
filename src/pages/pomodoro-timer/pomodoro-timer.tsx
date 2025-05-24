@@ -1,0 +1,152 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const POMODORO_DURATION = 25 * 60; // 25 minutes
+
+const PomodoroTimer = () => {
+  const [secondsLeft, setSecondsLeft] = useState(POMODORO_DURATION);
+  const [isRunning, setIsRunning] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [productivity, setProductivity] = useState<number | null>(null);
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+
+  const startTimer = () => {
+    if (isRunning) return;
+    setIsRunning(true);
+    const id = setInterval(() => {
+      setSecondsLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(id);
+          setIsRunning(false);
+          setShowModal(true);
+          handleSaveSession(POMODORO_DURATION);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    setIntervalId(id);
+  };
+
+  const stopTimer = () => {
+    if (intervalId) clearInterval(intervalId);
+    setIsRunning(false);
+    handleSaveSession(POMODORO_DURATION - secondsLeft);
+    setShowModal(true);
+  };
+
+  const resetTimer = () => {
+    if (intervalId) clearInterval(intervalId);
+    setSecondsLeft(POMODORO_DURATION);
+    setIsRunning(false);
+  };
+
+  const handleSaveSession = async (duration: number) => {
+    await fetch('/api/pomodoro/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ duration }),
+    });
+  };
+
+  const handleProductivitySubmit = async (score: number) => {
+    setProductivity(score);
+    setShowModal(false);
+    await fetch('/api/pomodoro/productivity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ score }),
+    });
+    resetTimer();
+  };
+
+  const minutes = Math.floor(secondsLeft / 60).toString().padStart(2, '0');
+  const seconds = (secondsLeft % 60).toString().padStart(2, '0');
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-br from-purple-600 to-blue-500">
+      <motion.div
+        className="flex flex-col items-center"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 200 }}
+      >
+        <motion.div
+          className="relative flex items-center justify-center w-64 h-64 rounded-full bg-white shadow-2xl mb-8"
+          animate={{ boxShadow: isRunning ? '0 0 60px 10px #a78bfa' : '0 0 30px 5px #818cf8' }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.span
+            className="text-6xl font-extrabold text-purple-700 select-none"
+            key={secondsLeft}
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.3 }}
+          >
+            {minutes}:{seconds}
+          </motion.span>
+        </motion.div>
+        <div className="flex gap-4">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            className="px-6 py-2 rounded-lg bg-purple-600 text-white font-bold shadow-lg hover:bg-purple-700 transition"
+            onClick={startTimer}
+            disabled={isRunning}
+          >
+            Start
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            className="px-6 py-2 rounded-lg bg-red-500 text-white font-bold shadow-lg hover:bg-red-600 transition"
+            onClick={stopTimer}
+            disabled={!isRunning}
+          >
+            Stop
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            className="px-6 py-2 rounded-lg bg-gray-400 text-white font-bold shadow-lg hover:bg-gray-500 transition"
+            onClick={resetTimer}
+          >
+            Reset
+          </motion.button>
+        </div>
+      </motion.div>
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white rounded-xl p-8 flex flex-col items-center shadow-2xl"
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.7, opacity: 0 }}
+            >
+              <h2 className="text-2xl font-bold mb-4 text-purple-700">How productive was your session?</h2>
+              <div className="flex gap-3 mb-4">
+                {[1, 2, 3, 4, 5].map(score => (
+                  <motion.button
+                    key={score}
+                    whileTap={{ scale: 1.2 }}
+                    className={`w-12 h-12 rounded-full text-xl font-bold border-2 border-purple-400 ${productivity === score ? 'bg-purple-500 text-white' : 'bg-white text-purple-700'} transition`}
+                    onClick={() => handleProductivitySubmit(score)}
+                  >
+                    {score}
+                  </motion.button>
+                ))}
+              </div>
+              <p className="text-gray-600">1 = Not productive, 5 = Very productive</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default PomodoroTimer;

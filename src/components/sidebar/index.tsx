@@ -1,6 +1,17 @@
 import { useEffect } from 'react';
+import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
+import ExpensesPage from '../../pages/expenses';
 
-const Sidebar = ({currentPlan, setCurrentPlan}: {currentPlan: string | undefined, setCurrentPlan: Function}) => {
+const Sidebar = ({currentPlan, setCurrentPlan, selectedPage, setSelectedPage}: {currentPlan: string | undefined, setCurrentPlan: Function, selectedPage: string, setSelectedPage: Function}) => {
+  
+  const SIDEBAR_ITEMS = [
+    { name: 'Pomodoro Timer', component: <PomodoroTimer/> },
+    { name: 'Daily Summary', component: <div>Daily Summary</div> },
+    { name: 'Weekly Productivity', component: <ExpensesPage/> },
+    { name: 'Pricing', component: <div>Pricing</div> },
+    { name: 'Settings', component: <div>Settings</div> },
+  ]
+  
   const updatePlan = (newPlan: string) => {
     setCurrentPlan([newPlan]);
   };
@@ -41,21 +52,17 @@ const Sidebar = ({currentPlan, setCurrentPlan}: {currentPlan: string | undefined
       <div className="h-[0.05rem] w-40 bg-gray-400"></div>
       <nav className="mt-6 w-full flex-grow">
         <ul className="ml-4 space-y-4">
-          <li className="cursor-pointer text-[20px] font-bold text-gray-400 hover:text-white">
-            Dashboard
-          </li>
-          <li className="cursor-pointer text-[20px] font-bold text-gray-400 hover:text-white">
-            Summary
-          </li>
-          <li className="relative pl-2 text-[20px] font-bold text-white before:absolute before:left-[-10px] before:h-full before:w-[5px] before:bg-white">
-            Expenses
-          </li>
-          <li className="cursor-pointer text-[20px] font-bold text-gray-400 hover:text-white">
-            Wallet
-          </li>
-          <li className="cursor-pointer text-[20px] font-bold text-gray-400 hover:text-white">
-            Settings
-          </li>
+          {
+            SIDEBAR_ITEMS.map((item) => (
+              <li
+                key={item.name}
+                className={`${selectedPage === item.name ? 'relative pl-2 text-[20px] font-bold text-white before:absolute before:left-[-10px] before:h-full before:w-[5px] before:bg-white' : 'cursor-pointer text-[20px] font-bold text-gray-400 hover:text-white'}`}
+                onClick={() => setSelectedPage(item.name)}
+              >
+                {item.name}
+              </li>
+            ))
+          }
         </ul>
       </nav>
     </div>
