@@ -104,7 +104,7 @@ const DailySummary = () => {
 
   return (
     <div ref={containerRef} className="h-full w-full overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 p-8 flex flex-col gap-8">
-      <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-3xl font-bold text-purple-700 mb-4 text-center">
+      <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-4xl font-bold text-purple-700 mb-4 text-center">
         Daily Pomodoro Summary
       </motion.h1>
       {loading ? (
@@ -123,10 +123,10 @@ const DailySummary = () => {
               className="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-4"
             >
               <div className="flex items-center gap-4 mb-2">
-                <span className="text-lg font-bold text-purple-600">
+                <span className="text-2xl font-bold text-purple-600">
                   {isToday(parseISO(day)) ? 'Today' : isYesterday(parseISO(day)) ? 'Yesterday' : format(parseISO(day), 'EEEE, MMM d')}
                 </span>
-                <span className="text-xs text-gray-400">{sessionsByDay[day].length} pomodoros</span>
+                <span className="text-lg text-gray-400">({sessionsByDay[day].length} pomodoros)</span>
               </div>
               <div className="flex flex-wrap gap-4">
                 {sessionsByDay[day].map((session, i) => (

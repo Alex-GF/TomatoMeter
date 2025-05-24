@@ -88,7 +88,7 @@ const WeeklyProductivity = () => {
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex flex-col items-center justify-between gap-6 rounded-2xl bg-white p-8 shadow-xl md:flex-row"
+        className="flex flex-col items-center justify-between gap-6 rounded-2xl bg-white p-8 shadow-xl md:flex-row w-full"
       >
         <div className="flex flex-1 flex-col items-center">
           <span className="mb-8 text-3xl font-bold text-purple-700">TomatoMeter</span>
@@ -115,13 +115,13 @@ const WeeklyProductivity = () => {
         </div>
       </motion.div>
 
-      <section className="flex flex-col gap-6 md:flex-row">
+      <section className="flex flex-col gap-6 md:flex-row w-full justify-center">
         {/* Daily Study Time Bar Chart */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="rounded-2xl bg-white p-6 shadow-lg"
+          className="rounded-2xl bg-white p-6 shadow-lg flex-grow"
         >
           <span className="text-xl text-center font-bold text-purple-700">Average daily study time (min)</span>
           <div className="mt-6 flex h-48 items-end gap-4">
@@ -152,7 +152,7 @@ const WeeklyProductivity = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="rounded-2xl bg-white p-6 shadow-lg"
+          className="rounded-2xl bg-white p-6 shadow-lg flex-grow"
         >
           <span className="text-xl text-center font-bold text-blue-700">Average daily productivity</span>
           <div className="mt-6 flex h-48 items-end gap-4">
@@ -186,7 +186,7 @@ const WeeklyProductivity = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9 }}
-        className="flex flex-col items-center rounded-2xl bg-white p-6 shadow-lg"
+        className="flex flex-col items-center rounded-2xl bg-white p-6 shadow-lg w-full"
       >
         <span className="mb-2 text-xl font-bold text-pink-700">Pomodoros completed this week</span>
         <span className="text-4xl font-extrabold text-pink-500">{completedPomodoros}</span>
