@@ -117,6 +117,18 @@ app.get('/api/pomodoro/weekly', (req, res) => {
   });
 });
 
+// Daily summary endpoint
+app.get('/api/pomodoro/daily', (req, res) => {
+  const userId = 'demo-user';
+  const sessions = (pomodoroSessions.get(userId) || []).filter(s => s.productivity > 0);
+  // Only return sessions from the last 30 days, sorted descending
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now);
+  thirtyDaysAgo.setDate(now.getDate() - 29);
+  const filtered = sessions.filter(s => new Date(s.date) >= thirtyDaysAgo);
+  res.json({ sessions: filtered.sort((a, b) => b.date.localeCompare(a.date)) });
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

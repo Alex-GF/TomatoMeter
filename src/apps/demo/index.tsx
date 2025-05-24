@@ -3,10 +3,11 @@ import ExpensesPage from '../../pages/expenses';
 import Sidebar from '../../components/sidebar';
 import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
 import WeeklyProductivity from '../../pages/weekly-productivity/weekly-productivity';
+import DailySummary from '../../pages/daily-summary/daily-summary';
 
 export const SIDEBAR_ITEMS = [
   { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
-  { name: 'Daily Summary', component: <ExpensesPage /> },
+  { name: 'Daily Summary', component: <DailySummary /> },
   { name: 'Weekly Productivity', component: <WeeklyProductivity/> },
   { name: 'Pricing', component: <div>Pricing</div> },
   { name: 'Settings', component: <div>Settings</div> },
