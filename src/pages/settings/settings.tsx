@@ -45,7 +45,7 @@ const settingsOptions = [
   {
     name: 'Advanced productivity analytics',
     description: 'Unlock detailed productivity charts and export options.',
-    premium: true,
+    premium: false,
   },
   {
     name: 'Motivational quotes',
