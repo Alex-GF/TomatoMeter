@@ -35,7 +35,7 @@ const settingsOptions = [
   {
     name: 'Dark mode',
     description: 'Switch the interface to a dark color scheme.',
-    premium: false,
+    premium: true,
   },
   {
     name: 'Custom pomodoro duration',
@@ -45,7 +45,7 @@ const settingsOptions = [
   {
     name: 'Motivational quotes',
     description: 'Show a motivational quote at the start of each pomodoro.',
-    premium: false,
+    premium: true,
   },
 ];
 
@@ -162,7 +162,7 @@ const Settings = () => {
           whileTap={{ scale: 0.95 }}
           className="mt-2 rounded-lg bg-yellow-400 dark:bg-yellow-600 px-6 py-2 font-bold text-yellow-900 dark:text-yellow-100 shadow hover:bg-yellow-300 dark:hover:bg-yellow-500 transition"
         >
-          Upgrade to Premium
+          Upgrade Plan
         </motion.button>
       </motion.div>
     </div>
