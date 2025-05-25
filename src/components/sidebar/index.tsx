@@ -30,7 +30,7 @@ const Sidebar = ({ selectedPage, setSelectedPage }: { selectedPage: string, setS
   }).filter(Boolean) as [string, number][];
 
   return (
-    <div className="flex h-full w-64 flex-col items-center bg-gray-900 px-4 py-10 text-white">
+    <div className="flex h-full min-w-72 flex-col items-center bg-gray-900 px-4 py-10 text-white">
       <div className="mb-8 text-center">
         <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-white text-black">
           <span className="text-[40px] font-bold">U</span>
