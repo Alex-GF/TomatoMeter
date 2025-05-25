@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SettingsContext, useMotivationalQuotes } from '../settings/settings';
+import notificationSound from '../../static/sounds/notification.mp3';
 
 const PomodoroTimer = () => {
   const { toggles } = useContext(SettingsContext);
@@ -14,6 +15,15 @@ const PomodoroTimer = () => {
   const [productivity, setProductivity] = useState<number | null>(null);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
 
+  const enableSound = toggles['Enable sound notifications'];
+
+  const playSound = () => {
+    if (enableSound) {
+      const audio = new Audio(notificationSound);
+      audio.play();
+    }
+  };
+
   const startTimer = () => {
     if (isRunning) return;
     setIsRunning(true);
@@ -24,6 +34,7 @@ const PomodoroTimer = () => {
           setIsRunning(false);
           setShowModal(true);
           handleSaveSession(customDuration * 60);
+          playSound(); // Play sound when pomodoro ends
           return 0;
         }
         return prev - 1;
@@ -37,6 +48,7 @@ const PomodoroTimer = () => {
     setIsRunning(false);
     handleSaveSession(customDuration * 60 - secondsLeft);
     setShowModal(true);
+    playSound(); // Play sound when pomodoro is stopped
   };
 
   const resetTimer = () => {
