@@ -35,17 +35,17 @@ const settingsOptions = [
   {
     name: 'Dark mode',
     description: 'Switch the interface to a dark color scheme.',
-    premium: true,
+    premium: false,
   },
   {
     name: 'Custom pomodoro duration',
     description: 'Set your own pomodoro and break durations.',
-    premium: true,
+    premium: false,
   },
   {
     name: 'Motivational quotes',
     description: 'Show a motivational quote at the start of each pomodoro.',
-    premium: true,
+    premium: false,
   },
 ];
 
