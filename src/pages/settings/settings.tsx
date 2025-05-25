@@ -43,11 +43,6 @@ const settingsOptions = [
     premium: true,
   },
   {
-    name: 'Advanced productivity analytics',
-    description: 'Unlock detailed productivity charts and export options.',
-    premium: false,
-  },
-  {
     name: 'Motivational quotes',
     description: 'Show a motivational quote at the start of each pomodoro.',
     premium: false,
@@ -58,7 +53,6 @@ export type SettingsToggle = {
   'Enable sound notifications': boolean;
   'Dark mode': boolean;
   'Custom pomodoro duration': boolean;
-  'Advanced productivity analytics': boolean;
   'Motivational quotes': boolean;
 };
 
@@ -67,7 +61,6 @@ export const SettingsContext = createContext<{ toggles: SettingsToggle; setToggl
     'Enable sound notifications': true,
     'Dark mode': false,
     'Custom pomodoro duration': false,
-    'Advanced productivity analytics': false,
     'Motivational quotes': true,
   },
   setToggles: () => {},

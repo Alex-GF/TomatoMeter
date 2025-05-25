@@ -8,7 +8,6 @@ export default function App() {
     'Enable sound notifications': true,
     'Dark mode': false,
     'Custom pomodoro duration': false,
-    'Advanced productivity analytics': false,
     'Motivational quotes': true,
   });
 
