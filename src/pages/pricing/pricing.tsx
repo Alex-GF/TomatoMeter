@@ -1,16 +1,17 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { SubscriptionContext } from '../../contexts/subscriptionContext';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
 const FEATURES = [
   'Pomodoro timer',
   'Sound notifications',
+  'Basic analytics',
   'Motivational Quotes',
   'Daily summary',
-  'Basic analytics',
-  'Advanced analytics',
   'Dark mode',
   'Custom pomodoro duration',
+  'Advanced analytics',
   'Export data to JSON',
 ];
 
@@ -19,7 +20,7 @@ const PLANS = [
     name: 'FREE',
     price: '0€',
     period: '/month',
-    features: [0, 1, 4],
+    features: [0, 1, 2],
     timerLimit: 3,
     description: 'Perfect to get started',
   },
@@ -27,7 +28,7 @@ const PLANS = [
     name: 'ADVANCED',
     price: '3.99€',
     period: '/month',
-    features: [0, 1, 2, 3, 4, 6],
+    features: [0, 1, 2, 3, 4, 5],
     timerLimit: 10,
     description: 'For regular study sessions',
   },
@@ -59,6 +60,12 @@ const ADDONS = [
     multiple: false,
   },
 ];
+
+const PLAN_COLORS = {
+  FREE: 'from-purple-400 to-purple-600',
+  ADVANCED: 'from-blue-400 to-blue-600',
+  PREMIUM: 'from-green-400 to-green-600',
+};
 
 const Pricing = () => {
   const subscription = useContext(SubscriptionContext);
@@ -117,6 +124,80 @@ const Pricing = () => {
     });
   };
 
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  // Tabla comparativa de features vs. planes
+  const featureTable = (
+    <div ref={tableRef} className="mb-10">
+      <table className="min-w-[600px] w-full border-separate border-spacing-y-2">
+        <thead>
+          <tr>
+            <th className="text-left text-lg font-bold text-purple-700 dark:text-yellow-300 px-4 py-2 bg-transparent">Feature</th>
+            {PLANS.map((plan) => (
+              <th
+                key={plan.name}
+                className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${PLAN_COLORS[plan.name as keyof typeof PLAN_COLORS] || PLAN_COLORS.FREE} text-white shadow`}
+              >
+                {plan.name}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {FEATURES.map((feature, fIdx) => (
+            <motion.tr
+              key={feature}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 + fIdx * 0.04 }}
+              className="bg-white dark:bg-gray-900/80 hover:bg-purple-50 dark:hover:bg-gray-800/80 transition"
+            >
+              <td className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-4 border-purple-200 dark:border-yellow-300">
+                {feature}
+              </td>
+              {PLANS.map((plan) => {
+                // Si la feature es Pomodoro timer, mostrar el límite
+                if (feature === 'Pomodoro timer' && plan.features.includes(fIdx)) {
+                  return (
+                    <td key={plan.name} className="text-center px-6 py-2">
+                      <span className="inline-block rounded-full bg-gradient-to-r from-green-400 to-green-600 dark:from-yellow-400 dark:to-yellow-600 px-3 py-1 text-xs font-bold text-white shadow animate-pulse">
+                        {plan.timerLimit} / day
+                      </span>
+                    </td>
+                  );
+                }
+                // Si la feature está incluida
+                if (plan.features.includes(fIdx)) {
+                  return (
+                    <td key={plan.name} className="text-center px-6 py-2">
+                      <FaCheckCircle className="mx-auto text-green-500 dark:text-yellow-300 animate-pop" size={20} />
+                    </td>
+                  );
+                }
+                // Si no está incluida
+                if (feature === 'Export data to JSON' && plan.name === 'PREMIUM') {
+                  return (
+                    <td key={plan.name} className="text-center px-6 py-2">
+                      <span className="text-sm text-gray-500 dark:text-gray-300">
+                        Add-on
+                      </span>
+                    </td>
+                  );
+                }
+
+                return (  
+                  <td key={plan.name} className="text-center px-6 py-2">
+                    <FaTimesCircle className="mx-auto text-gray-300 dark:text-gray-600" size={20} />
+                  </td>
+                );
+              })}
+            </motion.tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
     <div className="h-full w-full overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-8 flex flex-col gap-8 transition-colors duration-500">
       <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-3xl font-bold text-purple-700 dark:text-yellow-300 mb-8 text-center">
@@ -170,7 +251,7 @@ const Pricing = () => {
                   max={10}
                   value={addons[addon.name] || 0}
                   onChange={e => handleAddonChange(addon.name, Math.max(0, Math.min(10, parseInt(e.target.value) || 0)))}
-                  className="w-16 rounded-lg border border-purple-300 dark:border-yellow-400 px-2 py-1 text-center text-lg font-bold text-purple-700 dark:text-yellow-200 focus:border-purple-500 focus:outline-none transition"
+                  className="w-16 rounded-lg border dark:bg-gray-900 border-purple-300 dark:border-yellow-400 px-2 py-1 text-center text-lg font-bold text-purple-700 dark:text-yellow-200 focus:border-purple-500 focus:outline-none transition"
                 />
               </div>
             ) : (
@@ -186,6 +267,10 @@ const Pricing = () => {
           </motion.div>
         ))}
       </div>
+      <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }} className="text-xl font-bold text-purple-700 dark:text-yellow-300 mt-8 mb-2 text-center">
+        Feature Comparison
+      </motion.h2>
+      {featureTable}
     </div>
   );
 };
