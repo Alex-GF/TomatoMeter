@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SettingsContext, useMotivationalQuotes } from '../settings/settings';
 
 const POMODORO_DURATION = 25 * 60; // 25 minutes
 
 const PomodoroTimer = () => {
+  const { toggles } = useContext(SettingsContext);
+  const showQuote = toggles['Motivational quotes'];
+  const quote = useMotivationalQuotes(showQuote);
   const [secondsLeft, setSecondsLeft] = useState(POMODORO_DURATION);
   const [isRunning, setIsRunning] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -65,6 +69,19 @@ const PomodoroTimer = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-br from-purple-600 to-blue-500">
+      {showQuote && quote && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.6, type: 'spring' }}
+          className="mb-8 flex items-center justify-center"
+        >
+          <span className="rounded-xl bg-gradient-to-r from-purple-400 to-blue-400 px-6 py-3 text-lg font-semibold text-white shadow-lg animate-pulse">
+            {quote}
+          </span>
+        </motion.div>
+      )}
       <motion.div
         className="flex flex-col items-center"
         initial={{ scale: 0.8, opacity: 0 }}
