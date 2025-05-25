@@ -75,26 +75,41 @@ export const SettingsContext = createContext<{ toggles: SettingsToggle; setToggl
 
 const Settings = () => {
   const { toggles, setToggles } = useContext(SettingsContext);
+  const [customDuration, setCustomDuration] = useState<number>(25);
 
   const handleToggle = (name: keyof SettingsToggle) => {
     setToggles(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
+  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = parseInt(e.target.value, 10);
+    if (isNaN(value) || value < 5) value = 5;
+    if (value > 60) value = 60;
+    setCustomDuration(value);
+    localStorage.setItem('customPomodoroDuration', value.toString());
+  };
+
+  useEffect(() => {
+    // Load from localStorage on mount
+    const stored = localStorage.getItem('customPomodoroDuration');
+    if (stored) setCustomDuration(parseInt(stored, 10));
+  }, []);
+
   return (
-    <SettingsContext.Provider value={{ toggles, setToggles }}>
-      <div className="h-full w-full overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 p-8 flex flex-col gap-8 min-w-[420px] max-w-full">
-        <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-3xl font-bold text-purple-700 mb-4 text-center">
-          Settings
-        </motion.h1>
-        <div className="flex flex-col gap-6">
-          {settingsOptions.map((option, idx) => (
-            <motion.div
-              key={option.name}
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.08, duration: 0.5, type: 'spring' }}
-              className={`flex items-center justify-between rounded-2xl bg-white p-6 shadow-lg border-2 ${option.premium ? 'border-yellow-400' : 'border-transparent'}`}
-            >
+    <div className="h-full w-full overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 p-8 flex flex-col gap-8 min-w-[420px] max-w-full">
+      <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-3xl font-bold text-purple-700 mb-4 text-center">
+        Settings
+      </motion.h1>
+      <div className="flex flex-col gap-6">
+        {settingsOptions.map((option, idx) => (
+          <motion.div
+            key={option.name}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: idx * 0.08, duration: 0.5, type: 'spring' }}
+            className={`flex flex-col gap-2 rounded-2xl bg-white p-6 shadow-lg border-2 ${option.premium ? 'border-yellow-400' : 'border-transparent'}`}
+          >
+            <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <span className="text-lg font-bold text-gray-800 flex items-center gap-2">
                   {option.name}
@@ -117,26 +132,47 @@ const Settings = () => {
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 />
               </motion.button>
-            </motion.div>
-          ))}
-        </div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="mt-8 flex flex-col items-center gap-2"
-        >
-          <span className="text-xs text-gray-400">Some features are only available for premium users.</span>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="mt-2 rounded-lg bg-yellow-400 px-6 py-2 font-bold text-yellow-900 shadow hover:bg-yellow-300 transition"
-          >
-            Upgrade to Premium
-          </motion.button>
-        </motion.div>
+            </div>
+            {option.name === 'Custom pomodoro duration' && toggles['Custom pomodoro duration'] && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.4, type: 'spring' }}
+                className="mt-4 flex items-center gap-3"
+              >
+                <label htmlFor="pomodoro-duration" className="text-sm font-semibold text-purple-700">Pomodoro duration:</label>
+                <input
+                  id="pomodoro-duration"
+                  type="number"
+                  min={5}
+                  max={60}
+                  value={customDuration}
+                  onChange={handleDurationChange}
+                  className="w-20 rounded-lg border border-purple-300 px-2 py-1 text-center text-lg font-bold text-purple-700 focus:border-purple-500 focus:outline-none transition"
+                />
+                <span className="text-sm text-gray-500">minutes (5-60)</span>
+              </motion.div>
+            )}
+          </motion.div>
+        ))}
       </div>
-    </SettingsContext.Provider>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
+        className="mt-8 flex flex-col items-center gap-2"
+      >
+        <span className="text-xs text-gray-400">Some features are only available for premium users.</span>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="mt-2 rounded-lg bg-yellow-400 px-6 py-2 font-bold text-yellow-900 shadow hover:bg-yellow-300 transition"
+        >
+          Upgrade to Premium
+        </motion.button>
+      </motion.div>
+    </div>
   );
 };
 

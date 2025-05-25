@@ -1,14 +1,14 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SettingsContext, useMotivationalQuotes } from '../settings/settings';
-
-const POMODORO_DURATION = 25 * 60; // 25 minutes
 
 const PomodoroTimer = () => {
   const { toggles } = useContext(SettingsContext);
   const showQuote = toggles['Motivational quotes'];
   const quote = useMotivationalQuotes(showQuote);
-  const [secondsLeft, setSecondsLeft] = useState(POMODORO_DURATION);
+  const customPomodoroEnabled = toggles['Custom pomodoro duration'];
+  const customDuration = customPomodoroEnabled ? parseInt(localStorage.getItem('customPomodoroDuration') || '25', 10) : 25;
+  const [secondsLeft, setSecondsLeft] = useState(customDuration * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [productivity, setProductivity] = useState<number | null>(null);
@@ -23,7 +23,7 @@ const PomodoroTimer = () => {
           clearInterval(id);
           setIsRunning(false);
           setShowModal(true);
-          handleSaveSession(POMODORO_DURATION);
+          handleSaveSession(customDuration * 60);
           return 0;
         }
         return prev - 1;
@@ -35,13 +35,13 @@ const PomodoroTimer = () => {
   const stopTimer = () => {
     if (intervalId) clearInterval(intervalId);
     setIsRunning(false);
-    handleSaveSession(POMODORO_DURATION - secondsLeft);
+    handleSaveSession(customDuration * 60 - secondsLeft);
     setShowModal(true);
   };
 
   const resetTimer = () => {
     if (intervalId) clearInterval(intervalId);
-    setSecondsLeft(POMODORO_DURATION);
+    setSecondsLeft(customDuration * 60);
     setIsRunning(false);
   };
 
@@ -63,6 +63,10 @@ const PomodoroTimer = () => {
     });
     resetTimer();
   };
+
+  useEffect(() => {
+    setSecondsLeft(customDuration * 60);
+  }, [customDuration]);
 
   const minutes = Math.floor(secondsLeft / 60).toString().padStart(2, '0');
   const seconds = (secondsLeft % 60).toString().padStart(2, '0');
