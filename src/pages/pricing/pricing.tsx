@@ -136,7 +136,8 @@ const Pricing = () => {
             {PLANS.map((plan) => (
               <th
                 key={plan.name}
-                className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${PLAN_COLORS[plan.name as keyof typeof PLAN_COLORS] || PLAN_COLORS.FREE} text-white shadow`}
+                className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${PLAN_COLORS[plan.name as keyof typeof PLAN_COLORS] || PLAN_COLORS.FREE} text-white shadow min-w-[200px] w-[200px]`}
+                style={{ width: 160 }}
               >
                 {plan.name}
               </th>
@@ -159,7 +160,7 @@ const Pricing = () => {
                 // Si la feature es Pomodoro timer, mostrar el límite
                 if (feature === 'Pomodoro timer' && plan.features.includes(fIdx)) {
                   return (
-                    <td key={plan.name} className="text-center px-6 py-2">
+                    <td key={plan.name} className="text-center px-6 py-2 min-w-[200px] w-[200px]" style={{ width: 160 }}>
                       <span className="inline-block rounded-full bg-gradient-to-r from-green-400 to-green-600 dark:from-yellow-400 dark:to-yellow-600 px-3 py-1 text-xs font-bold text-white shadow animate-pulse">
                         {plan.timerLimit} / day
                       </span>
@@ -169,7 +170,7 @@ const Pricing = () => {
                 // Si la feature está incluida
                 if (plan.features.includes(fIdx)) {
                   return (
-                    <td key={plan.name} className="text-center px-6 py-2">
+                    <td key={plan.name} className="text-center px-6 py-2 min-w-[200px] w-[200px]" style={{ width: 160 }}>
                       <FaCheckCircle className="mx-auto text-green-500 dark:text-yellow-300 animate-pop" size={20} />
                     </td>
                   );
@@ -177,7 +178,7 @@ const Pricing = () => {
                 // Si no está incluida
                 if (feature === 'Export data to JSON' && plan.name === 'PREMIUM') {
                   return (
-                    <td key={plan.name} className="text-center px-6 py-2">
+                    <td key={plan.name} className="text-center px-6 py-2 min-w-[200px] w-[200px]" style={{ width: 160 }}>
                       <span className="text-sm text-gray-500 dark:text-gray-300">
                         Add-on
                       </span>
@@ -186,13 +187,30 @@ const Pricing = () => {
                 }
 
                 return (  
-                  <td key={plan.name} className="text-center px-6 py-2">
+                  <td key={plan.name} className="text-center px-6 py-2 min-w-[200px] w-[200px]" style={{ width: 160 }}>
                     <FaTimesCircle className="mx-auto text-gray-300 dark:text-gray-600" size={20} />
                   </td>
                 );
               })}
             </motion.tr>
           ))}
+          {/* Fila de botones de selección de plan */}
+          <tr>
+            <td></td>
+            {PLANS.map((plan, idx) => (
+              <td key={plan.name} className="text-center py-4">
+                <motion.button
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => handlePlanChange(plan.name)}
+                  className={`w-full px-4 py-2 font-bold shadow transition text-white text-base bg-gradient-to-r ${PLAN_COLORS[plan.name as keyof typeof PLAN_COLORS]}`}
+                  aria-label={`Select ${plan.name} plan`}
+                >
+                  {selectedPlan === plan.name ? 'Current Plan' : `Select ${plan.name}`}
+                </motion.button>
+              </td>
+            ))}
+          </tr>
         </tbody>
       </table>
     </div>
