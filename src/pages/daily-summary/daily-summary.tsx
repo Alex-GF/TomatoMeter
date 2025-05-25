@@ -103,8 +103,8 @@ const DailySummary = () => {
   }, [sortedDays, allLoaded, loading, isFetchingMore]);
 
   return (
-    <div ref={containerRef} className="h-full w-full overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 p-8 flex flex-col gap-8">
-      <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-4xl font-bold text-purple-700 mb-4 text-center">
+    <div ref={containerRef} className="h-full w-full overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-8 flex flex-col gap-8 min-w-[420px] max-w-full transition-colors duration-500">
+      <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-3xl font-bold text-purple-700 dark:text-yellow-300 mb-4 text-center">
         Daily Pomodoro Summary
       </motion.h1>
       {loading ? (
@@ -120,26 +120,38 @@ const DailySummary = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 30 }}
               transition={{ delay: idx * 0.05, duration: 0.5, type: 'spring' }}
-              className="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-4"
+              className="bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-lg p-6 flex flex-col gap-4 border border-gray-200 dark:border-gray-700 transition-colors duration-500"
             >
               <div className="flex items-center gap-4 mb-2">
-                <span className="text-2xl font-bold text-purple-600">
+                <span className="text-2xl font-bold text-purple-600 dark:text-yellow-300">
                   {isToday(parseISO(day)) ? 'Today' : isYesterday(parseISO(day)) ? 'Yesterday' : format(parseISO(day), 'EEEE, MMM d')}
                 </span>
-                <span className="text-lg text-gray-400">({sessionsByDay[day].length} pomodoros)</span>
+                <span className="text-lg text-gray-400 dark:text-gray-300">({sessionsByDay[day].length} pomodoros)</span>
               </div>
               <div className="flex flex-wrap gap-4">
-                {sessionsByDay[day].map((session, i) => (
-                  <motion.div
-                    key={i}
-                    whileHover={{ scale: 1.05 }}
-                    className={`flex flex-col items-center justify-center rounded-xl px-4 py-3 shadow transition-all ${productivityColors[session.productivity-1]}`}
-                  >
-                    <span className="text-lg font-bold text-white drop-shadow">{Math.round(session.duration/60)} min</span>
-                    <span className="text-xs text-white/80">{productivityLabels[session.productivity-1]}</span>
-                    <span className="text-xs text-white/60 mt-1">{format(parseISO(session.date), 'HH:mm')}</span>
-                  </motion.div>
-                ))}
+                {sessionsByDay[day].map((session, i) => {
+                  // Productivity color for dark mode
+                  const darkColors = [
+                    'bg-red-700',
+                    'bg-orange-700',
+                    'bg-yellow-700',
+                    'bg-blue-700',
+                    'bg-green-700',
+                  ];
+                  const baseColor = productivityColors[session.productivity-1];
+                  const darkColor = darkColors[session.productivity-1];
+                  return (
+                    <motion.div
+                      key={i}
+                      whileHover={{ scale: 1.05 }}
+                      className={`flex flex-col items-center justify-center rounded-xl px-4 py-3 shadow transition-all ${baseColor} dark:${darkColor}`}
+                    >
+                      <span className="text-lg font-bold text-white drop-shadow">{Math.round(session.duration/60)} min</span>
+                      <span className="text-xs text-white/80">{productivityLabels[session.productivity-1]}</span>
+                      <span className="text-xs text-white/60 mt-1">{format(parseISO(session.date), 'HH:mm')}</span>
+                    </motion.div>
+                  );
+                })}
               </div>
             </motion.div>
           ))}

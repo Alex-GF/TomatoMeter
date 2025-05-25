@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DemoApp } from './apps/demo';
 import { SubscriptionProvider } from './contexts/subscriptionContext';
 import { SettingsContext, SettingsToggle } from './pages/settings/settings';
@@ -11,6 +11,15 @@ export default function App() {
     'Advanced productivity analytics': false,
     'Motivational quotes': true,
   });
+
+  useEffect(() => {
+    if (toggles['Dark mode']) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [toggles['Dark mode']]);
+
   return (
     <SettingsContext.Provider value={{ toggles, setToggles }}>
       <SubscriptionProvider>

@@ -82,16 +82,16 @@ const WeeklyProductivity = () => {
   const completedPomodoros = stats.sessions.filter(s => s.duration === 1500).length;
 
   return (
-    <div className="flex h-full w-full flex-col justify-center gap-8 overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 p-8">
+    <div className="flex h-full w-full flex-col justify-center gap-8 overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-8 transition-colors duration-500">
       {/* TomatoMeter */}
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex flex-col items-center justify-between gap-6 rounded-2xl bg-white p-8 shadow-xl md:flex-row w-full"
+        className="flex flex-col items-center justify-between gap-6 rounded-2xl bg-white dark:bg-gray-900 p-8 shadow-xl md:flex-row transition-colors duration-500"
       >
         <div className="flex flex-1 flex-col items-center">
-          <span className="mb-8 text-3xl font-bold text-purple-700">TomatoMeter</span>
+          <span className="mb-8 text-3xl font-bold text-purple-700 dark:text-yellow-300">TomatoMeter</span>
           <motion.div
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
@@ -99,17 +99,17 @@ const WeeklyProductivity = () => {
             className="flex items-center gap-6"
           >
             <div className="flex flex-col items-center">
-              <span className="text-5xl font-extrabold text-green-500">
+              <span className="text-5xl font-extrabold text-green-500 dark:text-yellow-200">
                 {Math.round(stats.tomatoMeter.efficiency * 100)}%
               </span>
-              <span className="font-semibold text-gray-500">Efficiency</span>
+              <span className="font-semibold text-gray-500 dark:text-gray-300">Efficiency</span>
             </div>
             <div className="h-16 w-1 rounded-full bg-gray-200" />
             <div className="flex flex-col items-center">
-              <span className="text-5xl font-extrabold text-blue-500">
+              <span className="text-5xl font-extrabold text-blue-500 dark:text-yellow-200">
                 {formatMinutesToDuration(stats.tomatoMeter.productiveTime)}
               </span>
-              <span className="font-semibold text-gray-500">Real productive time</span>
+              <span className="font-semibold text-gray-500 dark:text-gray-300">Real productive time</span>
             </div>
           </motion.div>
         </div>
@@ -121,9 +121,9 @@ const WeeklyProductivity = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="rounded-2xl bg-white p-6 shadow-lg flex-grow"
+          className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-lg transition-colors duration-500"
         >
-          <span className="text-xl text-center font-bold text-purple-700">Average daily study time (min)</span>
+          <span className="text-xl text-center font-bold text-purple-700 dark:text-yellow-300">Average daily study time (min)</span>
           <div className="mt-6 flex h-48 items-end gap-4">
             {normalizedStudy.map((norm, i) => (
               <motion.div
@@ -135,13 +135,13 @@ const WeeklyProductivity = () => {
                 className="flex flex-1 flex-col items-center justify-end"
               >
                 <motion.div
-                  className="w-8 rounded-t-lg bg-purple-400"
+                  className="w-8 rounded-t-lg bg-purple-400 dark:bg-yellow-400"
                   style={{ minHeight: 8 }}
                   animate={{ height: Math.max(norm * 180, 8) }}
                   transition={{ type: 'spring', stiffness: 120 }}
                 />
-                <span className="mt-2 text-sm text-gray-600">{weekDays[i]}</span>
-                <span className="text-xs text-gray-400">{(stats.dailyStudy[i]/60).toFixed(1)}h</span>
+                <span className="mt-2 text-sm text-gray-600 dark:text-gray-200">{weekDays[i]}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-300">{(stats.dailyStudy[i]/60).toFixed(1)}h</span>
               </motion.div>
             ))}
           </div>
@@ -152,9 +152,9 @@ const WeeklyProductivity = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="rounded-2xl bg-white p-6 shadow-lg flex-grow"
+          className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-lg transition-colors duration-500"
         >
-          <span className="text-xl text-center font-bold text-blue-700">Average daily productivity</span>
+          <span className="text-xl text-center font-bold text-blue-700 dark:text-yellow-300">Average daily productivity</span>
           <div className="mt-6 flex h-48 items-end gap-4">
             {normalizedProductivity.map((norm, i) => (
               <motion.div
@@ -166,13 +166,13 @@ const WeeklyProductivity = () => {
                 className="flex flex-1 flex-col items-center justify-end"
               >
                 <motion.div
-                  className="w-8 rounded-t-lg bg-blue-400"
+                  className="w-8 rounded-t-lg bg-blue-400 dark:bg-yellow-400"
                   style={{ minHeight: 8 }}
                   animate={{ height: Math.max(norm * 180, 8) }}
                   transition={{ type: 'spring', stiffness: 120 }}
                 />
-                <span className="mt-2 text-sm text-gray-600">{weekDays[i]}</span>
-                <span className="text-xs text-gray-400">
+                <span className="mt-2 text-sm text-gray-600 dark:text-gray-200">{weekDays[i]}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-300">
                   {stats.dailyProductivity[i].toFixed(2)}
                 </span>
               </motion.div>
@@ -186,10 +186,10 @@ const WeeklyProductivity = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9 }}
-        className="flex flex-col items-center rounded-2xl bg-white p-6 shadow-lg w-full"
+        className="flex flex-col items-center rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-lg transition-colors duration-500"
       >
-        <span className="mb-2 text-xl font-bold text-pink-700">Pomodoros completed this week</span>
-        <span className="text-4xl font-extrabold text-pink-500">{completedPomodoros}</span>
+        <span className="mb-2 text-xl font-bold text-pink-700 dark:text-yellow-300">Pomodoros completed this week</span>
+        <span className="text-4xl font-extrabold text-pink-500 dark:text-yellow-200">{completedPomodoros}</span>
       </motion.div>
     </div>
   );

@@ -72,7 +72,7 @@ const PomodoroTimer = () => {
   const seconds = (secondsLeft % 60).toString().padStart(2, '0');
 
   return (
-    <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-br from-purple-600 to-blue-500">
+    <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-br from-purple-600 to-blue-500 dark:from-gray-900 dark:to-gray-800 transition-colors duration-500">
       {showQuote && quote && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -93,12 +93,12 @@ const PomodoroTimer = () => {
         transition={{ type: 'spring', stiffness: 200 }}
       >
         <motion.div
-          className="relative flex items-center justify-center w-64 h-64 rounded-full bg-white shadow-2xl mb-8"
+          className="relative flex items-center justify-center w-64 h-64 rounded-full bg-white dark:bg-gray-900 shadow-2xl mb-8 transition-colors duration-500"
           animate={{ boxShadow: isRunning ? '0 0 60px 10px #a78bfa' : '0 0 30px 5px #818cf8' }}
           transition={{ duration: 0.5 }}
         >
           <motion.span
-            className="text-6xl font-extrabold text-purple-700 select-none"
+            className="text-6xl font-extrabold text-purple-700 dark:text-yellow-200 select-none"
             key={secondsLeft}
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -111,7 +111,7 @@ const PomodoroTimer = () => {
         <div className="flex gap-4">
           <motion.button
             whileTap={{ scale: 0.9 }}
-            className="px-6 py-2 rounded-lg bg-purple-600 text-white font-bold shadow-lg hover:bg-purple-700 transition"
+            className="px-6 py-2 rounded-lg bg-purple-600 dark:bg-yellow-400 text-white dark:text-yellow-900 font-bold shadow-lg hover:bg-purple-700 dark:hover:bg-yellow-500 transition"
             onClick={startTimer}
             disabled={isRunning}
           >
@@ -119,7 +119,7 @@ const PomodoroTimer = () => {
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.9 }}
-            className="px-6 py-2 rounded-lg bg-red-500 text-white font-bold shadow-lg hover:bg-red-600 transition"
+            className="px-6 py-2 rounded-lg bg-red-500 dark:bg-yellow-600 text-white dark:text-yellow-100 font-bold shadow-lg hover:bg-red-600 dark:hover:bg-yellow-700 transition"
             onClick={stopTimer}
             disabled={!isRunning}
           >
@@ -127,7 +127,7 @@ const PomodoroTimer = () => {
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.9 }}
-            className="px-6 py-2 rounded-lg bg-gray-400 text-white font-bold shadow-lg hover:bg-gray-500 transition"
+            className="px-6 py-2 rounded-lg bg-gray-400 dark:bg-gray-700 text-white dark:text-yellow-200 font-bold shadow-lg hover:bg-gray-500 dark:hover:bg-gray-600 transition"
             onClick={resetTimer}
           >
             Reset
@@ -137,31 +137,31 @@ const PomodoroTimer = () => {
       <AnimatePresence>
         {showModal && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50"
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 dark:bg-opacity-80 z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-xl p-8 flex flex-col items-center shadow-2xl"
+              className="bg-white dark:bg-gray-900 rounded-xl p-8 flex flex-col items-center shadow-2xl transition-colors duration-500"
               initial={{ scale: 0.7, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.7, opacity: 0 }}
             >
-              <h2 className="text-2xl font-bold mb-4 text-purple-700">How productive was your session?</h2>
+              <h2 className="text-2xl font-bold mb-4 text-purple-700 dark:text-yellow-300">How productive was your session?</h2>
               <div className="flex gap-3 mb-4">
                 {[1, 2, 3, 4, 5].map(score => (
                   <motion.button
                     key={score}
                     whileTap={{ scale: 1.2 }}
-                    className={`w-12 h-12 rounded-full text-xl font-bold border-2 border-purple-400 ${productivity === score ? 'bg-purple-500 text-white' : 'bg-white text-purple-700'} transition`}
+                    className={`w-12 h-12 rounded-full text-xl font-bold border-2 border-purple-400 dark:border-yellow-400 ${productivity === score ? 'bg-purple-500 text-white dark:bg-yellow-400 dark:text-yellow-900' : 'bg-white text-purple-700 dark:bg-gray-800 dark:text-yellow-200'} transition`}
                     onClick={() => handleProductivitySubmit(score)}
                   >
                     {score}
                   </motion.button>
                 ))}
               </div>
-              <p className="text-gray-600">1 = Not productive, 5 = Very productive</p>
+              <p className="text-gray-600 dark:text-gray-300">1 = Not productive, 5 = Very productive</p>
             </motion.div>
           </motion.div>
         )}
