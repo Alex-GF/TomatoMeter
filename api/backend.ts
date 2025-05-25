@@ -99,7 +99,7 @@ app.get('/api/pomodoro/weekly', (req, res) => {
     const prods = sessions.filter(s => s.date.slice(0, 10) === day).map(s => s.productivity);
     return prods.length ? prods.reduce((a, b) => a + b, 0) / prods.length : 0;
   });
-  // TomatoMeter
+  // TomatoScore
   let totalTime = 0, productiveTime = 0;
   sessions.forEach(s => {
     totalTime += s.duration;
@@ -109,7 +109,7 @@ app.get('/api/pomodoro/weekly', (req, res) => {
   res.json({
     dailyStudy,
     dailyProductivity,
-    tomatoMeter: {
+    TomatoScore: {
       efficiency,
       productiveTime: Math.round(productiveTime / 60), // minutes
     },

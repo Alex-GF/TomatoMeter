@@ -12,7 +12,7 @@ interface Session {
 interface WeeklyStats {
   dailyStudy: number[]; // minutes per day
   dailyProductivity: number[]; // 1-5 per day
-  tomatoMeter: {
+  TomatoScore: {
     efficiency: number; // 0-1
     productiveTime: number; // minutes
   };
@@ -106,7 +106,7 @@ const WeeklyProductivity = () => {
 
   return (
     <div className="flex h-full w-full flex-col justify-center gap-8 overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 p-8 transition-colors duration-500 dark:from-gray-900 dark:to-gray-800">
-      {/* TomatoMeter */}
+      {/* TomatoScore */}
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,7 +115,7 @@ const WeeklyProductivity = () => {
       >
         <div className="flex flex-1 flex-col items-center">
           <span className="mb-8 text-3xl font-bold text-purple-700 dark:text-yellow-300">
-            TomatoMeter
+            Tomato Score
           </span>
           <motion.div
             initial={{ scale: 0.8 }}
@@ -125,14 +125,14 @@ const WeeklyProductivity = () => {
           >
             <div className="flex flex-col items-center">
               <span className="text-5xl font-extrabold text-green-500 dark:text-yellow-200">
-                {Math.round(stats.tomatoMeter.efficiency * 100)}%
+                {Math.round(stats.TomatoScore.efficiency * 100)}%
               </span>
               <span className="font-semibold text-gray-500 dark:text-gray-300">Efficiency</span>
             </div>
             <div className="h-16 w-1 rounded-full bg-gray-200" />
             <div className="flex flex-col items-center">
               <span className="text-5xl font-extrabold text-blue-500 dark:text-yellow-200">
-                {formatMinutesToDuration(stats.tomatoMeter.productiveTime)}
+                {formatMinutesToDuration(stats.TomatoScore.productiveTime)}
               </span>
               <span className="font-semibold text-gray-500 dark:text-gray-300">
                 Real productive time
