@@ -5,17 +5,17 @@ import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
 import WeeklyProductivity from '../../pages/weekly-productivity/weekly-productivity';
 import DailySummary from '../../pages/daily-summary/daily-summary';
 import Settings, { SettingsContext } from '../../pages/settings/settings';
+import Pricing from '../../pages/pricing/pricing';
 
 export const SIDEBAR_ITEMS = [
   { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
   { name: 'Daily Summary', component: <DailySummary /> },
   { name: 'Weekly Productivity', component: <WeeklyProductivity/> },
-  { name: 'Pricing', component: <div>Pricing</div> },
+  { name: 'Pricing', component: <Pricing /> },
   { name: 'Settings', component: <Settings /> },
 ];
 
 export function DemoApp() {
-  const [currentSubscription, setCurrentSubscription] = useState<string[]>(['FREE']);
   const [selectedPage, setSelectedPage] = useState<string>('Pomodoro Timer');
   const { toggles, setToggles } = useContext(SettingsContext);
 
@@ -25,8 +25,6 @@ export function DemoApp() {
         <div className="h-[75vh] w-[75vw] max-w-[1500px] overflow-hidden rounded-[25px] bg-white shadow-lg">
           <div className="flex h-full bg-demo-primary">
             <Sidebar
-              setCurrentPlan={setCurrentSubscription}
-              currentPlan={currentSubscription[0]}
               setSelectedPage={setSelectedPage}
               selectedPage={selectedPage}
             />
