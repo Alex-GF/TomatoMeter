@@ -8,13 +8,13 @@ import { usePage } from '../../contexts/pageContext';
 const PLAN_ICONS: Record<string, JSX.Element> = {
   PREMIUM: <FaCrown className="inline-block text-yellow-300 mr-2 animate-bounce" size={22} />,
   ADVANCED: <FaGem className="inline-block text-blue-300 mr-2 animate-pulse" size={20} />,
-  FREE: <FaRegStar className="inline-block text-gray-200 mr-2" size={20} />,
+  BASIC: <FaRegStar className="inline-block text-gray-200 mr-2" size={20} />,
 };
 
 const PLAN_COLORS: Record<string, string> = {
   PREMIUM: 'from-yellow-400 to-yellow-600',
   ADVANCED: 'from-blue-400 to-blue-600',
-  FREE: 'from-gray-400 to-gray-600',
+  BASIC: 'from-gray-400 to-gray-600',
 };
 
 const Sidebar = () => {
@@ -24,7 +24,7 @@ const Sidebar = () => {
   const { selectedPage, setSelectedPage } = usePage();
 
   // Parse currentSubscription to extract plan and addons
-  const planName = currentSubscription[0] || 'FREE';
+  const planName = currentSubscription[0] || 'BASIC';
   const activeAddons = currentSubscription
     .slice(1)
     .map(str => {
@@ -46,12 +46,12 @@ const Sidebar = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 120, damping: 12 }}
           className={`mt-4 rounded-2xl p-0.5 bg-gradient-to-r ${
-            PLAN_COLORS[planName] || PLAN_COLORS['FREE']
+            PLAN_COLORS[planName] || PLAN_COLORS['BASIC']
           } shadow-xl`}
         >
           <div className="flex flex-col items-center rounded-2xl bg-gray-900/90 px-5 py-4 min-w-[180px]">
             <div className="flex items-center gap-2 mb-1">
-              {PLAN_ICONS[planName] || PLAN_ICONS['FREE']}
+              {PLAN_ICONS[planName] || PLAN_ICONS['BASIC']}
               <span className="text-lg font-bold tracking-wide uppercase">{planName} Plan</span>
             </div>
             <AnimatePresence>
@@ -91,7 +91,7 @@ const Sidebar = () => {
             >
               {planName === 'PREMIUM' && 'You have access to all features!'}
               {planName === 'ADVANCED' && 'Most features unlocked. Upgrade for more.'}
-              {planName === 'FREE' && 'Basic features enabled. Upgrade for more!'}
+              {planName === 'BASIC' && 'Basic features enabled. Upgrade for more!'}
             </motion.div>
           </div>
         </motion.div>

@@ -18,7 +18,7 @@ const FEATURES = [
 
 const PLANS = [
   {
-    name: 'FREE',
+    name: 'BASIC',
     price: '0€',
     period: '/month',
     features: [0, 1, 2],
@@ -63,7 +63,7 @@ const ADDONS = [
 ];
 
 const PLAN_COLORS = {
-  FREE: 'from-purple-400 to-purple-600',
+  BASIC: 'from-purple-400 to-purple-600',
   ADVANCED: 'from-blue-400 to-blue-600',
   PREMIUM: 'from-green-400 to-green-600',
 };
@@ -76,7 +76,7 @@ const Pricing = () => {
   // Parse currentSubscription to extract plan and addons
   // Convention: [plan, ...addonNameXn] e.g. ['PREMIUM', 'Extra timersX2', 'Export as JSONX1']
   const parseSubscription = (subArr: string[]) => {
-    const plan = subArr[0] || 'FREE';
+    const plan = subArr[0] || 'BASIC';
     const addons: { [key: string]: number } = {};
     for (let i = 1; i < subArr.length; i++) {
       const match = subArr[i].match(/(.+)X(\d+)/);
@@ -129,7 +129,7 @@ const Pricing = () => {
             {PLANS.map((plan) => (
               <th
                 key={plan.name}
-                className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${PLAN_COLORS[plan.name as keyof typeof PLAN_COLORS] || PLAN_COLORS.FREE} text-white shadow min-w-[200px] w-[200px]`}
+                className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${PLAN_COLORS[plan.name as keyof typeof PLAN_COLORS] || PLAN_COLORS.BASIC} text-white shadow min-w-[200px] w-[200px]`}
                 style={{ width: 160 }}
               >
                 {plan.name}
