@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Default, feature, Feature, Loading, On } from 'pricing4react';
+import { Default, feature, Feature, On } from 'pricing4react';
 import SettingsOption from '../../components/settings-option';
 import { usePage } from '../../contexts/pageContext';
 

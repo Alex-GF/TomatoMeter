@@ -92,17 +92,19 @@ const Pricing = () => {
   const [addons, setAddons] = useState<{ [key: string]: number }>({ ...initialAddons });
 
   const handlePlanChange = async (plan: string) => {
+    
+    const newAddons = { ...addons };
+    if (plan !== 'PREMIUM') newAddons['Export as JSON'] = 0;
+
     setSelectedPlan(plan);
-    setAddons(prev => {
-      const newAddons = { ...prev };
-      if (plan !== 'PREMIUM') newAddons['Export as JSON'] = 0;
+    setAddons(() => {
       // Update context
       setCurrentSubscription(toSubscriptionArr(plan, newAddons));
       return newAddons;
     });
-    setCurrentSubscription(toSubscriptionArr(plan, addons));
+    setCurrentSubscription(toSubscriptionArr(plan, newAddons));
 
-    await updateContract(plan, addons);
+    await updateContract(plan, newAddons);
   };
 
   const handleAddonChange = async (addon: string, value: number) => {
