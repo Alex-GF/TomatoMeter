@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
+import axios from '../../lib/axios';
 
 interface Session {
   duration: number; // seconds
@@ -13,8 +14,8 @@ interface DailyStats {
 }
 
 const fetchDailyStats = async (): Promise<DailyStats> => {
-  const res = await fetch('/api/pomodoro/daily');
-  return res.json();
+  const res = await axios.get('/pomodoro/daily');
+  return res.data;
 };
 
 const productivityColors = [

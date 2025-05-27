@@ -1540,6 +1540,10 @@ video {
   text-transform: uppercase;
 }
 
+.lowercase {
+  text-transform: lowercase;
+}
+
 .tracking-wide {
   letter-spacing: 0.025em;
 }

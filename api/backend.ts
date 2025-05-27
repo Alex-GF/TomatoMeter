@@ -5,6 +5,7 @@ import pomodoroRoutes from './routes/pomodoro';
 import contractsRoutes from './routes/contract';
 import featureChecker from './middlewares/featureChecker';
 import { configureSpaceClient } from './utils/configurators';
+import cors from 'cors';
 
 const app: express.Server = express();
 const port = 3000;
@@ -12,6 +13,12 @@ const port = 3000;
 configureSpaceClient();
 
 app.use(express.json());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  exposedHeaders: ['Pricing-Token'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Pricing-Token'],
+}));
 
 app.use(featureChecker);
 
