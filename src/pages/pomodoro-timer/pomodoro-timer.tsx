@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SettingsContext } from '../../contexts/settingsContext';
 import { useMotivationalQuotes } from '../settings/settings';
 import notificationSound from '../../static/sounds/notification.mp3';
-import { feature, Feature, On } from 'pricing4react';
+import { Default, feature, Feature, On, ErrorFallback } from 'pricing4react';
 import axios from '../../lib/axios';
+import { usePage } from '../../contexts/pageContext';
 
 const PomodoroTimer = () => {
   const { toggles } = useContext(SettingsContext);
@@ -19,6 +20,8 @@ const PomodoroTimer = () => {
   const [showModal, setShowModal] = useState(false);
   const [productivity, setProductivity] = useState<number | null>(null);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+
+  const {setSelectedPage} = usePage();
 
   const enableSound = toggles['Enable sound notifications'];
 
@@ -63,17 +66,25 @@ const PomodoroTimer = () => {
   };
 
   const handleSaveSession = async (duration: number) => {
-    await axios.post('/pomodoro/session', { duration }, {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    await axios.post(
+      '/pomodoro/session',
+      { duration },
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   };
 
   const handleProductivitySubmit = async (score: number) => {
     setProductivity(score);
     setShowModal(false);
-    await axios.post('/pomodoro/productivity', { score }, {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    await axios.post(
+      '/pomodoro/productivity',
+      { score },
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
     resetTimer();
   };
 
@@ -90,21 +101,19 @@ const PomodoroTimer = () => {
     <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-br from-purple-600 to-blue-500 dark:from-gray-900 dark:to-gray-800 transition-colors duration-500">
       <Feature expression={feature('tomatometer-motivationalQuotes')}>
         <On>
-          {
-            showQuote && quote && (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.6, type: 'spring' }}
-                className="mb-8 flex items-center justify-center"
-              >
-                <span className="rounded-xl bg-gradient-to-r from-purple-400 to-blue-400 px-6 py-3 text-lg font-semibold text-white shadow-lg animate-pulse">
-                  {quote}
-                </span>
-              </motion.div>
-            )
-          }
+          {showQuote && quote && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6, type: 'spring' }}
+              className="mb-8 flex items-center justify-center"
+            >
+              <span className="rounded-xl bg-gradient-to-r from-purple-400 to-blue-400 px-6 py-3 text-lg font-semibold text-white shadow-lg animate-pulse">
+                {quote}
+              </span>
+            </motion.div>
+          )}
         </On>
       </Feature>
 
@@ -130,31 +139,83 @@ const PomodoroTimer = () => {
             {minutes}:{seconds}
           </motion.span>
         </motion.div>
-        <div className="flex gap-4">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            className="px-6 py-2 rounded-lg bg-purple-600 dark:bg-yellow-400 text-white dark:text-yellow-900 font-bold shadow-lg hover:bg-purple-700 dark:hover:bg-yellow-500 transition"
-            onClick={startTimer}
-            disabled={isRunning}
-          >
-            Start
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            className="px-6 py-2 rounded-lg bg-red-500 dark:bg-yellow-600 text-white dark:text-yellow-100 font-bold shadow-lg hover:bg-red-600 dark:hover:bg-yellow-700 transition"
-            onClick={stopTimer}
-            disabled={!isRunning}
-          >
-            Stop
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            className="px-6 py-2 rounded-lg bg-gray-400 dark:bg-gray-700 text-white dark:text-yellow-200 font-bold shadow-lg hover:bg-gray-500 dark:hover:bg-gray-600 transition"
-            onClick={resetTimer}
-          >
-            Reset
-          </motion.button>
-        </div>
+        <Feature expression={feature('tomatometer-pomodoroTimer')}>
+          <On>
+            <div className="flex gap-4">
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                className="px-6 py-2 rounded-lg bg-purple-600 dark:bg-yellow-400 text-white dark:text-yellow-900 font-bold shadow-lg hover:bg-purple-700 dark:hover:bg-yellow-500 transition"
+                onClick={startTimer}
+                disabled={isRunning}
+              >
+                Start
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                className="px-6 py-2 rounded-lg bg-red-500 dark:bg-yellow-600 text-white dark:text-yellow-100 font-bold shadow-lg hover:bg-red-600 dark:hover:bg-yellow-700 transition"
+                onClick={stopTimer}
+                disabled={!isRunning}
+              >
+                Stop
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                className="px-6 py-2 rounded-lg bg-gray-400 dark:bg-gray-700 text-white dark:text-yellow-200 font-bold shadow-lg hover:bg-gray-500 dark:hover:bg-gray-600 transition"
+                onClick={resetTimer}
+              >
+                Reset
+              </motion.button>
+            </div>
+          </On>
+          <Default>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 40 }}
+              transition={{ duration: 0.5, type: 'spring' }}
+              className="flex flex-col items-center justify-center w-full p-8 bg-gradient-to-br from-yellow-100 to-purple-100 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-xl min-h-[220px]"
+            >
+              <motion.div
+                initial={{ scale: 0.7, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                className="mb-4"
+              >
+                <svg width="70" height="70" viewBox="0 0 24 24" fill="none" className="mx-auto">
+                  <circle cx="12" cy="12" r="10" fill="#fbbf24" className="dark:fill-yellow-400" />
+                  <path d="M8 12h8M12 8v8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </motion.div>
+              <motion.h2
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-2xl font-bold text-purple-700 dark:text-yellow-300 mb-2 text-center"
+              >
+                Daily Pomodoro Limit Reached
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-md text-gray-600 dark:text-gray-300 mb-6 text-center max-w-md"
+              >
+                You have reached your daily pomodoro limit for your current plan.<br />
+                Upgrade your subscription to unlock more sessions, or come back tomorrow for a fresh start!
+              </motion.p>
+              <motion.button
+                whileHover={{ scale: 1.07 }}
+                whileTap={{ scale: 0.96 }}
+                className="rounded-full bg-gradient-to-r from-purple-500 to-blue-700 dark:from-yellow-400 dark:to-yellow-600 px-8 py-3 text-lg font-bold text-white shadow-lg hover:from-purple-600 hover:to-blue-800 dark:hover:from-yellow-500 dark:hover:to-yellow-700 transition-all duration-300"
+                onClick={() => {
+                  setSelectedPage('Pricing');
+                }}
+              >
+                Upgrade Plan
+              </motion.button>
+            </motion.div>
+          </Default>
+        </Feature>
       </motion.div>
       <AnimatePresence>
         {showModal && (
