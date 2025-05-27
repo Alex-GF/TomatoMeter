@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SettingsContext, useMotivationalQuotes } from '../settings/settings';
+import { SettingsContext } from '../../contexts/settingsContext';
+import { useMotivationalQuotes } from '../settings/settings';
 import notificationSound from '../../static/sounds/notification.mp3';
 import { feature, Feature, On } from 'pricing4react';
 
@@ -92,17 +93,21 @@ const PomodoroTimer = () => {
     <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-br from-purple-600 to-blue-500 dark:from-gray-900 dark:to-gray-800 transition-colors duration-500">
       <Feature expression={feature('tomatometer-motivationalQuotes')}>
         <On>
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.6, type: 'spring' }}
-            className="mb-8 flex items-center justify-center"
-          >
-            <span className="rounded-xl bg-gradient-to-r from-purple-400 to-blue-400 px-6 py-3 text-lg font-semibold text-white shadow-lg animate-pulse">
-              {quote}
-            </span>
-          </motion.div>
+          {
+            showQuote && quote && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.6, type: 'spring' }}
+                className="mb-8 flex items-center justify-center"
+              >
+                <span className="rounded-xl bg-gradient-to-r from-purple-400 to-blue-400 px-6 py-3 text-lg font-semibold text-white shadow-lg animate-pulse">
+                  {quote}
+                </span>
+              </motion.div>
+            )
+          }
         </On>
       </Feature>
 

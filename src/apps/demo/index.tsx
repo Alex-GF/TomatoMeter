@@ -1,11 +1,12 @@
-import { useContext, useState } from 'react';
+import { useContext} from 'react';
 import Sidebar from '../../components/sidebar';
 import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
 import WeeklyProductivity from '../../pages/weekly-productivity/weekly-productivity';
-import Settings, { SettingsContext } from '../../pages/settings/settings';
+import { SettingsContext } from '../../contexts/settingsContext';
 import Pricing from '../../pages/pricing/pricing';
-import { PageProvider, usePage } from '../../contexts/pageContext';
+import { usePage } from '../../contexts/pageContext';
 import DailySummaryPage from '../../pages/daily-summary/daily-summary';
+import Settings from '../../pages/settings/settings';
 
 export const SIDEBAR_ITEMS = [
   { name: 'Pomodoro Timer', component: <PomodoroTimer /> },

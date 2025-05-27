@@ -18,27 +18,27 @@ export function configureSpaceClient() {
 async function spaceSynchronizationCallback() {
   console.log('Space client synchronized successfully');
 
-  const serviceExists = await container.spaceClient?.services.getService('TomatoMeter');
-  if (serviceExists) {
+  try {
+    await container.spaceClient?.services.getService('TomatoMeter');
+    
     console.log('TomatoMeter service and test user contract already exist, skipping creation');
-    return;
+  } catch (_) {
+    await container.spaceClient?.services.addService('./api/resources/TomatoMeter.yml');
+
+    await container.spaceClient?.contracts.addContract({
+      userContact: {
+        userId: testUserId,
+        username: 'Test User',
+      },
+      contractedServices: {
+        tomatometer: '1.0.0',
+      },
+      subscriptionPlans: {
+        tomatometer: 'BASIC',
+      },
+      subscriptionAddOns: {},
+    });
+
+    console.log('TomatoMeter service and test user contract created successfully');
   }
-
-  await container.spaceClient?.services.addService('./api/resources/TomatoMeter.yml');
-
-  await container.spaceClient?.contracts.addContract({
-    userContact: {
-      userId: testUserId,
-      username: 'Test User',
-    },
-    contractedServices: {
-      tomatometer: '1.0.0',
-    },
-    subscriptionPlans: {
-      tomatometer: 'BASIC',
-    },
-    subscriptionAddOns: {},
-  });
-
-  console.log('TomatoMeter service and test user contract created successfully');
 }

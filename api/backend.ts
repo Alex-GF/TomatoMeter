@@ -8,7 +8,7 @@ import { configureSpaceClient } from './utils/configurators';
 import cors from 'cors';
 
 const app: express.Server = express();
-const port = 3000;
+const port = 8080;
 
 configureSpaceClient();
 
