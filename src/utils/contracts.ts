@@ -15,8 +15,9 @@ export async function updateContract(plan: string, addons: Record<string, number
   });
 }
 
-export const toSubscriptionArr = (plan: string, addons: { [key: string]: number }) => {
+export const toSubscriptionArr = (plan: string, addons?: { [key: string]: number }) => {
     const arr = [plan];
+    if (!addons) return arr;
     Object.entries(addons).forEach(([name, v]) => {
       if (v > 0) arr.push(`${name}X${v}`);
     });
