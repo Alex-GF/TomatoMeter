@@ -808,6 +808,10 @@ video {
   width: 100%;
 }
 
+.min-w-72 {
+  min-width: 18rem;
+}
+
 .min-w-\[180px\] {
   min-width: 180px;
 }
@@ -830,10 +834,6 @@ video {
 
 .min-w-\[600px\] {
   min-width: 600px;
-}
-
-.min-w-72 {
-  min-width: 18rem;
 }
 
 .max-w-\[1500px\] {

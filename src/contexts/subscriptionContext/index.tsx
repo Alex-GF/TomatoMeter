@@ -24,9 +24,6 @@ export function SubscriptionProvider({
       const subscriptionPlan = response.data.contract.subscriptionPlans.tomatometer;
       const subscriptionAddons = response.data.contract.subscriptionAddOns.tomatometer;
 
-      console.log("Current subscription plan:", subscriptionPlan);
-      console.log("Current subscription addons:", subscriptionAddons);
-
       setCurrentSubscription(toSubscriptionArr(subscriptionPlan, subscriptionAddons));
     })
   }, []);
