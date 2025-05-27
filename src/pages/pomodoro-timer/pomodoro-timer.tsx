@@ -4,6 +4,7 @@ import { SettingsContext } from '../../contexts/settingsContext';
 import { useMotivationalQuotes } from '../settings/settings';
 import notificationSound from '../../static/sounds/notification.mp3';
 import { feature, Feature, On } from 'pricing4react';
+import axios from '../../lib/axios';
 
 const PomodoroTimer = () => {
   const { toggles } = useContext(SettingsContext);
@@ -62,20 +63,16 @@ const PomodoroTimer = () => {
   };
 
   const handleSaveSession = async (duration: number) => {
-    await fetch('/api/pomodoro/session', {
-      method: 'POST',
+    await axios.post('/pomodoro/session', { duration }, {
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ duration }),
     });
   };
 
   const handleProductivitySubmit = async (score: number) => {
     setProductivity(score);
     setShowModal(false);
-    await fetch('/api/pomodoro/productivity', {
-      method: 'POST',
+    await axios.post('/pomodoro/productivity', { score }, {
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ score }),
     });
     resetTimer();
   };

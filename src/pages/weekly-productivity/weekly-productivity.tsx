@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatDuration, intervalToDuration } from 'date-fns';
+import axios from '../../lib/axios';
+import { feature, Feature, On } from 'pricing4react';
 
 interface Session {
   duration: number; // seconds
@@ -19,8 +21,9 @@ interface WeeklyStats {
 }
 
 const fetchWeeklyStats = async (): Promise<WeeklyStats> => {
-  const res = await fetch('/api/pomodoro/weekly');
-  return res.json();
+  const res = await axios.get('/pomodoro/weekly');
+
+  return res.data;
 };
 
 const barVariants = {
@@ -105,187 +108,207 @@ const WeeklyProductivity = () => {
   return (
     <div className="flex h-full w-full flex-col justify-center gap-8 overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 p-8 transition-colors duration-500 dark:from-gray-900 dark:to-gray-800">
       {/* TomatoScore */}
-      <motion.div
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="flex flex-col items-center justify-between gap-6 rounded-2xl bg-white p-8 shadow-xl transition-colors duration-500 dark:bg-gray-900 md:flex-row"
-      >
-        <div className="flex flex-1 flex-col items-center">
-          <span className="mb-8 text-3xl font-bold text-purple-700 dark:text-yellow-300">
-            Tomato Score
-          </span>
+      <Feature expression={feature('tomatometer-basicAnalytics')}>
+        <On>
           <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200 }}
-            className="flex items-center gap-6"
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col items-center justify-between gap-6 rounded-2xl bg-white p-8 shadow-xl transition-colors duration-500 dark:bg-gray-900 md:flex-row"
           >
-            <div className="flex flex-col items-center">
-              <span className="text-5xl font-extrabold text-green-500 dark:text-yellow-200">
-                {Math.round(stats.TomatoScore.efficiency * 100)}%
+            <div className="flex flex-1 flex-col items-center">
+              <span className="mb-8 text-3xl font-bold text-purple-700 dark:text-yellow-300">
+                Tomato Score
               </span>
-              <span className="font-semibold text-gray-500 dark:text-gray-300">Efficiency</span>
-            </div>
-            <div className="h-16 w-1 rounded-full bg-gray-200" />
-            <div className="flex flex-col items-center">
-              <span className="text-5xl font-extrabold text-blue-500 dark:text-yellow-200">
-                {formatMinutesToDuration(stats.TomatoScore.productiveTime)}
-              </span>
-              <span className="font-semibold text-gray-500 dark:text-gray-300">
-                Real productive time
-              </span>
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200 }}
+                className="flex items-center gap-6"
+              >
+                <div className="flex flex-col items-center">
+                  <span className="text-5xl font-extrabold text-green-500 dark:text-yellow-200">
+                    {Math.round(stats.TomatoScore.efficiency * 100)}%
+                  </span>
+                  <span className="font-semibold text-gray-500 dark:text-gray-300">Efficiency</span>
+                </div>
+                <div className="h-16 w-1 rounded-full bg-gray-200" />
+                <div className="flex flex-col items-center">
+                  <span className="text-5xl font-extrabold text-blue-500 dark:text-yellow-200">
+                    {formatMinutesToDuration(stats.TomatoScore.productiveTime)}
+                  </span>
+                  <span className="font-semibold text-gray-500 dark:text-gray-300">
+                    Real productive time
+                  </span>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
-        </div>
-      </motion.div>
+        </On>
+      </Feature>
 
       {/* Advanced Analytics (Premium) */}
 
-      <>
-        <section className="flex w-full flex-col justify-center gap-6 md:flex-row">
-          {/* Average daily study time widget */}
+      <Feature expression={feature('tomatometer-advancedAnalytics')}>
+        <On>
+          <section className="flex w-full flex-col justify-center gap-6 md:flex-row">
+            {/* Average daily study time widget */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              className="rounded-2xl bg-white p-6 shadow-lg transition-colors duration-500 dark:bg-gray-900"
+            >
+              <span className="text-center text-xl font-bold text-purple-700 dark:text-yellow-300">
+                Average daily study time (min)
+              </span>
+              <div className="mt-6 flex h-48 items-end gap-4">
+                {normalizedStudy.map((norm, i) => (
+                  <motion.div
+                    key={i}
+                    custom={norm * 180}
+                    variants={barVariants}
+                    initial="initial"
+                    animate="animate"
+                    className="flex flex-1 flex-col items-center justify-end"
+                  >
+                    <motion.div
+                      className="w-8 rounded-t-lg bg-purple-400 dark:bg-yellow-400"
+                      style={{ minHeight: 8 }}
+                      animate={{ height: Math.max(norm * 180, 8) }}
+                      transition={{ type: 'spring', stiffness: 120 }}
+                    />
+                    <span className="mt-2 text-sm text-gray-600 dark:text-gray-200">
+                      {weekDays[i]}
+                    </span>
+                    <span className="text-xs text-gray-400 dark:text-gray-300">
+                      {(stats.dailyStudy[i] / 60).toFixed(1)}h
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Average daily productivity widget */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="rounded-2xl bg-white p-6 shadow-lg transition-colors duration-500 dark:bg-gray-900"
+            >
+              <span className="text-center text-xl font-bold text-blue-700 dark:text-yellow-300">
+                Average daily productivity
+              </span>
+              <div className="mt-6 flex h-48 items-end gap-4">
+                {normalizedProductivity.map((norm, i) => (
+                  <motion.div
+                    key={i}
+                    custom={norm * 180}
+                    variants={barVariants}
+                    initial="initial"
+                    animate="animate"
+                    className="flex flex-1 flex-col items-center justify-end"
+                  >
+                    <motion.div
+                      className="w-8 rounded-t-lg bg-blue-400 dark:bg-yellow-400"
+                      style={{ minHeight: 8 }}
+                      animate={{ height: Math.max(norm * 180, 8) }}
+                      transition={{ type: 'spring', stiffness: 120 }}
+                    />
+                    <span className="mt-2 text-sm text-gray-600 dark:text-gray-200">
+                      {weekDays[i]}
+                    </span>
+                    <span className="text-xs text-gray-400 dark:text-gray-300">
+                      {stats.dailyProductivity[i].toFixed(2)}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </section>
+        </On>
+      </Feature>
+
+      {/* Extra Widget: Pomodoros completed */}
+      <Feature expression={feature('tomatometer-basicAnalytics')}>
+        <On>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9 }}
+            className="flex flex-col items-center rounded-2xl bg-white p-6 shadow-lg transition-colors duration-500 dark:bg-gray-900"
+          >
+            <span className="mb-2 text-xl font-bold text-pink-700 dark:text-yellow-300">
+              Pomodoros completed this week
+            </span>
+            <span className="text-4xl font-extrabold text-pink-500 dark:text-yellow-200">
+              {completedPomodoros}
+            </span>
+          </motion.div>
+        </On>
+      </Feature>
+
+      {/* Advanced Analytics (Premium) */}
+
+      <Feature expression={feature('tomatometer-advancedAnalytics')}>
+        <On>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="rounded-2xl bg-white p-6 shadow-lg transition-colors duration-500 dark:bg-gray-900"
+            className="mt-2 flex flex-col items-center justify-between gap-8 rounded-2xl border-2 border-yellow-400 bg-gradient-to-r from-yellow-200 to-yellow-400 p-6 shadow-lg dark:border-yellow-600 dark:from-yellow-700 dark:to-yellow-900 md:flex-row"
           >
-            <span className="text-center text-xl font-bold text-purple-700 dark:text-yellow-300">
-              Average daily study time (min)
-            </span>
-            <div className="mt-6 flex h-48 items-end gap-4">
-              {normalizedStudy.map((norm, i) => (
-                <motion.div
-                  key={i}
-                  custom={norm * 180}
-                  variants={barVariants}
-                  initial="initial"
-                  animate="animate"
-                  className="flex flex-1 flex-col items-center justify-end"
-                >
-                  <motion.div
-                    className="w-8 rounded-t-lg bg-purple-400 dark:bg-yellow-400"
-                    style={{ minHeight: 8 }}
-                    animate={{ height: Math.max(norm * 180, 8) }}
-                    transition={{ type: 'spring', stiffness: 120 }}
-                  />
-                  <span className="mt-2 text-sm text-gray-600 dark:text-gray-200">
-                    {weekDays[i]}
-                  </span>
-                  <span className="text-xs text-gray-400 dark:text-gray-300">
-                    {(stats.dailyStudy[i] / 60).toFixed(1)}h
-                  </span>
-                </motion.div>
-              ))}
+            <div className="flex flex-1 flex-col items-center">
+              <span className="mb-2 text-lg font-bold text-yellow-900 dark:text-yellow-100">
+                Best Study Day
+              </span>
+              <span className="text-3xl font-extrabold text-yellow-700 dark:text-yellow-200">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][bestDayIdx]}
+              </span>
+              <span className="text-sm text-yellow-800 dark:text-yellow-300">
+                {bestDayValue} min
+              </span>
             </div>
-          </motion.div>
-
-          {/* Average daily productivity widget */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="rounded-2xl bg-white p-6 shadow-lg transition-colors duration-500 dark:bg-gray-900"
-          >
-            <span className="text-center text-xl font-bold text-blue-700 dark:text-yellow-300">
-              Average daily productivity
-            </span>
-            <div className="mt-6 flex h-48 items-end gap-4">
-              {normalizedProductivity.map((norm, i) => (
-                <motion.div
-                  key={i}
-                  custom={norm * 180}
-                  variants={barVariants}
-                  initial="initial"
-                  animate="animate"
-                  className="flex flex-1 flex-col items-center justify-end"
-                >
-                  <motion.div
-                    className="w-8 rounded-t-lg bg-blue-400 dark:bg-yellow-400"
-                    style={{ minHeight: 8 }}
-                    animate={{ height: Math.max(norm * 180, 8) }}
-                    transition={{ type: 'spring', stiffness: 120 }}
-                  />
-                  <span className="mt-2 text-sm text-gray-600 dark:text-gray-200">
-                    {weekDays[i]}
-                  </span>
-                  <span className="text-xs text-gray-400 dark:text-gray-300">
-                    {stats.dailyProductivity[i].toFixed(2)}
-                  </span>
-                </motion.div>
-              ))}
+            <div className="flex flex-1 flex-col items-center">
+              <span className="mb-2 text-lg font-bold text-yellow-900 dark:text-yellow-100">
+                Current Streak
+              </span>
+              <span className="text-3xl font-extrabold text-yellow-700 dark:text-yellow-200">
+                {currentStreak} days
+              </span>
+              <span className="text-sm text-yellow-800 dark:text-yellow-300">
+                Max streak: {maxStreak} days
+              </span>
             </div>
+            <Feature expression={feature('tomatometer-exportDataToJson')}>
+              <On>
+                <div className="flex flex-1 flex-col items-center">
+                  <span className="mb-2 text-lg font-bold text-yellow-900 dark:text-yellow-100">
+                    Export Data
+                  </span>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    className="mt-2 rounded-lg bg-yellow-400 px-6 py-2 font-bold text-yellow-900 shadow transition hover:bg-yellow-300 dark:bg-yellow-600 dark:text-yellow-100 dark:hover:bg-yellow-500"
+                    onClick={() => {
+                      const blob = new Blob([JSON.stringify(stats.sessions, null, 2)], {
+                        type: 'application/json',
+                      });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'pomodoro_sessions.json';
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
+                    Download JSON
+                  </motion.button>
+                </div>
+              </On>
+            </Feature>
           </motion.div>
-        </section>
-      </>
-
-      {/* Extra Widget: Pomodoros completed */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9 }}
-        className="flex flex-col items-center rounded-2xl bg-white p-6 shadow-lg transition-colors duration-500 dark:bg-gray-900"
-      >
-        <span className="mb-2 text-xl font-bold text-pink-700 dark:text-yellow-300">
-          Pomodoros completed this week
-        </span>
-        <span className="text-4xl font-extrabold text-pink-500 dark:text-yellow-200">
-          {completedPomodoros}
-        </span>
-      </motion.div>
-
-      {/* Advanced Analytics (Premium) */}
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="mt-2 flex flex-col items-center justify-between gap-8 rounded-2xl border-2 border-yellow-400 bg-gradient-to-r from-yellow-200 to-yellow-400 p-6 shadow-lg dark:border-yellow-600 dark:from-yellow-700 dark:to-yellow-900 md:flex-row"
-      >
-        <div className="flex flex-1 flex-col items-center">
-          <span className="mb-2 text-lg font-bold text-yellow-900 dark:text-yellow-100">
-            Best Study Day
-          </span>
-          <span className="text-3xl font-extrabold text-yellow-700 dark:text-yellow-200">
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][bestDayIdx]}
-          </span>
-          <span className="text-sm text-yellow-800 dark:text-yellow-300">{bestDayValue} min</span>
-        </div>
-        <div className="flex flex-1 flex-col items-center">
-          <span className="mb-2 text-lg font-bold text-yellow-900 dark:text-yellow-100">
-            Current Streak
-          </span>
-          <span className="text-3xl font-extrabold text-yellow-700 dark:text-yellow-200">
-            {currentStreak} days
-          </span>
-          <span className="text-sm text-yellow-800 dark:text-yellow-300">
-            Max streak: {maxStreak} days
-          </span>
-        </div>
-        <div className="flex flex-1 flex-col items-center">
-          <span className="mb-2 text-lg font-bold text-yellow-900 dark:text-yellow-100">
-            Export Data
-          </span>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            className="mt-2 rounded-lg bg-yellow-400 px-6 py-2 font-bold text-yellow-900 shadow transition hover:bg-yellow-300 dark:bg-yellow-600 dark:text-yellow-100 dark:hover:bg-yellow-500"
-            onClick={() => {
-              const blob = new Blob([JSON.stringify(stats.sessions, null, 2)], {
-                type: 'application/json',
-              });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = 'pomodoro_sessions.json';
-              a.click();
-              URL.revokeObjectURL(url);
-            }}
-          >
-            Download JSON
-          </motion.button>
-        </div>
-      </motion.div>
+        </On>
+      </Feature>
     </div>
   );
 };
