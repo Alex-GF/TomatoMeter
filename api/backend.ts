@@ -1,32 +1,26 @@
 import express from 'express';
-import { PricingContextManager } from 'pricing4ts/server';
-import { PricingConfiguration } from './config/PricingConfiguration';
 import healthRoutes from './routes/health';
 import pricingRoutes from './routes/pricing';
 import pomodoroRoutes from './routes/pomodoro';
-import { container } from './config/container';
-import {connect} from 'space-node-client';
+import contractsRoutes from './routes/contract';
+import featureChecker from './middlewares/featureChecker';
+import { configureSpaceClient } from './utils/configurators';
 
 const app: express.Server = express();
 const port = 3000;
 
-container.spaceClient = connect({
-  url: process.env.SPACE_URL || 'http://localhost:5403',
-  apiKey: process.env.SPACE_API_KEY || 'your-api-key',
-})
-
-container.spaceClient.on('synchronized', () => {
-  console.log('Space client synchronized successfully');
-})
-
-PricingContextManager.registerContext(new PricingConfiguration());
+configureSpaceClient();
 
 app.use(express.json());
+
+app.use(featureChecker);
 
 // Modular routes
 app.use('/api', healthRoutes);
 app.use('/api', pricingRoutes);
 app.use('/api', pomodoroRoutes);
+app.use('/api', pomodoroRoutes);
+app.use('/api', contractsRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

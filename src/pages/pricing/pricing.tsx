@@ -2,6 +2,7 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { SubscriptionContext } from '../../contexts/subscriptionContext';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { updateContract } from '../../utils/contracts';
 
 const FEATURES = [
   'Pomodoro timer',
@@ -104,7 +105,7 @@ const Pricing = () => {
     setAddons({ ...addons });
   }, [currentSubscription]);
 
-  const handlePlanChange = (plan: string) => {
+  const handlePlanChange = async (plan: string) => {
     setSelectedPlan(plan);
     setAddons(prev => {
       const newAddons = { ...prev };
@@ -114,14 +115,18 @@ const Pricing = () => {
       return newAddons;
     });
     setCurrentSubscription(toSubscriptionArr(plan, addons));
+
+    await updateContract(plan, addons);
   };
 
-  const handleAddonChange = (addon: string, value: number) => {
+  const handleAddonChange = async (addon: string, value: number) => {
     setAddons(prev => {
       const newAddons = { ...prev, [addon]: value };
       setCurrentSubscription(toSubscriptionArr(selectedPlan, newAddons));
       return newAddons;
     });
+
+    await updateContract(selectedPlan, {...addons, [addon]: value });
   };
 
   const tableRef = useRef<HTMLDivElement>(null);
@@ -202,7 +207,7 @@ const Pricing = () => {
                 <motion.button
                   whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.96 }}
-                  onClick={() => handlePlanChange(plan.name)}
+                  onClick={async () => await handlePlanChange(plan.name)}
                   className={`w-full px-4 py-2 font-bold shadow transition text-white text-base bg-gradient-to-r ${PLAN_COLORS[plan.name as keyof typeof PLAN_COLORS]}`}
                   aria-label={`Select ${plan.name} plan`}
                 >
@@ -229,7 +234,7 @@ const Pricing = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1, duration: 0.5, type: 'spring' }}
             className={`flex flex-col flex-1 min-w-[260px] max-w-[340px] rounded-2xl shadow-xl p-8 border-2 transition-all duration-300 cursor-pointer ${selectedPlan === plan.name ? 'border-purple-500 dark:border-yellow-400 scale-105 bg-white dark:bg-gray-900' : 'border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 hover:scale-105'}`}
-            onClick={() => handlePlanChange(plan.name)}
+            onClick={async () => await handlePlanChange(plan.name)}
           >
             <span className="text-xl font-bold text-purple-700 dark:text-yellow-300 mb-2">{plan.name}</span>
             <span className="text-3xl font-extrabold text-purple-900 dark:text-yellow-200 mb-2">{plan.price}<span className="text-base font-normal">{plan.period}</span></span>
@@ -268,7 +273,7 @@ const Pricing = () => {
                   min={0}
                   max={10}
                   value={addons[addon.name] || 0}
-                  onChange={e => handleAddonChange(addon.name, Math.max(0, Math.min(10, parseInt(e.target.value) || 0)))}
+                  onChange={async (e) => await handleAddonChange(addon.name, Math.max(0, Math.min(10, parseInt(e.target.value) || 0)))}
                   className="w-16 rounded-lg border dark:bg-gray-900 border-purple-300 dark:border-yellow-400 px-2 py-1 text-center text-lg font-bold text-purple-700 dark:text-yellow-200 focus:border-purple-500 focus:outline-none transition"
                 />
               </div>
@@ -276,7 +281,7 @@ const Pricing = () => {
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 className={`mt-auto rounded-lg px-4 py-2 font-bold shadow transition ${addons[addon.name] ? 'bg-purple-500 dark:bg-yellow-400 text-white dark:text-yellow-900' : 'bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
-                onClick={() => handleAddonChange(addon.name, addons[addon.name] ? 0 : 1)}
+                onClick={async () => await handleAddonChange(addon.name, addons[addon.name] ? 0 : 1)}
                 disabled={!addon.available(selectedPlan)}
               >
                 {addons[addon.name] ? 'Remove' : 'Add'}
