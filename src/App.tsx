@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { DemoApp } from './apps/demo';
 import { SubscriptionProvider } from './contexts/subscriptionContext';
 import { SettingsContext, SettingsToggle } from './pages/settings/settings';
-import axios from './lib/axios';
 
 export default function App() {
   const [toggles, setToggles] = useState<SettingsToggle>({
@@ -19,12 +18,6 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [toggles['Dark mode']]);
-
-  useEffect(() => {
-    if (localStorage.getItem('pricingToken')) {
-      axios.get('/health-check');
-    }
-  }, [localStorage.getItem('pricingToken')]);
 
   return (
     <SettingsContext.Provider value={{ toggles, setToggles }}>

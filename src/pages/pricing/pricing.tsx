@@ -2,7 +2,7 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { SubscriptionContext } from '../../contexts/subscriptionContext';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import { updateContract } from '../../utils/contracts';
+import { toSubscriptionArr, updateContract } from '../../utils/contracts';
 
 const FEATURES = [
   'Pomodoro timer',
@@ -85,13 +85,6 @@ const Pricing = () => {
       }
     }
     return { plan, addons };
-  };
-  const toSubscriptionArr = (plan: string, addons: { [key: string]: number }) => {
-    const arr = [plan];
-    Object.entries(addons).forEach(([name, v]) => {
-      if (v > 0) arr.push(`${name}X${v}`);
-    });
-    return arr;
   };
 
   const { plan: initialPlan, addons: initialAddons } = parseSubscription(currentSubscription);

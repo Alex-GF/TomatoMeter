@@ -1,4 +1,6 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import axios from "../../lib/axios";
+import { toSubscriptionArr } from "../../utils/contracts";
 
 interface SubscriptionContextType {
     currentSubscription: string[];
@@ -16,6 +18,18 @@ export function SubscriptionProvider({
     children: React.ReactNode;
 }): JSX.Element {
     const [currentSubscription, setCurrentSubscription] = useState<string[]>(["FREE"]);
+
+  useEffect(() => {
+    axios.get('/contracts').then((response) => {
+      const subscriptionPlan = response.data.contract.subscriptionPlans.tomatometer;
+      const subscriptionAddons = response.data.contract.subscriptionAddOns.tomatometer;
+
+      console.log("Current subscription plan:", subscriptionPlan);
+      console.log("Current subscription addons:", subscriptionAddons);
+
+      setCurrentSubscription(toSubscriptionArr(subscriptionPlan, subscriptionAddons));
+    })
+  }, []);
 
     return (
         <SubscriptionContext.Provider
