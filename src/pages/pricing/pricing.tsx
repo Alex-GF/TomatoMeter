@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { SubscriptionContext } from '../../contexts/subscriptionContext';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { toSubscriptionArr, updateContract } from '../../utils/contracts';
+import { formatToCamelCase } from '../../utils/helpers';
 
 const FEATURES = [
   'Pomodoro timer',
@@ -45,6 +46,7 @@ const PLANS = [
 
 const ADDONS = [
   {
+    id: 'extraTimers',
     name: 'Extra timers',
     price: '+1€',
     period: '/month',
@@ -53,6 +55,7 @@ const ADDONS = [
     multiple: true,
   },
   {
+    id: 'exportAsJson',
     name: 'Export as JSON',
     price: '+2€',
     period: '/month',
@@ -94,7 +97,7 @@ const Pricing = () => {
   const handlePlanChange = async (plan: string) => {
     
     const newAddons = { ...addons };
-    if (plan !== 'PREMIUM') newAddons['Export as JSON'] = 0;
+    if (plan !== 'PREMIUM') newAddons['exportAsJson'] = 0;
 
     setSelectedPlan(plan);
     setAddons(() => {
@@ -244,7 +247,7 @@ const Pricing = () => {
       <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch">
         {ADDONS.map((addon, idx) => (
           <motion.div
-            key={addon.name}
+            key={addon.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1, duration: 0.5, type: 'spring' }}
@@ -260,19 +263,19 @@ const Pricing = () => {
                   type="number"
                   min={0}
                   max={10}
-                  value={addons[addon.name] || 0}
-                  onChange={async (e) => await handleAddonChange(addon.name, Math.max(0, Math.min(10, parseInt(e.target.value) || 0)))}
+                  value={addons[addon.id] || 0}
+                  onChange={async (e) => await handleAddonChange(addon.id, Math.max(0, Math.min(10, parseInt(e.target.value) || 0)))}
                   className="w-16 rounded-lg border dark:bg-gray-900 border-purple-300 dark:border-yellow-400 px-2 py-1 text-center text-lg font-bold text-purple-700 dark:text-yellow-200 focus:border-purple-500 focus:outline-none transition"
                 />
               </div>
             ) : (
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                className={`mt-auto rounded-lg px-4 py-2 font-bold shadow transition ${addons[addon.name] ? 'bg-purple-500 dark:bg-yellow-400 text-white dark:text-yellow-900' : 'bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
-                onClick={async () => await handleAddonChange(addon.name, addons[addon.name] ? 0 : 1)}
+                className={`mt-auto rounded-lg px-4 py-2 font-bold shadow transition ${addons[addon.id] ? 'bg-purple-500 dark:bg-yellow-400 text-white dark:text-yellow-900' : 'bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+                onClick={async () => await handleAddonChange(addon.id, addons[addon.id] ? 0 : 1)}
                 disabled={!addon.available(selectedPlan)}
               >
-                {addons[addon.name] ? 'Remove' : 'Add'}
+                {addons[addon.id] ? 'Remove' : 'Add'}
               </motion.button>
             )}
           </motion.div>

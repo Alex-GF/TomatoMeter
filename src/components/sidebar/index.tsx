@@ -4,6 +4,7 @@ import { SubscriptionContext } from '../../contexts/subscriptionContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCrown, FaGem, FaRegStar } from 'react-icons/fa';
 import { usePage } from '../../contexts/pageContext';
+import { revertCamelCaseToString } from '../../utils/helpers';
 
 const PLAN_ICONS: Record<string, JSX.Element> = {
   PREMIUM: <FaCrown className="inline-block text-yellow-300 mr-2 animate-bounce" size={22} />,
@@ -67,15 +68,15 @@ const Sidebar = () => {
                     Active Add-ons:
                   </span>
                   <ul className="flex flex-wrap justify-center gap-1">
-                    {activeAddons.map(([name, v], idx) => (
+                    {activeAddons.map(([id, v], idx) => (
                       <motion.li
-                        key={name}
+                        key={id}
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.1 + idx * 0.08, type: 'spring', stiffness: 200 }}
                         className="rounded-full bg-purple-600/80 px-3 py-1 text-xs font-bold text-white shadow-md flex items-center gap-1"
                       >
-                        {name}
+                        {revertCamelCaseToString(id)}
                         {v > 1 ? <span className="ml-1 text-yellow-200">×{v}</span> : null}
                       </motion.li>
                     ))}
