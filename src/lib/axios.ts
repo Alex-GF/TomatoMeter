@@ -12,7 +12,7 @@ axiosInstance.interceptors.response.use(
   response => {
     const token = response.headers['pricing-token']; // This must be in lowercase
     if (token) {
-      localStorage.setItem('pricingToken', token);
+      localStorage.setItem('pricingToken', JSON.stringify(token));
     }
     return response;
   },
