@@ -48,7 +48,7 @@ const ADDONS = [
     price: '+1€',
     period: '/month',
     description: '+5 extra pomodoros per day (stackable)',
-    available: (plan: string) => true,
+    available: (_: string) => true,
     multiple: true,
   },
   {

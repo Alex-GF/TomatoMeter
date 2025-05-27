@@ -1,7 +1,6 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatDuration, intervalToDuration } from 'date-fns';
-import { SettingsContext } from '../settings/settings';
 
 interface Session {
   duration: number; // seconds
@@ -50,7 +49,6 @@ function formatMinutesToDuration(minutes: number): string {
 }
 
 const WeeklyProductivity = () => {
-  const { toggles } = useContext(SettingsContext);
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
 
