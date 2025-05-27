@@ -91,13 +91,6 @@ const Pricing = () => {
   const [selectedPlan, setSelectedPlan] = useState(initialPlan);
   const [addons, setAddons] = useState<{ [key: string]: number }>({ ...initialAddons });
 
-  // Sync local state with context if context changes externally
-  useEffect(() => {
-    const { plan, addons } = parseSubscription(currentSubscription);
-    setSelectedPlan(plan);
-    setAddons({ ...addons });
-  }, [currentSubscription]);
-
   const handlePlanChange = async (plan: string) => {
     setSelectedPlan(plan);
     setAddons(prev => {
