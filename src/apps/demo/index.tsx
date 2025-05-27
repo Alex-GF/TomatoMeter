@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 import Sidebar from '../../components/sidebar';
 import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
@@ -16,7 +16,7 @@ export const SIDEBAR_ITEMS = [
 ];
 
 export function DemoApp() {
-  const [selectedPage, setSelectedPage] = useState<string>('Pomodoro Timer');
+  const [ selectedPage, setSelectedPage ] = useState<string>('Pomodoro Timer');
   const { toggles, setToggles } = useContext(SettingsContext);
 
   return (
