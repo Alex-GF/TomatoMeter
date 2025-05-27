@@ -32,7 +32,7 @@ export function SubscriptionProvider({
         <SubscriptionContext.Provider
             value={{
                 currentSubscription,
-                setCurrentSubscription,
+                setCurrentSubscription
             }}
         >
             {children}

@@ -13,6 +13,7 @@ export function configureSpaceClient() {
   });
 
   container.spaceClient.on('synchronized', spaceSynchronizationCallback);
+  container.spaceClient.on('pricing_created', pricingCreatedCallback);
 }
 
 async function spaceSynchronizationCallback() {
@@ -41,4 +42,18 @@ async function spaceSynchronizationCallback() {
 
     console.log('TomatoMeter service and test user contract created successfully');
   }
+}
+
+async function pricingCreatedCallback(data: {serviceName: string, pricingVersion: any}) {
+  const pricing = await container.spaceClient?.services.getPricing(data.serviceName, data.pricingVersion);
+
+  await container.spaceClient?.contracts.updateContractSubscription(testUserId, {
+    contractedServices: {
+      tomatometer: data.pricingVersion,
+    },
+    subscriptionPlans: {
+      tomatometer: Object.keys(pricing?.plans)[0],
+    },
+    subscriptionAddOns: {},
+  })
 }
