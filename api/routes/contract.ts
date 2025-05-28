@@ -20,7 +20,6 @@ router.put('/contracts', async (req, res) => {
     await container.spaceClient?.contracts.updateContractSubscription(testUserId, req.body);
     res.status(200).json({ message: 'Contract updated successfully' });
   }catch (error) {
-    console.log(error.response.data);
     res.status(500).json({ error: 'Failed to update contract' });
   }
 });

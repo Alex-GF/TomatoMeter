@@ -22,10 +22,40 @@ export function DemoApp() {
   const { toggles, setToggles } = useContext(SettingsContext);
   const { selectedPage } = usePage();
   const [showModal, setShowModal] = useState(false);
+  const [triggered, setTriggered] = useState(false);
+  const [currentPricingVersion, setCurrentPricingVersion] = useState('1.0.0');
 
   async function handleTrigger() {
-    await axios.post('/pricing/trigger');
-    setShowModal(true);
+    const currentContract = (await axios.get('/contracts')).data.contract;
+
+    if (!triggered && currentContract.contractedServices.tomatometer === '1.0.0') {
+      try{
+        await axios.post('/pricing/trigger');
+        setShowModal(true);
+        setTriggered(true);
+        setCurrentPricingVersion("2.0.0");
+      }catch (error) {
+        setShowModal(true);
+        setTriggered(true);
+        setCurrentPricingVersion("2.0.0");
+      }
+    }else{
+      const newVersion = currentContract.contractedServices.tomatometer === '1.0.0' ? '2.0.0' : '1.0.0';
+      await axios.put('/contracts', {
+        contractedServices: {
+          tomatometer: newVersion,
+        },
+        subscriptionPlans: {
+          tomatometer: 'BASIC',
+        },
+        subscriptionAddOns: {
+          tomatometer: {},
+        },
+      })
+
+      setShowModal(true);
+      setCurrentPricingVersion(newVersion);
+    }
   }
 
   return (
@@ -85,7 +115,7 @@ export function DemoApp() {
                   Pricing Version Updated!
                 </h2>
                 <p className="text-md text-gray-600 dark:text-gray-300 mb-6 text-center">
-                  TomatoMeter pricing has been successfully updated to <span className="font-bold text-blue-600 dark:text-yellow-200">version 2.0</span>.<br />
+                  TomatoMeter pricing has been successfully updated to <span className="font-bold text-blue-600 dark:text-yellow-200">version {currentPricingVersion}</span>.<br />
                   Enjoy the new features and improvements!
                 </p>
                 <motion.button

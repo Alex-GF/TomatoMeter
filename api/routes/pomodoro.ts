@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { populatePomodoroSessions } from '../utils/generators';
+import { container } from '../config/container';
+import { testUserId } from '../utils/configurators';
 
 const router = Router();
 
@@ -8,7 +10,18 @@ const pomodoroSessions: Map<string, { duration: number, productivity: number, da
 populatePomodoroSessions(pomodoroSessions);
 
 // Save pomodoro session duration
-router.post('/pomodoro/session', (req, res) => {
+router.post('/pomodoro/session', async (req, res) => {
+  
+  const canSavePomodoroSession = await container.spaceClient?.features.evaluate(testUserId, 'tomatometer-pomodoroTimer', {
+    "tomatometer-maxPomodoroTimers": 1
+  }, {
+    server: true
+  });
+
+  if (!canSavePomodoroSession){
+    return res.status(403).json({ error: 'Feature not enabled for this user. Limit has been reached.' });
+  }
+  
   const userId = 'demo-user';
   const { duration } = req.body;
   if (!pomodoroSessions.has(userId)) pomodoroSessions.set(userId, []);
