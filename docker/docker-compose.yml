@@ -1,0 +1,30 @@
+services:
+  space-demo-server:
+    restart: always
+    container_name: space-demo-server
+    build:
+        context: ../
+        dockerfile: ./api/docker/Dockerfile
+    env_file:
+      - ../.env
+    networks:
+      - space-demo-network
+  space-demo-client:
+    restart: always
+    container_name: space-demo-client
+    build:
+        context: ../
+        dockerfile: ./Dockerfile
+    environment:
+      VITE_SERVER_URL: http://space-demo-server:3000/api
+    ports:
+      - 80:5173
+    depends_on:
+      - space-demo-server
+    links:
+      - space-demo-server
+    networks:
+      - space-demo-network
+networks:
+  space-demo-network:
+    driver: bridge
