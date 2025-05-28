@@ -116,7 +116,9 @@ export function DemoApp() {
                 </h2>
                 <p className="text-md text-gray-600 dark:text-gray-300 mb-6 text-center">
                   TomatoMeter pricing has been successfully updated to <span className="font-bold text-blue-600 dark:text-yellow-200">version {currentPricingVersion}</span>.<br />
-                  Enjoy the new features and improvements!
+                </p>
+                <p className="text-md text-gray-600 dark:text-gray-300 mb-6 text-center">
+                  This new version restricts access to weekly productivity for <strong>BASIC</strong> users and <strong>limits the amount of daily pomodoro timers to 1</strong>.
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
