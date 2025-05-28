@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { DemoApp } from './apps/demo';
 import { SubscriptionProvider } from './contexts/subscriptionContext';
-import { SettingsContext, SettingsToggle } from './pages/settings/settings';
+import { SettingsContext, SettingsToggle } from './contexts/settingsContext';
+import { PageProvider } from './contexts/pageContext';
 
 export default function App() {
   const [toggles, setToggles] = useState<SettingsToggle>({
     'Enable sound notifications': true,
     'Dark mode': false,
     'Custom pomodoro duration': false,
-    'Motivational quotes': true,
+    'Motivational quotes': false,
   });
 
   useEffect(() => {
@@ -20,10 +21,12 @@ export default function App() {
   }, [toggles['Dark mode']]);
 
   return (
-    <SettingsContext.Provider value={{ toggles, setToggles }}>
-      <SubscriptionProvider>
-        <DemoApp />
-      </SubscriptionProvider>
-    </SettingsContext.Provider>
+    <PageProvider>
+      <SettingsContext.Provider value={{ toggles, setToggles }}>
+        <SubscriptionProvider>
+          <DemoApp />
+        </SubscriptionProvider>
+      </SettingsContext.Provider>
+    </PageProvider>
   );
 }

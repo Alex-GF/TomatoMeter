@@ -24,6 +24,7 @@
     "@types/prop-types": "^15.7.13",
     "@types/react-helmet": "^6.1.11",
     "axios": "^0.25.0",
+    "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
@@ -36,7 +37,8 @@
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",
     "react-icons": "^5.3.0",
-    "react-svg": "^16.1.34"
+    "react-svg": "^16.1.34",
+    "space-node-client": "link:../../../Library/pnpm/global/5/node_modules/space-node-client"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
@@ -51,6 +53,7 @@
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.2.7",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.4",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.7.0",
     "vite": "^5.4.8",
