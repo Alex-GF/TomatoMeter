@@ -1,4 +1,4 @@
-# SPACE Demo
+# TomatoMeter
 
 ![Analytics View](images/analytics-view.png)
 
@@ -15,9 +15,9 @@
 
 ## Introduction
 
-Welcome to the **SPACE Demo** project!  
+Welcome to **TomatoMeter**!  
 
-This repository presents a Pomodoro timer application that integrates with [SPACE](https://github.com/Alex-GF/space) as its pricing-driven self-adaptation engine, enabling dynamic behavior based on variability induced by its pricing model.
+This repository presents a demo Pomodoro timer application that integrates with [SPACE](https://github.com/Alex-GF/space) as its pricing-driven self-adaptation engine, enabling dynamic behavior based on variability induced by its pricing model. It is designed to test and showcase the functionality and capabilities of SPACE in a practical setting.
 
 Developed by the [ISA-Group](https://github.com/isa-group), this project is part of ongoing research into pricing-driven development and operation.
 
@@ -26,6 +26,7 @@ Developed by the [ISA-Group](https://github.com/isa-group), this project is part
 You can launch the entire demo locally using Docker.
 
 **Requirements:**  
+
 - [Docker](https://www.docker.com/get-started) installed on your machine.
 
 ### Run a SPACE instance
@@ -101,20 +102,38 @@ docker compose up -d
 
 Wait for the space-demo-nginx instance to start. If everything is set up correctly, the TomatoMeter SPACE demo should be running at [http://localhost](http://localhost).
 
-## About the Demo Application & Pricing
+## About TomatoMeter and its Pricing
 
-The SPACE Demo is a productivity and expense management app with a modular, feature-flagged architecture.  
+TomatoMeter is a productivity management app based in the pomodoro technique. It allows users to track their work sessions, evaluate their productivity, and review insights about their performance. 
+
+### Pricing
+
+Since TomatoMeter has been designed to demonstrate the capabilities of SPACE in managing variability introduced by pricing models, it includes a pricing model with 3 different plans: FREE, ADVANCED, and PREMIUM; along with 2 add-ons.
+
 **Key features include:**
-- Pomodoro timer
-- Daily and weekly productivity summaries
-- Expense tracking and analytics
-- Dynamic pricing plans with feature toggling
 
-The pricing page (see image below) demonstrates how different features are enabled or disabled based on the selected plan, using a pricing-driven feature flag system.
+- **Pomodoro Timer:** A simple and effective timer to manage work sessions based on the Pomodoro Technique. The pricing also impose an **usage limit** to this feature that restricts the maximum amount of pomodoro timers that can be initiated each day.
+- **Sound Notifications:** Emit sound notifications to signal the end of pomodoros.
+- **Basic analytics:** number of pomodoros completed pomodoros, total time worked and productivity score.
+- **Motivational Quotes:** Display motivational quotes above the timer to keep users inspired.
+- **Daily summary:** Overview of completed pomodoros by day over the last month.
+- **Dark Mode:** A dark mode option for a better user experience in low-light environments.
+- **Custom Pomodoro Duration:** Users can customize the duration of their pomodoros and breaks.
+- **Advanced analytics:** productivity trends, pomodoro streaks, and more
+- **Export Data as JSON:** Ability to export pomodoro data in JSON format for further analysis or backup.
+
+The pricing page (see image below) showcases how different features must be enabled or disabled regarding the selected subscription (i.e. the selected plan and, optionally, complementary contracted add-ons).
 
 ![Pricing Plans](images/pricing-plans.png)
 
----
+### Purpose of the Demo
+
+Since, as mentioned before, this demo aims to demonstrate the capabilities of SPACE in managing variability introduced by pricing models, you'll find a button behind the TomatoMeter's screen that triggers a **pricing change event.** In short, this event will perform the following changes to the pricing:
+
+- **Change the availability of the basic analytics feature:** In this new version, only users from ADVANCED and PREMIUM plans will be able to access this feature.
+- **Further restricts the amount of daily pomodoro timers for BASIC users:** These will only be able to initiate **1 pomodoro timers per day**.
+
+By clicking the button again, you can revert these changes and return to the original pricing model.
 
 ## Project Structure
 
@@ -166,13 +185,8 @@ The repository is organized as follows:
 > This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 > **Disclaimer:**  
-> This repository is developed and maintained in a controlled research environment by the [ISA-Group](https://isa-group.es) to demonstrate advances in software engineering research.  
+> This repository is developed and maintained in a controlled research environment by the [ISA-Group](https://isa-group.es) to demonstrate advances pricing-driven self adaptation solutions.  
 > The ISA-Group is not responsible for any issues, damages, or consequences that may arise if this software is used in other projects or production environments.  
 > Use at your own risk.
 
----
-
 If you have any questions or want to contribute, feel free to open an issue or contact the maintainers.
-
----
-
