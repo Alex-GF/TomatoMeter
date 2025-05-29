@@ -4,27 +4,25 @@ FROM node:21.1-slim
 # Set the working directory in the container
 WORKDIR /usr/src/server
 
-# Install pnpm globally
-RUN npm install -g pnpm
-
 # Copy package.json and ./pnpm-lock.yaml to the container
 COPY ./package.json .
 # Copy tsconfig.json to the container
 COPY ./tsconfig.json .
 
 # Install Node.js dependencies
-RUN pnpm install 
+RUN npm install 
 
 # Copy the rest of the application source code to the container
 RUN mkdir src
 COPY ./src ./src
 COPY ./index.html .
 
-RUN pnpm i tsc-alias@1.8.16
+ARG VITE_SERVER_URL
+ENV VITE_SERVER_URL=$VITE_SERVER_URL
 
-# Build your application
-RUN pnpm exec tsc -p ./tsconfig.json && \
-    pnpm exec tsc-alias --project="./tsconfig.json" --resolve-full-paths
+# Build your application (the build phase of vite loads all envs)
+RUN npx vite build && \
+    npm install -g serve
 
-# Specify the command to start the server
-CMD [ "node", "dist/backend.js"]
+# Specify the command to start your React app
+CMD [ "serve", "-s", "dist", "-l", "5173" ]

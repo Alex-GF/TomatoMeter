@@ -15,6 +15,15 @@ export function configureSpaceClient() {
 
   container.spaceClient.on('synchronized', spaceSynchronizationCallback);
   container.spaceClient.on('pricing_created', pricingCreatedCallback);
+  container.spaceClient.on('error', (error: Error) => {
+    console.log('------- Cannot connect to SPACE -------');
+    console.error(error);
+    console.log("---------");
+    console.log(`User URL: ${process.env.SPACE_URL || 'http://localhost:5403'}`);
+    console.log(`API Key: ${process.env.SPACE_API_KEY || 'your-api-key'}`);
+    console.log("---------");
+    console.log('Please check that your .env file information corresponds to the configuration of SPACE.');
+  });
 }
 
 async function spaceSynchronizationCallback() {

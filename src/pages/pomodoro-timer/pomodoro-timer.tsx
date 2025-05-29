@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SettingsContext } from '../../contexts/settingsContext';
 import { useMotivationalQuotes } from '../settings/settings';
 import notificationSound from '../../static/sounds/notification.mp3';
-import { Default, feature, Feature, On, ErrorFallback } from 'pricing4react';
+import { Default, feature, Feature, On } from 'pricing4react';
 import axios from '../../lib/axios';
 import { usePage } from '../../contexts/pageContext';
 
@@ -19,7 +19,7 @@ const PomodoroTimer = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [productivity, setProductivity] = useState<number | null>(null);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const [intervalId, setIntervalId] = useState<number | null>(null);
 
   const {setSelectedPage} = usePage();
 

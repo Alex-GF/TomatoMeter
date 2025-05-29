@@ -9,20 +9,22 @@ RUN npm install -g pnpm
 
 # Copy package.json and ./pnpm-lock.yaml to the container
 COPY ./package.json .
-# Copy tsconfig.json to the container
-COPY ./tsconfig.json .
 
 RUN pnpm install
 
+# Copy tsconfig.json to the container
+COPY ./api/docker/tsconfig.json .
+
 # Copy the rest of the application source code to the container
 RUN mkdir src
-COPY ./api ./src
+COPY ./api ./api
 
-RUN pnpm i tsc-alias@1.8.16
+ARG SPACE_URL
+ENV SPACE_URL=$SPACE_URL
 
 # Build your application
 RUN pnpm exec tsc -p ./tsconfig.json && \
-    pnpm exec tsc-alias --project="./tsconfig.json" --resolve-full-paths
+    pnpm exec tsc-alias --project="./tsconfig.json" --resolve-full-paths 
 
 # Specify the command to start the server
-CMD [ "node", "dist/backend.js"]
+CMD [ "node", "./dist/backend.js"]

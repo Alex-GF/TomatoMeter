@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "./dist",                     // Output in the `dist` folder
-    "rootDir": "./src",                     // Source code in the `src` folder
+    "rootDir": "./api",                     // Source code in the `src` folder
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -26,5 +26,5 @@
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["api"]
 }
