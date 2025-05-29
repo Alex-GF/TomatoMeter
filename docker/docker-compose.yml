@@ -1,0 +1,41 @@
+services:
+  space-demo-server:
+    restart: always
+    container_name: space-demo-server
+    build:
+        context: ../
+        dockerfile: ./api/docker/Dockerfile
+        args:
+          SPACE_URL: http://host.docker.internal:5403
+    env_file:
+      - ../.env
+    networks:
+      - space-demo-network
+  space-demo-client:
+    restart: always
+    container_name: space-demo-client
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+      args:
+        VITE_SERVER_URL: http://localhost/api
+    depends_on:
+      - space-demo-server
+    networks:
+      - space-demo-network
+  nginx:
+    restart: always
+    container_name: space-demo-nginx
+    build:
+        context: ../nginx
+        dockerfile: ./Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - space-demo-server
+      - space-demo-client
+    networks:
+      - space-demo-network
+networks:
+  space-demo-network:
+    driver: bridge

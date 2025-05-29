@@ -2,7 +2,7 @@ import { PricingContext } from 'pricing4ts/server';
 
 export class PricingConfiguration extends PricingContext{
 
-    private userPlan: string = "FREE";
+    private userPlan: string = "BASIC";
     private userContext: Record<string, boolean | string | number> = {
         user: "test",
         createdExpenses: 2,
