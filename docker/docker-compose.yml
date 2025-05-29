@@ -6,7 +6,7 @@ services:
         context: ../
         dockerfile: ./api/docker/Dockerfile
         args:
-          SPACE_URL: http://host.docker.internal:3000
+          SPACE_URL: http://host.docker.internal:5403
     env_file:
       - ../.env
     networks:
