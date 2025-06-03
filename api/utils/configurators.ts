@@ -1,6 +1,7 @@
 import { connect } from 'space-node-client';
 import { container } from '../config/container';
 import dotenv from 'dotenv';
+import { SpaceServiceOperations } from './spaceOperations';
 
 dotenv.config();
 
@@ -29,19 +30,24 @@ export function configureSpaceClient() {
 async function spaceSynchronizationCallback() {
   console.log('Space client synchronized successfully');
 
+  SpaceServiceOperations.setAxiosInstance(
+    container.spaceClient?.httpUrl!,
+    container.spaceClient?.apiKey!
+  );
+
   try {
-    await container.spaceClient?.services.getService('TomatoMeter');
+    await SpaceServiceOperations.getService('TomatoMeter');
 
     console.log('TomatoMeter service and test user contract already exist, skipping creation');
   } catch (_) {
-    await container.spaceClient?.services.addService('./api/resources/TomatoMeter.yml');
+    await SpaceServiceOperations.addService('./api/resources/TomatoMeter.yml');
 
     console.log('TomatoMeter service and test user contract created successfully');
   }
 }
 
 async function pricingCreatedCallback(data: { serviceName: string; pricingVersion: any }) {
-  const pricing = await container.spaceClient?.services.getPricing(
+  const pricing = await SpaceServiceOperations.getPricing(
     data.serviceName,
     data.pricingVersion
   );
@@ -54,7 +60,7 @@ async function pricingCreatedCallback(data: { serviceName: string; pricingVersio
           tomatometer: data.pricingVersion,
         },
         subscriptionPlans: {
-          tomatometer: Object.keys(pricing?.plans)[0],
+          tomatometer: Object.keys(pricing?.plans!)[0],
         },
         subscriptionAddOns: {},
       });

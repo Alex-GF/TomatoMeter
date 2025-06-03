@@ -32,6 +32,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
+    "form-data": "^4.0.2",
     "framer-motion": "^12.12.2",
     "helmet": "^8.0.0",
     "pricing4react": "^2.2.0",
@@ -42,7 +43,8 @@
     "react-helmet": "^6.1.0",
     "react-icons": "^5.3.0",
     "react-svg": "^16.1.34",
-    "space-node-client": "0.1.2",
+    "space-node-client": "^0.2.0",
+    "space-react-client": "link:../../../Library/pnpm/global/5/node_modules/space-react-client",
     "tsc-alias": "1.8.16"
   },
   "devDependencies": {
