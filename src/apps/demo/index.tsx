@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Sidebar from '../../components/sidebar';
 import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
 import WeeklyProductivity from '../../pages/weekly-productivity/weekly-productivity';
@@ -9,6 +9,7 @@ import DailySummaryPage from '../../pages/daily-summary/daily-summary';
 import Settings from '../../pages/settings/settings';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from '../../lib/axios';
+import { usePricingToken, useSpaceClient } from 'space-react-client';
 
 export const SIDEBAR_ITEMS = [
   { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
@@ -24,23 +25,52 @@ export function DemoApp() {
   const [showModal, setShowModal] = useState(false);
   const [triggered, setTriggered] = useState(false);
   const [currentPricingVersion, setCurrentPricingVersion] = useState('1.0.0');
+  const [triggerPricingChange, setTriggerPricingChange] = useState(false);
+
+  const spaceClient = useSpaceClient();
+  const tokenService = usePricingToken();
+
+  spaceClient.on('pricing_created', (data: { serviceName: string; pricingVersion?: string }) => {
+    console.log('Pricing created event received:', data);
+
+    if (data.serviceName.toLowerCase() === 'tomatometer') {
+      axios
+        .put('/contracts', {
+          contractedServices: {
+            tomatometer: data.pricingVersion || '1.0.0',
+          },
+          subscriptionPlans: {
+            tomatometer: 'BASIC',
+          },
+          subscriptionAddOns: {},
+        })
+        .then(() => {
+          setTriggerPricingChange(!triggerPricingChange);
+        });
+    }
+  });
+
+  spaceClient.on('pricing_archived', (data: { serviceName: string; pricingVersion?: string }) => {
+    setTriggerPricingChange(!triggerPricingChange);
+  });
 
   async function handleTrigger() {
     const currentContract = (await axios.get('/contracts')).data.contract;
 
     if (!triggered && currentContract.contractedServices.tomatometer === '1.0.0') {
-      try{
+      try {
         await axios.post('/pricing/trigger');
         setShowModal(true);
         setTriggered(true);
-        setCurrentPricingVersion("2.0.0");
-      }catch (error) {
+        setCurrentPricingVersion('2.0.0');
+      } catch (error) {
         setShowModal(true);
         setTriggered(true);
-        setCurrentPricingVersion("2.0.0");
+        setCurrentPricingVersion('2.0.0');
       }
-    }else{
-      const newVersion = currentContract.contractedServices.tomatometer === '1.0.0' ? '2.0.0' : '1.0.0';
+    } else {
+      const newVersion =
+        currentContract.contractedServices.tomatometer === '1.0.0' ? '2.0.0' : '1.0.0';
       await axios.put('/contracts', {
         contractedServices: {
           tomatometer: newVersion,
@@ -51,12 +81,20 @@ export function DemoApp() {
         subscriptionAddOns: {
           tomatometer: {},
         },
-      })
+      });
 
       setShowModal(true);
       setCurrentPricingVersion(newVersion);
     }
   }
+
+  useEffect(() => {
+    axios.post('/contracts/renew-token').then(response => {
+      const pricingToken = response.data.pricingToken;
+
+      tokenService.updatePricingToken(pricingToken);
+    });
+  }, [triggerPricingChange]);
 
   return (
     <SettingsContext.Provider value={{ toggles, setToggles }}>
@@ -107,18 +145,36 @@ export function DemoApp() {
                   className="mb-4"
                 >
                   <svg width="60" height="60" viewBox="0 0 24 24" fill="none" className="mx-auto">
-                    <circle cx="12" cy="12" r="10" fill="#6366f1" className="dark:fill-yellow-400" />
-                    <path d="M8 12.5l2.5 2.5 5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      fill="#6366f1"
+                      className="dark:fill-yellow-400"
+                    />
+                    <path
+                      d="M8 12.5l2.5 2.5 5-5"
+                      stroke="#fff"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </motion.div>
                 <h2 className="text-2xl font-bold text-purple-700 dark:text-yellow-300 mb-2 text-center">
                   Pricing Version Updated!
                 </h2>
                 <p className="text-md text-gray-600 dark:text-gray-300 mb-6 text-center">
-                  TomatoMeter pricing has been successfully updated to <span className="font-bold text-blue-600 dark:text-yellow-200">version {currentPricingVersion}</span>.<br />
+                  TomatoMeter pricing has been successfully updated to{' '}
+                  <span className="font-bold text-blue-600 dark:text-yellow-200">
+                    version {currentPricingVersion}
+                  </span>
+                  .<br />
                 </p>
                 <p className="text-md text-gray-600 dark:text-gray-300 mb-6 text-center">
-                  This new version restricts access to weekly productivity for <strong>BASIC</strong> users and <strong>limits the amount of daily pomodoro timers to 1</strong>.
+                  This new version restricts access to weekly productivity for{' '}
+                  <strong>BASIC</strong> users and{' '}
+                  <strong>limits the amount of daily pomodoro timers to 1</strong>.
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.05 }}

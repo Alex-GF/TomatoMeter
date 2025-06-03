@@ -1,13 +1,13 @@
-import { Default, feature, Feature, On } from 'pricing4react';
 import DailySummaryList from '../../components/daily-summary-list';
 import { motion } from 'framer-motion';
 import { usePage } from '../../contexts/pageContext';
+import { Feature, On, Default } from 'space-react-client';
 
 const DailySummaryPage = () => {
   const { setSelectedPage } = usePage();
 
   return (
-    <Feature expression={feature('tomatometer-dailySummary')}>
+    <Feature id={'tomatometer-dailySummary'}>
       <On>
         <DailySummaryList />
       </On>

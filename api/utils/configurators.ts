@@ -9,8 +9,8 @@ export const testUserId = 'test-user-id';
 
 export function configureSpaceClient() {
   container.spaceClient = connect({
-    url: process.env.SPACE_URL || 'http://localhost:5403',
-    apiKey: process.env.SPACE_API_KEY || 'your-api-key',
+    url: process.env.VITE_SPACE_URL || 'http://localhost:5403',
+    apiKey: process.env.VITE_SPACE_API_KEY || 'your-api-key',
     timeout: 5000,
   });
 
@@ -20,8 +20,8 @@ export function configureSpaceClient() {
     console.log('------- Cannot connect to SPACE -------');
     console.error(error);
     console.log("---------");
-    console.log(`User URL: ${process.env.SPACE_URL || 'http://localhost:5403'}`);
-    console.log(`API Key: ${process.env.SPACE_API_KEY || 'your-api-key'}`);
+    console.log(`User URL: ${process.env.VITE_SPACE_URL || 'http://localhost:5403'}`);
+    console.log(`API Key: ${process.env.VITE_SPACE_API_KEY || 'your-api-key'}`);
     console.log("---------");
     console.log('Please check that your .env file information corresponds to the configuration of SPACE.');
   });

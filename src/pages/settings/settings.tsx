@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Default, feature, Feature, On } from 'pricing4react';
+import { Default, Feature, On } from 'space-react-client';
 import SettingsOption from '../../components/settings-option';
 import { usePage } from '../../contexts/pageContext';
 
@@ -75,7 +75,7 @@ const Settings = () => {
       <div className="flex flex-col gap-6">
         {settingsOptions.map((option, idx) => {
           return (
-            <Feature expression={feature(option.featureId)}>
+            <Feature id={option.featureId}>
               <On>
                 <SettingsOption
                   key={new Date().getTime()}

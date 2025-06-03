@@ -24,4 +24,13 @@ router.put('/contracts', async (req, res) => {
   }
 });
 
+router.post('/contracts/renew-token', async (req, res) => {
+  try {
+    const token = await container.spaceClient?.features.generateUserPricingToken(testUserId);
+    res.status(200).json({ pricingToken: token });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to renew token' });
+  } 
+})
+
 export default router;
