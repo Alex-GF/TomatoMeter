@@ -4,6 +4,7 @@ import { SubscriptionContext } from '../../contexts/subscriptionContext';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { toSubscriptionArr, updateContract } from '../../utils/contracts';
 import { formatToCamelCase } from '../../utils/helpers';
+import { usePricingToken } from 'space-react-client';
 
 const FEATURES = [
   'Pomodoro timer',
@@ -94,6 +95,8 @@ const Pricing = () => {
   const [selectedPlan, setSelectedPlan] = useState(initialPlan);
   const [addons, setAddons] = useState<{ [key: string]: number }>({ ...initialAddons });
 
+  const tokenService = usePricingToken();
+
   const handlePlanChange = async (plan: string) => {
     
     const newAddons = { ...addons };
@@ -105,9 +108,8 @@ const Pricing = () => {
       setCurrentSubscription(toSubscriptionArr(plan, newAddons));
       return newAddons;
     });
-    setCurrentSubscription(toSubscriptionArr(plan, newAddons));
 
-    await updateContract(plan, newAddons);
+    await updateContract(plan, newAddons, tokenService);
   };
 
   const handleAddonChange = async (addon: string, value: number) => {
@@ -117,7 +119,7 @@ const Pricing = () => {
       return newAddons;
     });
 
-    await updateContract(selectedPlan, {...addons, [addon]: value });
+    await updateContract(selectedPlan, {...addons, [addon]: value }, tokenService);
   };
 
   const tableRef = useRef<HTMLDivElement>(null);
