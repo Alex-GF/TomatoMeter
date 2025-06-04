@@ -104,14 +104,36 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
                       className="mt-8 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={async () => {
                         if (!editedPlans || Object.keys(editedPlans).length === 0) return;
+
+                        // --- Add-on/plan consistency check ---
+                        const validPlanKeys = editedPlans ? Object.keys(editedPlans) : [];
+                        let cleanedAddOns = { ...editedAddOns };
+                        if (cleanedAddOns) {
+                          for (const [addOnKey, addOn] of Object.entries(cleanedAddOns)) {
+                            if (Array.isArray(addOn.availableFor)) {
+                              // Filtra los planes que ya no existen
+                              const filtered = addOn.availableFor.filter(plan => validPlanKeys.includes(plan));
+                              if (filtered.length === 0) {
+                                // Si no queda ningún plan válido, elimina el add-on
+                                delete cleanedAddOns[addOnKey];
+                              } else if (filtered.length !== addOn.availableFor.length) {
+                                // Si se han eliminado planes, actualiza el array
+                                cleanedAddOns[addOnKey] = { ...addOn, availableFor: filtered };
+                              }
+                            }
+                          }
+                        }
+                        // --- END CHECK ---
                         const newPricing: PricingToCreate = {
                           ...pricing,
                           createdAt: new Date().toISOString().split('T')[0],
                           plans: editedPlans,
-                          addOns: editedAddOns,
+                          addOns: cleanedAddOns,
                         };
 
                         setIsSubmitting(true);
+
+                        console.log(newPricing)
 
                         await axios.post('/contracts/pricing', newPricing);
                         setIsSubmitting(false);

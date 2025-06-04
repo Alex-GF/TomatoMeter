@@ -33,3 +33,12 @@ export function camelToTitle(str: string) {
     .replace(/^./, s => s.toUpperCase())
     .replace(/_/g, ' ');
 }
+
+// Helper: convert string to camelCase
+export function toCamelCase(str: string) {
+  return str
+    .replace(/[^a-zA-Z0-9 ]/g, '') // Remove non-alphanumeric except space
+    .replace(/(?:^|\s)([a-zA-Z])/g, (_, c) => (c ? c.toUpperCase() : '')) // Capitalize first letter of each word
+    .replace(/\s+/g, '') // Remove spaces
+    .replace(/^([A-Z])/, m => m.toLowerCase()); // Lowercase first char
+}

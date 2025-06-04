@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { AddOn, PricingFeature, UsageLimit } from "../../types";
 import { AnimatePresence, motion } from "framer-motion";
-
-function camelToTitle(str: string) {
-  return str.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
-}
+import { camelToTitle, toCamelCase } from "../../utils/helpers";
 
 function Toggle({ checked, onChange }: { readonly checked: boolean; readonly onChange: (v: boolean) => void }) {
   return (
@@ -32,12 +29,13 @@ export function AddOnsEditor({
   const [modalOpen, setModalOpen] = useState<string | null>(null);
   const [editingAddOn, setEditingAddOn] = useState<AddOn | null>(null);
   const [isScalable, setIsScalable] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Añadir nuevo add-on
   const addAddOn = () => {
     const newKey = `addon${addOns ? Object.keys(addOns).length + 1 : 1}`;
     const newAddOn: AddOn = {
-      name: `New Add-on`,
+      name: `New AddOn`,
       price: 0,
       features: {},
       usageLimits: {},
@@ -60,14 +58,32 @@ export function AddOnsEditor({
   // Guardar cambios en el modal
   const saveAddOn = (key: string) => {
     if (!editingAddOn) return;
-    const updated = { ...(addOns || {}) };
-    updated[key] = { ...editingAddOn };
-    if (isScalable) {
-      delete updated[key].features;
-      delete updated[key].usageLimits;
-    } else {
-      delete updated[key].usageLimitsExtensions;
+    // Validación: solo letras, números y espacios
+    if (!/^[a-zA-Z0-9 ]+$/.test(editingAddOn.name)) {
+      setValidationError('Name can only contain letters, numbers, and spaces.');
+      return;
     }
+    if ((!editingAddOn.features || Object.keys(editingAddOn.features).length === 0) && 
+        (!editingAddOn.usageLimits || Object.keys(editingAddOn.usageLimits).length === 0) &&
+        (!editingAddOn.usageLimitsExtensions || Object.keys(editingAddOn.usageLimitsExtensions).length === 0)) {
+      setValidationError('At least one feature, usage limit or usage limit extension must be defined.');
+      return;
+    }
+
+    setValidationError(null);
+    
+    editingAddOn.name = toCamelCase(editingAddOn.name);
+    const formattedKey = editingAddOn.name;
+    const updated = { ...(addOns || {}) };
+    delete updated[key];
+    updated[formattedKey] = { ...editingAddOn };
+    if (isScalable) {
+      delete updated[formattedKey].features;
+      delete updated[formattedKey].usageLimits;
+    } else {
+      delete updated[formattedKey].usageLimitsExtensions;
+    }
+
     onChange(updated);
     setModalOpen(null);
     setEditingAddOn(null);
@@ -185,6 +201,9 @@ export function AddOnsEditor({
             </div>
           </div>
         )}
+        {validationError && (
+          <div className="text-red-500 text-xs font-semibold mt-1">{validationError}</div>
+        )}
       </div>
     );
   }
@@ -213,7 +232,7 @@ export function AddOnsEditor({
                 setIsScalable(!!addOn.usageLimitsExtensions && Object.keys(addOn.usageLimitsExtensions).length > 0);
               }}
             >
-              <span className="font-medium text-blue-700">{addOn.name}</span>
+              <span className="font-medium text-blue-700">{camelToTitle(addOn.name)}</span>
               <button
                 className="text-red-500 hover:text-red-700 text-xs ml-2"
                 onClick={e => {
@@ -244,7 +263,7 @@ export function AddOnsEditor({
             >
               <button
                 className="absolute top-2 right-2 text-gray-400 hover:text-gray-700"
-                onClick={() => { setModalOpen(null); setEditingAddOn(null); }}
+                onClick={() => { setValidationError(null); setModalOpen(null); setEditingAddOn(null); }}
               >
                 <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -255,7 +274,7 @@ export function AddOnsEditor({
               <div className="flex gap-2 mt-6">
                 <button
                   className="flex-1 bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300 transition font-semibold"
-                  onClick={() => { setModalOpen(null); setEditingAddOn(null); }}
+                  onClick={() => { setValidationError(null); setModalOpen(null); setEditingAddOn(null); }}
                 >
                   Cancel
                 </button>
