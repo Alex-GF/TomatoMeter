@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Pricing, Plan } from "../../types";
+import { Pricing, Plan, AddOn } from "../../types";
 import axios from "../../lib/axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { PlansEditor } from "./PlansEditor";
+import { AddOnsEditor } from "./AddOnsEditor";
 
 interface PricingEditorProps {
   readonly open: boolean;
@@ -13,6 +14,7 @@ interface PricingEditorProps {
 export default function PricingEditor({ open, onClose, side = "right" }: PricingEditorProps) {
   const [pricing, setPricing] = useState<Pricing | null>(null);
   const [editedPlans, setEditedPlans] = useState<Record<string, Plan> | undefined>(undefined);
+  const [editedAddOns, setEditedAddOns] = useState<Record<string, AddOn> | undefined>(undefined);
 
   useEffect(() => {
     if (open) {
@@ -22,6 +24,7 @@ export default function PricingEditor({ open, onClose, side = "right" }: Pricing
           console.log('Fetched pricing:', fetchedPricing);
           setPricing(fetchedPricing);
           setEditedPlans(fetchedPricing.plans);
+          setEditedAddOns(fetchedPricing.addOns);
         })
         .catch(error => {
           console.error('Error fetching pricing:', error);
@@ -63,13 +66,18 @@ export default function PricingEditor({ open, onClose, side = "right" }: Pricing
                   onChange={plans => setEditedPlans(plans)}
                   usageLimits={pricing.usageLimits}
                 />
-                {/* Aquí irán las secciones de add-ons y el botón de submit */}
+                <AddOnsEditor
+                  addOns={editedAddOns}
+                  onChange={setEditedAddOns}
+                  features={pricing.features}
+                  usageLimits={pricing.usageLimits}
+                />
                 <button
                   className="mt-8 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => {
                     if (!editedPlans || Object.keys(editedPlans).length === 0) return;
-                    const newPricing = { ...pricing, plans: editedPlans };
-                    // TODO: incluir addOns cuando se editen
+                    const newPricing = { ...pricing, plans: editedPlans, addOns: editedAddOns };
+                    // TODO: incluir lógica para el submit
                     // eslint-disable-next-line no-console
                     console.log('New pricing:', newPricing);
                   }}
