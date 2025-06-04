@@ -42,3 +42,18 @@ export function toCamelCase(str: string) {
     .replace(/\s+/g, '') // Remove spaces
     .replace(/^([A-Z])/, m => m.toLowerCase()); // Lowercase first char
 }
+
+export function computePriceSplit(plans: Record<string, { price: number }>) {
+  
+  if (!plans || typeof plans !== 'object') {
+    throw new Error('Invalid plans data');
+  }
+  
+  const minPrice = Math.min(...Object.values(plans).map(plan => plan.price));
+  const maxPrice = Math.max(...Object.values(plans).map(plan => plan.price));
+
+  const priceRange = maxPrice - minPrice;
+  const split = priceRange / 3;
+
+  return split;
+}
