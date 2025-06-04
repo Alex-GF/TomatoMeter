@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Pricing, Plan, UsageLimit } from "../../types";
 import { AnimatePresence, motion } from "framer-motion";
+import { toCamelCase } from "../../utils/helpers";
 
 // Utilidad para transformar camelCase a texto con espacios
 function camelToTitle(str: string) {
@@ -32,6 +33,7 @@ export function PlansEditor({
 }) {
   const [localPlans, setLocalPlans] = useState<Record<string, Plan>>(pricing.plans || {});
   const [editingPlan, setEditingPlan] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState<string>("");
   const plansEndRef = useRef<HTMLDivElement>(null);
 
   // Sincroniza localPlans con pricing.plans si cambia el objeto pricing
@@ -67,12 +69,13 @@ export function PlansEditor({
 
   // Añadir nuevo plan
   const addPlan = () => {
-    const newPlanKey = `plan${Object.keys(localPlans).length + 1}`;
     setLocalPlans(prev => {
+      const newName = `newPlan`;
+      const newPlanKey = toCamelCase(newName);
       const updated = {
         ...prev,
         [newPlanKey]: {
-          name: `New Plan`,
+          name: newPlanKey,
           price: 0,
           features: {},
           usageLimits: {}
@@ -97,6 +100,12 @@ export function PlansEditor({
     });
   };
 
+  // Cuando se inicia la edición, mostrar el nombre legible
+  const startEditing = (planKey: string) => {
+    setEditingPlan(planKey);
+    setDisplayName(camelToTitle(localPlans[planKey]?.name ?? planKey));
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
@@ -119,31 +128,45 @@ export function PlansEditor({
                 {editingPlan === planKey ? (
                   <input
                     className="font-bold text-blue-700 text-base bg-white border-b border-blue-400 focus:outline-none px-1"
-                    value={plan.name ?? camelToTitle(planKey)}
+                    value={displayName}
                     autoFocus
-                    onBlur={() => setEditingPlan(null)}
-                    onChange={e => {
-                      const name = e.target.value;
+                    onBlur={() => {
+                      // Al salir, guardar en camelCase
+                      const newKey = toCamelCase(displayName);
                       setLocalPlans(prev => {
-                        const updated = { ...prev };
-                        updated[planKey] = { ...updated[planKey], name };
-                        onChange(updated);
-                        return updated;
+                        if (newKey !== planKey && displayName.trim() !== "") {
+                          if (prev[newKey]) return prev; // Evita duplicados
+                          const updated = { ...prev };
+                          updated[newKey] = { ...updated[planKey], name: newKey };
+                          delete updated[planKey];
+                          onChange(updated);
+                          setEditingPlan(null);
+                          return updated;
+                        } else {
+                          const updated = { ...prev };
+                          updated[planKey] = { ...updated[planKey], name: newKey };
+                          onChange(updated);
+                          setEditingPlan(null);
+                          return updated;
+                        }
                       });
                     }}
+                    onChange={e => setDisplayName(e.target.value)}
                     onKeyDown={e => {
-                      if (e.key === 'Enter') setEditingPlan(null);
+                      if (e.key === 'Enter') {
+                        (e.target as HTMLInputElement).blur();
+                      }
                     }}
                   />
                 ) : (
                   <button
                     className="font-bold text-blue-700 text-base cursor-text bg-transparent border-none p-0"
-                    onClick={() => setEditingPlan(planKey)}
+                    onClick={() => startEditing(planKey)}
                     onKeyDown={e => {
-                      if (e.key === 'Enter' || e.key === ' ') setEditingPlan(planKey);
+                      if (e.key === 'Enter' || e.key === ' ') startEditing(planKey);
                     }}
                   >
-                    {plan.name ?? camelToTitle(planKey)}
+                    {camelToTitle(plan.name ?? planKey)}
                   </button>
                 )}
                 <button
