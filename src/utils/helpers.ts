@@ -1,9 +1,9 @@
-import { TokenService } from "space-react-client";
-import axios from "../lib/axios";
+import { TokenService } from 'space-react-client';
+import axios from '../lib/axios';
 
 export function formatToCamelCase(str: string): string {
   return str
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, (match, index) => 
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, (match, index) =>
       index === 0 ? match.toLowerCase() : match.toUpperCase()
     )
     .replace(/\s+/g, '');
@@ -21,8 +21,8 @@ export function revertCamelCaseToString(str: string): string {
 
 export async function renewToken(tokenService: TokenService): Promise<void> {
   return axios.post('/contracts/renew-token').then(response => {
-      const pricingToken = response.data.pricingToken;
+    const pricingToken = response.data.pricingToken;
 
-      tokenService.updatePricingToken(pricingToken);
-    });
+    tokenService.updatePricingToken(pricingToken);
+  });
 }

@@ -20,7 +20,7 @@ router.get('/contracts/pricing', async (req, res) => {
   try{
     const contract = await container.spaceClient?.contracts.getContract(testUserId);
 
-    const currentPricingVersion = contract?.contractedServices.tomatoMeter;
+    const currentPricingVersion = contract?.contractedServices.tomatometer;
 
     if (!currentPricingVersion) {
       return res.status(404).json({ error: 'No pricing version found' });

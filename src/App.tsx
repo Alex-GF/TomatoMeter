@@ -5,6 +5,7 @@ import { SettingsContext, SettingsToggle } from './contexts/settingsContext';
 import { PageProvider } from './contexts/pageContext';
 import { type SpaceConfiguration } from 'space-react-client';
 import { SpaceProvider } from 'space-react-client';
+import PricingEditor from './components/pricing-editor';
 
 export default function App() {
   const [toggles, setToggles] = useState<SettingsToggle>({
@@ -27,16 +28,21 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [toggles['Dark mode']]);
-  
+
   return (
     <SpaceProvider config={spaceConfig}>
-      <PageProvider>
-        <SettingsContext.Provider value={{ toggles, setToggles }}>
-          <SubscriptionProvider>
-            <DemoApp />
-          </SubscriptionProvider>
-        </SettingsContext.Provider>
-      </PageProvider>
+      <div className="flex h-screen w-screen">
+        <PricingEditor />
+        <div className="w-full grow">
+          <PageProvider>
+            <SettingsContext.Provider value={{ toggles, setToggles }}>
+              <SubscriptionProvider>
+                <DemoApp />
+              </SubscriptionProvider>
+            </SettingsContext.Provider>
+          </PageProvider>
+        </div>
+      </div>
     </SpaceProvider>
   );
 }
