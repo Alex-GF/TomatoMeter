@@ -19,53 +19,60 @@ export function configureSpaceClient() {
   container.spaceClient.on('error', (error: Error) => {
     console.log('------- Cannot connect to SPACE -------');
     console.error(error);
-    console.log("---------");
+    console.log('---------');
     console.log(`User URL: ${process.env.VITE_SPACE_URL || 'http://localhost:5403'}`);
     console.log(`API Key: ${process.env.VITE_SPACE_API_KEY || 'your-api-key'}`);
-    console.log("---------");
-    console.log('Please check that your .env file information corresponds to the configuration of SPACE.');
+    console.log('---------');
+    console.log(
+      'Please check that your .env file information corresponds to the configuration of SPACE.'
+    );
   });
 }
 
 async function spaceSynchronizationCallback() {
   console.log('Space client synchronized successfully');
 
+  if (!container.spaceClient?.httpUrl) {
+    throw new Error('Space client HTTP URL is not defined');
+  }
+
+  if (!container.spaceClient?.apiKey) {
+    throw new Error('Space client API key is not defined');
+  }
+
   SpaceServiceOperations.setAxiosInstance(
-    container.spaceClient?.httpUrl!,
-    container.spaceClient?.apiKey!
+    container.spaceClient.httpUrl,
+    container.spaceClient?.apiKey
   );
 
   try {
     await SpaceServiceOperations.getService('TomatoMeter');
 
     console.log('TomatoMeter service and test user contract already exist, skipping creation');
-  } catch (_) {
+  } catch {
     await SpaceServiceOperations.addService('./api/resources/TomatoMeter.yml');
 
     console.log('TomatoMeter service and test user contract created successfully');
   }
 }
 
-async function pricingCreatedCallback(data: { serviceName: string; pricingVersion: any }) {
-  const pricing = await SpaceServiceOperations.getPricing(
-    data.serviceName,
-    data.pricingVersion
-  );
+async function pricingCreatedCallback(data: { serviceName: string; pricingVersion: string }) {
+  const pricing = await SpaceServiceOperations.getPricing(data.serviceName, data.pricingVersion);
 
   container.spaceClient?.contracts
     .getContract(testUserId)
-    .then(async _ => {
+    .then(async () => {
       await container.spaceClient?.contracts.updateContractSubscription(testUserId, {
         contractedServices: {
           tomatometer: data.pricingVersion,
         },
         subscriptionPlans: {
-          tomatometer: Object.keys(pricing?.plans!)[0],
+          tomatometer: Object.keys(pricing?.plans ?? {})[0] || 'BASIC',
         },
         subscriptionAddOns: {},
       });
     })
-    .catch(async _ => {
+    .catch(async () => {
       await container.spaceClient?.contracts.addContract({
         userContact: {
           userId: testUserId,

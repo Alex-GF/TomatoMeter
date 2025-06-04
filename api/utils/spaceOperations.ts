@@ -96,7 +96,7 @@ export class SpaceServiceOperations {
     pricingVersion: string,
     newAvailability: 'active' | 'archived',
     fallbackSubscription?: FallbackSubscription
-  ): Promise<any> {
+  ): Promise<Service> {
     if (newAvailability !== 'active' && newAvailability !== 'archived') {
       throw new Error('Invalid availability status. Use "active" or "archived".');
     }
@@ -134,7 +134,7 @@ export class SpaceServiceOperations {
    * @throws An error if the operation fails.
    * @private
    */
-  private static async _postWithFile(endpoint: string, filePath: string): Promise<any> {
+  private static async _postWithFile(endpoint: string, filePath: string): Promise<Service> {
     const form = new FormData();
     const fileStream = fs.createReadStream(filePath);
     form.append('pricing', fileStream, path.basename(filePath));
@@ -150,7 +150,7 @@ export class SpaceServiceOperations {
         timeout: 5000,
       });
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error adding service with file:', error.response?.data || error);
       throw error;
     }
@@ -166,7 +166,7 @@ export class SpaceServiceOperations {
    * @throws An error if the operation fails.
    * @private
    */
-  private static async _postWithUrl(endpoint: string, pricingUrl: string): Promise<any> {
+  private static async _postWithUrl(endpoint: string, pricingUrl: string): Promise<Service> {
     return await this.axiosInstance
       .post(
         endpoint,
@@ -201,7 +201,7 @@ export class SpaceServiceOperations {
         timeout: 5000,
       });
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       if (error.response) {
         console.error('Error response from server:', error.response.data);
         throw new Error(`Failed to add service: ${error.response.data.message}`);
