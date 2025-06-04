@@ -34,7 +34,6 @@ export function DemoApp() {
   useEffect(() => {
     renewToken(tokenService);
     const onPricingCreated = async (data: { serviceName: string; pricingVersion: string }) => {
-      console.log('Pricing created:', data);
       axios
         .put('/contracts', {
           contractedServices: {
@@ -52,7 +51,6 @@ export function DemoApp() {
         });
     };
     const onPricingArchived = async () => {
-      console.log('Pricing archived');
       await renewToken(tokenService);
       setReloadTrigger(prev => prev + 1);
     };

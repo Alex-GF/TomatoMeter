@@ -31,7 +31,6 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
         .get('/contracts/pricing')
         .then(response => {
           const fetchedPricing: Pricing = response.data;
-          console.log('Fetched pricing:', fetchedPricing);
           setPricing(fetchedPricing);
           setEditedPlans(fetchedPricing.plans);
           setEditedAddOns(fetchedPricing.addOns);
