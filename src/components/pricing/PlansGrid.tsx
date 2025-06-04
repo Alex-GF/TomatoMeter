@@ -1,12 +1,6 @@
 import { motion } from 'framer-motion';
 import { Plan, PricingFeature } from '../../types';
-
-function camelToTitle(str: string) {
-  return str
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, s => s.toUpperCase())
-    .replace(/_/g, ' ');
-}
+import { camelToTitle } from '../../utils/helpers';
 
 // const PLAN_COLORS: Record<string, string> = {
 //   BASIC: 'from-purple-400 to-purple-600',
@@ -25,7 +19,7 @@ export function PlansGrid({ plans, features, selectedPlan, onSelect }: PlansGrid
   const planKeys = Object.keys(plans);
   const featureKeys = Object.keys(features);
   return (
-    <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch">
+    <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch flex-wrap">
       {planKeys.map((planKey, idx) => {
         const plan = plans[planKey];
         return (
@@ -34,7 +28,7 @@ export function PlansGrid({ plans, features, selectedPlan, onSelect }: PlansGrid
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1, duration: 0.5, type: 'spring' }}
-            className={`flex flex-col flex-1 min-w-[260px] max-w-[340px] rounded-2xl shadow-xl p-8 border-2 transition-all duration-300 cursor-pointer ${
+            className={`flex flex-col w-[260px] rounded-2xl shadow-xl p-8 border-2 transition-all duration-300 cursor-pointer ${
               selectedPlan === planKey
                 ? 'border-purple-500 dark:border-yellow-400 scale-105 bg-white dark:bg-gray-900'
                 : 'border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 hover:scale-105'
@@ -42,7 +36,7 @@ export function PlansGrid({ plans, features, selectedPlan, onSelect }: PlansGrid
             onClick={() => onSelect(planKey)}
           >
             <span className="text-xl font-bold text-purple-700 dark:text-yellow-300 mb-2">
-              {plan.name ?? camelToTitle(planKey)}
+              {plan.name ? camelToTitle(plan.name) : camelToTitle(planKey)}
             </span>
             <span className="text-3xl font-extrabold text-purple-900 dark:text-yellow-200 mb-2">
               {plan.price}

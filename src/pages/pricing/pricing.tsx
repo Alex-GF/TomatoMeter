@@ -8,10 +8,12 @@ import { Pricing, Contract } from '../../types';
 import { PlansGrid } from '../../components/pricing/PlansGrid';
 import { AddOnsGrid } from '../../components/pricing/AddOnsGrid';
 import { FeatureTable } from '../../components/pricing/FeatureTable';
+import PricingLoader from '../../components/loading/PricingLoader';
 
 const PricingPage = () => {
   const [pricing, setPricing] = useState<Pricing | null>(null);
   const [userContract, setUserContract] = useState<Contract | null>(null);
+
   const subscription = useContext(SubscriptionContext);
   if (!subscription) throw new Error('SubscriptionContext not found');
   const { setCurrentSubscription } = subscription;
@@ -54,16 +56,32 @@ const PricingPage = () => {
   // Handlers
   const handlePlanChange = async (planKey: string) => {
     setSelectedPlan(planKey);
-    setCurrentSubscription([planKey, ...Object.entries(selectedAddOns).map(([k, v]) => `${k}X${v}`)]);
+    setCurrentSubscription([
+      planKey,
+      ...Object.entries(selectedAddOns).map(([k, v]) => `${k}X${v}`),
+    ]);
     await updateContract(planKey, selectedAddOns, tokenService);
   };
 
   const handleAddonChange = async (addonKey: string, value: number) => {
     const newAddOns = { ...selectedAddOns, [addonKey]: value };
     setSelectedAddOns(newAddOns);
-    setCurrentSubscription([selectedPlan!, ...Object.entries(newAddOns).map(([k, v]) => `${k}X${v}`)]);
+    setCurrentSubscription([
+      selectedPlan!,
+      ...Object.entries(newAddOns).map(([k, v]) => `${k}X${v}`),
+    ]);
     await updateContract(selectedPlan!, newAddOns, tokenService);
   };
+
+  // Loader: only render main UI if both userContract and pricing are loaded
+  if (!userContract || !pricing) {
+    return (
+      <PricingLoader
+        title="Pricing"
+        message="Please wait while we fetch the latest plans and your subscription details."
+      />
+    );
+  }
 
   // Render helpers
   const plans = pricing?.plans ?? {};
@@ -87,7 +105,7 @@ const PricingPage = () => {
         plans={plans}
         features={features}
         selectedPlan={selectedPlan}
-        onSelect={async (planKey) => await handlePlanChange(planKey)}
+        onSelect={async planKey => await handlePlanChange(planKey)}
       />
       {/* ADDONS */}
       {Object.keys(addOns).length > 0 && (
@@ -123,7 +141,7 @@ const PricingPage = () => {
         usageLimits={usageLimits}
         addOns={addOns}
         selectedPlan={selectedPlan}
-        onSelect={async (planKey) => await handlePlanChange(planKey)}
+        onSelect={async planKey => await handlePlanChange(planKey)}
       />
     </div>
   );

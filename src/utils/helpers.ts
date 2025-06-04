@@ -26,3 +26,10 @@ export async function renewToken(tokenService: TokenService): Promise<void> {
     tokenService.updatePricingToken(pricingToken);
   });
 }
+
+export function camelToTitle(str: string) {
+  return str
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, s => s.toUpperCase())
+    .replace(/_/g, ' ');
+}
