@@ -41,6 +41,31 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
     }
   }, [open]);
 
+  const handlePlansChange = (plans: Record<string, Plan>) => {
+    setEditedPlans(plans);
+    // Si se añade un nuevo plan, inclúyelo en availableFor de todos los add-ons existentes
+    if (editedAddOns) {
+      const planKeys = Object.keys(plans);
+      const prevPlanKeys = editedPlans ? Object.keys(editedPlans) : [];
+      // Detecta si hay algún plan nuevo
+      const newPlans = planKeys.filter(k => !prevPlanKeys.includes(k));
+      if (newPlans.length > 0) {
+        const updatedAddOns = { ...editedAddOns };
+        Object.entries(updatedAddOns).forEach(([addOnKey, addOn]) => {
+          if (Array.isArray(addOn.availableFor)) {
+            // Añade los nuevos planes si no están ya
+            const newAvailable = [...addOn.availableFor];
+            newPlans.forEach(planKey => {
+              if (!newAvailable.includes(planKey)) newAvailable.push(planKey);
+            });
+            updatedAddOns[addOnKey] = { ...addOn, availableFor: newAvailable };
+          }
+        });
+        setEditedAddOns(updatedAddOns);
+      }
+    }
+  };
+
   const position = side === 'left' ? { left: 0, right: 'auto' } : { right: 0, left: 'auto' };
   const initialX = side === 'left' ? '-100%' : '100%';
 
@@ -91,7 +116,7 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
                   <>
                     <PlansEditor
                       pricing={pricing}
-                      onChange={plans => setEditedPlans(plans)}
+                      onChange={handlePlansChange}
                       usageLimits={pricing.usageLimits}
                     />
                     <AddOnsEditor
@@ -107,7 +132,7 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
 
                         // --- Add-on/plan consistency check ---
                         const validPlanKeys = editedPlans ? Object.keys(editedPlans) : [];
-                        let cleanedAddOns = { ...editedAddOns };
+                        const cleanedAddOns = { ...editedAddOns };
                         if (cleanedAddOns) {
                           for (const [addOnKey, addOn] of Object.entries(cleanedAddOns)) {
                             if (Array.isArray(addOn.availableFor)) {

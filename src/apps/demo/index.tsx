@@ -11,6 +11,7 @@ import axios from '../../lib/axios';
 import { usePricingToken, useSpaceClient } from 'space-react-client';
 import { renewToken } from '../../utils/helpers';
 import PricingEditor from '../../components/pricing-editor';
+import { useSubscription } from '../../hooks/useSubscription';
 
 export const SIDEBAR_ITEMS = [
   { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
@@ -22,6 +23,7 @@ export const SIDEBAR_ITEMS = [
 
 export function DemoApp() {
   const { toggles, setToggles } = useContext(SettingsContext);
+  const { setCurrentSubscription } = useSubscription();
   const { selectedPage } = usePage();
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [isPricingEditorOpen, setPricingEditorOpen] = useState<boolean>(false);
@@ -34,21 +36,25 @@ export function DemoApp() {
   useEffect(() => {
     renewToken(tokenService);
     const onPricingCreated = async (data: { serviceName: string; pricingVersion: string }) => {
-      axios
-        .put('/contracts', {
-          contractedServices: {
-            tomatometer: data.pricingVersion || '1.0.0',
-          },
-          subscriptionPlans: {
-            tomatometer: 'BASIC',
-          },
-          subscriptionAddOns: {},
-        })
-        .then(() => {
-          renewToken(tokenService).then(() => {
-            setReloadTrigger(prev => prev + 1);
+      axios.get('/contracts/pricing').then(response => {
+        const pricing = response.data;
+        axios
+          .put('/contracts', {
+            contractedServices: {
+              tomatometer: data.pricingVersion || '1.0.0',
+            },
+            subscriptionPlans: {
+              tomatometer: Object.keys(pricing.plans)[0]
+            },
+            subscriptionAddOns: {},
+          })
+          .then(() => {
+            renewToken(tokenService).then(() => {
+              setCurrentSubscription([Object.keys(pricing.plans)[0]]);
+              setReloadTrigger(prev => prev + 1);
+            });
           });
-        });
+      });
     };
     const onPricingArchived = async () => {
       await renewToken(tokenService);
@@ -70,13 +76,24 @@ export function DemoApp() {
           onClick={() => setPricingEditorOpen(true)}
           className="fixed top-8 left-8 z-40 bg-white shadow-lg rounded-full px-5 py-2 font-semibold text-demo-primary hover:bg-gray-100 transition-all border border-gray-200 flex items-center gap-2"
         >
-          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <svg
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
           Edit Pricing
         </button>
         {/* Sidebar de Pricing Editor a la izquierda */}
-        <PricingEditor open={isPricingEditorOpen} onClose={() => setPricingEditorOpen(false)} side="left" />
+        <PricingEditor
+          open={isPricingEditorOpen}
+          onClose={() => setPricingEditorOpen(false)}
+          side="left"
+        />
         {/* Main app centered */}
         <main className="flex h-screen items-center justify-center">
           <div className="h-[75vh] w-[75vw] max-w-[1500px] overflow-hidden rounded-[25px] bg-white shadow-lg">

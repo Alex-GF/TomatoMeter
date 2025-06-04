@@ -111,7 +111,9 @@ router.post('/contracts/pricing', async (req, res) => {
 
     const stream = Readable.from([yamlStr]);
 
-    SpaceServiceOperations.addPricing('tomatometer', undefined, stream);
+    await SpaceServiceOperations.addPricing('tomatometer', undefined, stream);
+
+    
 
     res.status(200).json({ message: 'Pricing received successfully' });
   } catch (error) {

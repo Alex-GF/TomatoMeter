@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SIDEBAR_ITEMS } from '../../apps/demo';
-import { SubscriptionContext } from '../../contexts/subscriptionContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCrown, FaGem, FaRegStar } from 'react-icons/fa';
 import { usePage } from '../../contexts/pageContext';
 import { computePriceSplit, revertCamelCaseToString } from '../../utils/helpers';
 import axios from '../../lib/axios';
 import { Plan } from '../../types';
+import { useSubscription } from '../../hooks/useSubscription';
 
 const PLAN_ICONS: Record<string, JSX.Element> = {
   expensive: <FaCrown className="inline-block text-yellow-300 mr-2 animate-bounce" size={22} />,
@@ -24,9 +24,7 @@ const Sidebar = () => {
 
   const [plans, setPlans] = useState<Record<string, "cheap" | "medium" | "expensive">>({});
 
-  const subscription = useContext(SubscriptionContext);
-  if (!subscription) throw new Error('SubscriptionContext not found');
-  const { currentSubscription } = subscription;
+  const {currentSubscription} = useSubscription();
   const { selectedPage, setSelectedPage } = usePage();
 
   // Parse currentSubscription to extract plan and addons
@@ -65,7 +63,7 @@ const Sidebar = () => {
       .catch(error => {
         console.error('Error fetching pricing data:', error);
       })
-  }, [])
+  }, [currentSubscription]);
 
   return (
     <div className="flex h-full min-w-72 flex-col items-center bg-gray-900 px-4 py-10 text-white">
