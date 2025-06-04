@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Pricing } from "../../types";
+import { Pricing, Plan } from "../../types";
 import axios from "../../lib/axios";
 import { motion, AnimatePresence } from "framer-motion";
+import { PlansEditor } from "./PlansEditor";
 
 interface PricingEditorProps {
   readonly open: boolean;
@@ -11,13 +12,16 @@ interface PricingEditorProps {
 
 export default function PricingEditor({ open, onClose, side = "right" }: PricingEditorProps) {
   const [pricing, setPricing] = useState<Pricing | null>(null);
+  const [editedPlans, setEditedPlans] = useState<Record<string, Plan> | undefined>(undefined);
 
   useEffect(() => {
     if (open) {
       axios.get('/contracts/pricing')
         .then(response => {
           const fetchedPricing: Pricing = response.data;
+          console.log('Fetched pricing:', fetchedPricing);
           setPricing(fetchedPricing);
+          setEditedPlans(fetchedPricing.plans);
         })
         .catch(error => {
           console.error('Error fetching pricing:', error);
@@ -53,11 +57,27 @@ export default function PricingEditor({ open, onClose, side = "right" }: Pricing
           </div>
           <div className="flex-1 overflow-y-auto p-6">
             {pricing ? (
-              <div>
-                {/* Aquí irá el editor visual de pricing en el futuro */}
-                <p className="text-gray-600">This feature is under development.</p>
-                <p className="text-gray-600">Please check back later!</p>
-              </div>
+              <>
+                <PlansEditor
+                  pricing={pricing}
+                  onChange={plans => setEditedPlans(plans)}
+                  usageLimits={pricing.usageLimits}
+                />
+                {/* Aquí irán las secciones de add-ons y el botón de submit */}
+                <button
+                  className="mt-8 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => {
+                    if (!editedPlans || Object.keys(editedPlans).length === 0) return;
+                    const newPricing = { ...pricing, plans: editedPlans };
+                    // TODO: incluir addOns cuando se editen
+                    // eslint-disable-next-line no-console
+                    console.log('New pricing:', newPricing);
+                  }}
+                  disabled={!editedPlans || Object.keys(editedPlans).length === 0}
+                >
+                  Submit Pricing
+                </button>
+              </>
             ) : (
               <div className="flex items-center justify-center h-full">
                 <span className="text-gray-400 animate-pulse">Loading pricing...</span>

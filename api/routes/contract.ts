@@ -28,7 +28,7 @@ router.get('/contracts/pricing', async (req, res) => {
 
     const pricing: Pricing = await SpaceServiceOperations.getPricing("TomatoMeter", currentPricingVersion);
 
-    res.status(200).json({ pricing });
+    res.status(200).json(pricing);
   }catch {
     res.status(500).json({ error: 'Failed to fetch contract' });
   }
