@@ -7,11 +7,9 @@ import Pricing from '../../pages/pricing/pricing';
 import { usePage } from '../../contexts/pageContext';
 import DailySummaryPage from '../../pages/daily-summary/daily-summary';
 import Settings from '../../pages/settings/settings';
-import { motion, AnimatePresence } from 'framer-motion';
 import axios from '../../lib/axios';
 import { usePricingToken, useSpaceClient } from 'space-react-client';
 import { renewToken } from '../../utils/helpers';
-import { updateContract } from '../../utils/contracts';
 
 export const SIDEBAR_ITEMS = [
   { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
@@ -29,31 +27,36 @@ export function DemoApp() {
   const spaceClient = useSpaceClient();
   const tokenService = usePricingToken();
 
-  spaceClient.on('pricing_created', async (data: {serviceName: string, pricingVersion: string}) => {
-    axios
-        .put('/contracts', {
-          contractedServices: {
-            tomatometer: data.pricingVersion || '1.0.0',
-          },
-          subscriptionPlans: {
-            tomatometer: 'BASIC',
-          },
-          subscriptionAddOns: {},
-        })
-        .then(() => {
-          renewToken(tokenService).then(() => {
-            setReloadTrigger(prev => prev + 1);
-          })
-        });
-  });
-
-  spaceClient.on('pricing_archived', async () => {
-    await renewToken(tokenService);
-    setReloadTrigger(prev => prev + 1);
-  });
-
   useEffect(() => {
     renewToken(tokenService);
+
+    spaceClient.on(
+      'pricing_created',
+      async (data: { serviceName: string; pricingVersion: string }) => {
+        console.log('Pricing created:', data);
+        axios
+          .put('/contracts', {
+            contractedServices: {
+              tomatometer: data.pricingVersion || '1.0.0',
+            },
+            subscriptionPlans: {
+              tomatometer: 'BASIC',
+            },
+            subscriptionAddOns: {},
+          })
+          .then(() => {
+            renewToken(tokenService).then(() => {
+              setReloadTrigger(prev => prev + 1);
+            });
+          });
+      }
+    );
+
+    spaceClient.on('pricing_archived', async () => {
+      console.log('Pricing archived');
+      await renewToken(tokenService);
+      setReloadTrigger(prev => prev + 1);
+    });
   }, []);
 
   return (

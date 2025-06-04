@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  space-react-client: link:../../../../Library/pnpm/global/5/node_modules/space-react-client
+
 importers:
 
   .:
@@ -72,8 +75,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0
       space-react-client:
-        specifier: ^0.2.0
-        version: 0.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: link:../../../../Library/pnpm/global/5/node_modules/space-react-client
+        version: link:../../../../Library/pnpm/global/5/node_modules/space-react-client
       tsc-alias:
         specifier: 1.8.16
         version: 1.8.16
@@ -2321,12 +2324,6 @@ packages:
     resolution: {integrity: sha512-q7kbtbBL/7zocbRi5OjEFygYXkXCDomkw5OUtFPOkIqRtcjtA2nyu3mn21PjlItijb9aBk51TeSdgj7pD8NKTg==}
     engines: {node: '>=16.0.0'}
 
-  space-react-client@0.2.0:
-    resolution: {integrity: sha512-Cm3lJ8wfbhQ5XQh7jS+QE4k1hoGhwZUFhAcB1BJrwiD63S0g31f0G5R24SED+TSS/t3hNFuCi4l8rSatyK9BAQ==}
-    peerDependencies:
-      react: ^18.3.1
-      react-dom: ^18.3.1
-
   statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
@@ -2395,9 +2392,6 @@ packages:
   timers-browserify@2.0.12:
     resolution: {integrity: sha512-9phl76Cqm6FhSX9Xe1ZUAMLtm1BLkKj2Qd5ApyWkXzsMRaA7dgr81kf4wJmQf/hAvg8EEyJxDo3du/0KlhPiKQ==}
     engines: {node: '>=0.6.0'}
-
-  tiny-emitter@2.1.0:
-    resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
 
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
@@ -4823,19 +4817,6 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  space-react-client@0.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      axios: 1.9.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      socket.io-client: 4.8.1
-      tiny-emitter: 2.1.0
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - supports-color
-      - utf-8-validate
-
   statuses@2.0.1: {}
 
   stream-browserify@3.0.0:
@@ -4938,8 +4919,6 @@ snapshots:
   timers-browserify@2.0.12:
     dependencies:
       setimmediate: 1.0.5
-
-  tiny-emitter@2.1.0: {}
 
   to-regex-range@5.0.1:
     dependencies:
