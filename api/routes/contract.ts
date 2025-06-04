@@ -115,7 +115,7 @@ router.post('/contracts/pricing', async (req, res) => {
 
     res.status(200).json({ message: 'Pricing received successfully' });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to submit pricing', details: error.message });
+    res.status(500).json({ error: 'Failed to submit pricing', details: (error as Error).message });
   }
 });
 

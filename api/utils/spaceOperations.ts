@@ -6,6 +6,8 @@ import { Pricing, Service } from '../types';
 import axios, { AxiosInstance } from 'axios';
 import { Readable } from 'stream';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export class SpaceServiceOperations {
   private static axiosInstance: AxiosInstance;
 
@@ -27,7 +29,7 @@ export class SpaceServiceOperations {
       .then(response => {
         return response.data;
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error retrieving service:', error.response?.data || error);
         throw error;
       });
@@ -63,7 +65,7 @@ export class SpaceServiceOperations {
       .then(response => {
         return response.data;
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error retrieving pricing:', error.response?.data || error);
         throw error;
       });
@@ -134,7 +136,7 @@ export class SpaceServiceOperations {
       .then(response => {
         return response.data;
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error archiving pricing:', error.response.data);
         throw error;
       });
@@ -166,7 +168,7 @@ export class SpaceServiceOperations {
         timeout: 5000,
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding service with file:', error.response?.data || error);
       throw error;
     }
@@ -187,7 +189,7 @@ export class SpaceServiceOperations {
         timeout: 5000,
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding service with file:', error.response?.data || error);
       throw error;
     }
@@ -215,7 +217,7 @@ export class SpaceServiceOperations {
       .then(response => {
         return response.data;
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error adding service/pricing:', error.response.data);
         throw error;
       });
@@ -238,17 +240,18 @@ export class SpaceServiceOperations {
         timeout: 5000,
       });
       return response.data;
-    } catch (error) {
-      if (error.response) {
-        console.error('Error response from server:', error.response.data);
-        throw new Error(`Failed to add service: ${error.response.data.message}`);
-      } else if (error.request) {
-        console.error('No response received:', error.request);
+    } catch (error: any) {
+      if ((error as any).response) {
+        console.error('Error response from server:', (error as any).response.data);
+        throw new Error(`Failed to add service: ${(error as any).response.data.message}`);
+      } else if ((error as any).request) {
+        console.error('No response received:', (error as any).request);
         throw new Error('Failed to add service: No response from server');
       } else {
-        console.error('Error setting up request:', error.message);
-        throw new Error(`Failed to add service: ${error.message}`);
+        console.error('Error setting up request:', (error as any).message);
+        throw new Error(`Failed to add service: ${(error as any).message}`);
       }
     }
+    throw new Error('Unexpected error in addService');
   }
 }
