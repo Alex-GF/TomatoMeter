@@ -6,9 +6,11 @@ services:
         context: ../
         dockerfile: ./api/docker/Dockerfile
         args:
-          SPACE_URL: http://host.docker.internal:5403
+          VITE_SPACE_URL: http://host.docker.internal:5403
     env_file:
       - ../.env
+    environment:
+      VITE_SPACE_URL: http://host.docker.internal:5403
     networks:
       - space-demo-network
   space-demo-client:

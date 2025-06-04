@@ -6,7 +6,7 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: container.spaceClient?.httpUrl,
   headers: {
     'Content-Type': 'application/json',
-    'x-api-key': container.spaceClient?.apiKey!,
+    'x-api-key': container.spaceClient?.apiKey || '',
   },
 });
 
