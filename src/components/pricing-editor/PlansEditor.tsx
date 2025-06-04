@@ -70,7 +70,7 @@ export function PlansEditor({
   // Añadir nuevo plan
   const addPlan = () => {
     setLocalPlans(prev => {
-      const newName = `newPlan`;
+      const newName = 'New Plan';
       const newPlanKey = toCamelCase(newName);
       const updated = {
         ...prev,
@@ -85,6 +85,7 @@ export function PlansEditor({
       setTimeout(() => {
         plansEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
         setEditingPlan(newPlanKey);
+        setDisplayName(newName); // Mostramos 'New Plan' en el input
       }, 100);
       return updated;
     });
@@ -126,38 +127,50 @@ export function PlansEditor({
             <motion.div key={planKey} layout className="bg-gray-50 rounded-lg p-4 shadow" ref={idx === arr.length - 1 ? plansEndRef : undefined}>
               <div className="flex items-center justify-between mb-2">
                 {editingPlan === planKey ? (
-                  <input
-                    className="font-bold text-blue-700 text-base bg-white border-b border-blue-400 focus:outline-none px-1"
-                    value={displayName}
-                    autoFocus
-                    onBlur={() => {
-                      // Al salir, guardar en camelCase
-                      const newKey = toCamelCase(displayName);
-                      setLocalPlans(prev => {
-                        if (newKey !== planKey && displayName.trim() !== "") {
-                          if (prev[newKey]) return prev; // Evita duplicados
-                          const updated = { ...prev };
-                          updated[newKey] = { ...updated[planKey], name: newKey };
-                          delete updated[planKey];
-                          onChange(updated);
-                          setEditingPlan(null);
-                          return updated;
-                        } else {
-                          const updated = { ...prev };
-                          updated[planKey] = { ...updated[planKey], name: newKey };
-                          onChange(updated);
-                          setEditingPlan(null);
-                          return updated;
+                  <div className="flex flex-col w-full">
+                    <input
+                      className="font-bold text-blue-700 text-base bg-white border-b border-blue-400 focus:outline-none px-1"
+                      value={displayName}
+                      autoFocus
+                      onBlur={() => {
+                        const trimmed = displayName.trim();
+                        if (!trimmed) {
+                          setDisplayName("");
+                          return;
                         }
-                      });
-                    }}
-                    onChange={e => setDisplayName(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        (e.target as HTMLInputElement).blur();
-                      }
-                    }}
-                  />
+                        const newKey = toCamelCase(trimmed);
+                        setLocalPlans(prev => {
+                          if (newKey !== planKey && prev[newKey]) {
+                            return prev; // No permite duplicados
+                          }
+                          const updated = { ...prev };
+                          if (newKey !== planKey) {
+                            updated[newKey] = { ...updated[planKey], name: newKey };
+                            delete updated[planKey];
+                          } else {
+                            updated[planKey] = { ...updated[planKey], name: newKey };
+                          }
+                          onChange(updated);
+                          return updated;
+                        });
+                        setEditingPlan(null);
+                      }}
+                      onChange={e => setDisplayName(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          const trimmed = displayName.trim();
+                          if (!trimmed) {
+                            setDisplayName("");
+                            return;
+                          }
+                          (e.target as HTMLInputElement).blur();
+                        }
+                      }}
+                    />
+                    {displayName.trim() === "" && (
+                      <span className="text-xs text-red-500 mt-1">Name cannot be empty.</span>
+                    )}
+                  </div>
                 ) : (
                   <button
                     className="font-bold text-blue-700 text-base cursor-text bg-transparent border-none p-0"
