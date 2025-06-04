@@ -4,6 +4,7 @@ import axios from '../../lib/axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlansEditor } from './PlansEditor';
 import { AddOnsEditor } from './AddOnsEditor';
+import ConfirmPricingModal from './ConfirmPricingModal';
 
 interface PricingEditorProps {
   readonly open: boolean;
@@ -16,6 +17,7 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
   const [editedPlans, setEditedPlans] = useState<Record<string, Plan> | undefined>(undefined);
   const [editedAddOns, setEditedAddOns] = useState<Record<string, AddOn> | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Handler para cerrar al hacer click fuera del sidebar
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -68,6 +70,56 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
 
   const position = side === 'left' ? { left: 0, right: 'auto' } : { right: 0, left: 'auto' };
   const initialX = side === 'left' ? '-100%' : '100%';
+
+  const hasChanges = () => {
+    if (!pricing) return false;
+    return (
+      JSON.stringify(pricing.plans) !== JSON.stringify(editedPlans) ||
+      JSON.stringify(pricing.addOns) !== JSON.stringify(editedAddOns)
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (!editedPlans || Object.keys(editedPlans).length === 0) return;
+
+    // --- Add-on/plan consistency check ---
+    const validPlanKeys = editedPlans ? Object.keys(editedPlans) : [];
+    const cleanedAddOns = { ...editedAddOns };
+    if (cleanedAddOns) {
+      for (const [addOnKey, addOn] of Object.entries(cleanedAddOns)) {
+        if (Array.isArray(addOn.availableFor)) {
+          // Filtra los planes que ya no existen
+          const filtered = addOn.availableFor.filter(plan => validPlanKeys.includes(plan));
+          if (filtered.length === 0) {
+            // Si no queda ningún plan válido, elimina el add-on
+            delete cleanedAddOns[addOnKey];
+          } else if (filtered.length !== addOn.availableFor.length) {
+            // Si se han eliminado planes, actualiza el array
+            cleanedAddOns[addOnKey] = { ...addOn, availableFor: filtered };
+          }
+        }
+      }
+    }
+    // --- END CHECK ---
+    const newPricing: PricingToCreate = {
+      ...pricing,
+      version: pricing?.version || '',
+      currency: pricing?.currency || '',
+      features: pricing?.features || {},
+      usageLimits: pricing?.usageLimits || {},
+      createdAt: new Date().toISOString().split('T')[0],
+      plans: editedPlans,
+      addOns: cleanedAddOns,
+    };
+
+    setIsSubmitting(true);
+
+    await axios.post('/contracts/pricing', newPricing);
+    setIsSubmitting(false);
+    onClose();
+    setEditedPlans(undefined);
+    setEditedAddOns(undefined);
+  };
 
   return (
     <>
@@ -129,47 +181,24 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
                       className="mt-8 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={async () => {
                         if (!editedPlans || Object.keys(editedPlans).length === 0) return;
-
-                        // --- Add-on/plan consistency check ---
-                        const validPlanKeys = editedPlans ? Object.keys(editedPlans) : [];
-                        const cleanedAddOns = { ...editedAddOns };
-                        if (cleanedAddOns) {
-                          for (const [addOnKey, addOn] of Object.entries(cleanedAddOns)) {
-                            if (Array.isArray(addOn.availableFor)) {
-                              // Filtra los planes que ya no existen
-                              const filtered = addOn.availableFor.filter(plan => validPlanKeys.includes(plan));
-                              if (filtered.length === 0) {
-                                // Si no queda ningún plan válido, elimina el add-on
-                                delete cleanedAddOns[addOnKey];
-                              } else if (filtered.length !== addOn.availableFor.length) {
-                                // Si se han eliminado planes, actualiza el array
-                                cleanedAddOns[addOnKey] = { ...addOn, availableFor: filtered };
-                              }
-                            }
-                          }
+                        if (hasChanges()) {
+                          setShowConfirm(true);
+                        } else {
+                          await handleSubmit();
                         }
-                        // --- END CHECK ---
-                        const newPricing: PricingToCreate = {
-                          ...pricing,
-                          createdAt: new Date().toISOString().split('T')[0],
-                          plans: editedPlans,
-                          addOns: cleanedAddOns,
-                        };
-
-                        setIsSubmitting(true);
-
-                        console.log(newPricing)
-
-                        await axios.post('/contracts/pricing', newPricing);
-                        setIsSubmitting(false);
-                        onClose();
-                        setEditedPlans(undefined);
-                        setEditedAddOns(undefined);
                       }}
                       disabled={!editedPlans || Object.keys(editedPlans).length === 0 || isSubmitting}
                     >
                       Submit Pricing
                     </button>
+                    <ConfirmPricingModal
+                      open={showConfirm}
+                      onCancel={() => setShowConfirm(false)}
+                      onConfirm={async () => {
+                        setShowConfirm(false);
+                        await handleSubmit();
+                      }}
+                    />
                   </>
                 ) : (
                   <div className="flex items-center justify-center h-full">
