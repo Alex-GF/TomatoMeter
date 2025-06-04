@@ -4,6 +4,7 @@ import FormData from 'form-data';
 import { FallbackSubscription } from 'space-node-client';
 import { Pricing, Service } from '../types';
 import axios, { AxiosInstance } from 'axios';
+import { Readable } from 'stream';
 
 export class SpaceServiceOperations {
   private static axiosInstance: AxiosInstance;
@@ -68,14 +69,29 @@ export class SpaceServiceOperations {
       });
   }
 
-  static async addPricing(serviceName: string, url: string) {
-    const isRemoteUrl = /^(http|https):\/\//.test(url);
-    const endpoint = `/services/${serviceName}/pricings`;
-    if (isRemoteUrl) {
-      return await this._postWithUrl(endpoint, url);
-    } else {
-      const resolvedPath = path.resolve(process.cwd(), url);
-      return await this._postWithFile(endpoint, resolvedPath);
+  static async addPricing(serviceName: string, url?: string, file?: Readable) {
+    
+    if (!url && !file) {
+      throw new Error('You must provide either a URL or a file to add pricing.');
+    }
+
+    if (url && file) {
+      throw new Error('You cannot provide both a URL and a file. Please provide only one.');
+    }
+    
+    if (url) {
+      const isRemoteUrl = /^(http|https):\/\//.test(url);
+      const endpoint = `/services/${serviceName}/pricings`;
+      if (isRemoteUrl) {
+        return await this._postWithUrl(endpoint, url);
+      } else {
+        const resolvedPath = path.resolve(process.cwd(), url);
+        return await this._postWithFilePath(endpoint, resolvedPath);
+      }
+    }
+
+    if (file) {
+      return await this._postWithFile(`/services/${serviceName}/pricings`, file);
     }
   }
 
@@ -134,10 +150,31 @@ export class SpaceServiceOperations {
    * @throws An error if the operation fails.
    * @private
    */
-  private static async _postWithFile(endpoint: string, filePath: string): Promise<Service> {
+  private static async _postWithFilePath(endpoint: string, filePath: string): Promise<Service> {
     const form = new FormData();
     const fileStream = fs.createReadStream(filePath);
     form.append('pricing', fileStream, path.basename(filePath));
+    try {
+      const response = await this.axiosInstance.post(endpoint, form, {
+        headers: {
+          ...form.getHeaders(),
+          ...this.axiosInstance.defaults.headers.common,
+          ...this.axiosInstance.defaults.headers.post,
+        },
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+        timeout: 5000,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error adding service with file:', error.response?.data || error);
+      throw error;
+    }
+  }
+
+  private static async _postWithFile(endpoint: string, file: Readable): Promise<Service> {
+    const form = new FormData();
+    form.append('pricing', file, `${new Date().getTime()}.yaml`);
     try {
       const response = await this.axiosInstance.post(endpoint, form, {
         headers: {

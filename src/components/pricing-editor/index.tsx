@@ -1,24 +1,26 @@
-import { useEffect, useState } from "react";
-import { Pricing, Plan, AddOn } from "../../types";
-import axios from "../../lib/axios";
-import { motion, AnimatePresence } from "framer-motion";
-import { PlansEditor } from "./PlansEditor";
-import { AddOnsEditor } from "./AddOnsEditor";
+import { useEffect, useState } from 'react';
+import { Pricing, Plan, AddOn, PricingToCreate } from '../../types';
+import axios from '../../lib/axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PlansEditor } from './PlansEditor';
+import { AddOnsEditor } from './AddOnsEditor';
 
 interface PricingEditorProps {
   readonly open: boolean;
   readonly onClose: () => void;
-  readonly side?: "left" | "right";
+  readonly side?: 'left' | 'right';
 }
 
-export default function PricingEditor({ open, onClose, side = "right" }: PricingEditorProps) {
+export default function PricingEditor({ open, onClose, side = 'right' }: PricingEditorProps) {
   const [pricing, setPricing] = useState<Pricing | null>(null);
   const [editedPlans, setEditedPlans] = useState<Record<string, Plan> | undefined>(undefined);
   const [editedAddOns, setEditedAddOns] = useState<Record<string, AddOn> | undefined>(undefined);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (open) {
-      axios.get('/contracts/pricing')
+      axios
+        .get('/contracts/pricing')
         .then(response => {
           const fetchedPricing: Pricing = response.data;
           console.log('Fetched pricing:', fetchedPricing);
@@ -32,8 +34,8 @@ export default function PricingEditor({ open, onClose, side = "right" }: Pricing
     }
   }, [open]);
 
-  const position = side === "left" ? { left: 0, right: 'auto' } : { right: 0, left: 'auto' };
-  const initialX = side === "left" ? '-100%' : '100%';
+  const position = side === 'left' ? { left: 0, right: 'auto' } : { right: 0, left: 'auto' };
+  const initialX = side === 'left' ? '-100%' : '100%';
 
   return (
     <AnimatePresence>
@@ -53,7 +55,14 @@ export default function PricingEditor({ open, onClose, side = "right" }: Pricing
               className="rounded-full p-2 hover:bg-gray-100 transition-colors"
               aria-label="Close pricing editor"
             >
-              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -74,17 +83,69 @@ export default function PricingEditor({ open, onClose, side = "right" }: Pricing
                 />
                 <button
                   className="mt-8 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => {
+                  onClick={async () => {
                     if (!editedPlans || Object.keys(editedPlans).length === 0) return;
-                    const newPricing = { ...pricing, plans: editedPlans, addOns: editedAddOns };
-                    // TODO: incluir lógica para el submit
-                    // eslint-disable-next-line no-console
-                    console.log('New pricing:', newPricing);
+                    const newPricing: PricingToCreate = {
+                      ...pricing,
+                      createdAt: new Date().toISOString().split('T')[0],
+                      plans: editedPlans,
+                      addOns: editedAddOns,
+                    };
+
+                    setIsSubmitting(true);
+
+                    await axios.post('/contracts/pricing', newPricing);
+                    setIsSubmitting(false);
+                    onClose();
+                    setEditedPlans(undefined);
+                    setEditedAddOns(undefined);
                   }}
-                  disabled={!editedPlans || Object.keys(editedPlans).length === 0}
+                  disabled={!editedPlans || Object.keys(editedPlans).length === 0 || isSubmitting}
                 >
                   Submit Pricing
                 </button>
+                {/* Loader modal */}
+                <AnimatePresence>
+                  {isSubmitting && (
+                    <motion.div
+                      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <motion.div
+                        className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center gap-4"
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.95, opacity: 0 }}
+                      >
+                        <svg
+                          className="animate-spin h-10 w-10 text-blue-600"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                          ></path>
+                        </svg>
+                        <span className="text-blue-700 font-semibold text-lg">
+                          Saving pricing...
+                        </span>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </>
             ) : (
               <div className="flex items-center justify-center h-full">

@@ -23,6 +23,11 @@ export interface FeatureTogglingContextType {
   setLibrary: (libraryName: FeatureFlagLibrary) => void; // Set the library to use
 }
 
+export type PricingToCreate = Omit<Pricing, "createdAt"> & {
+  saasName?: string;
+  syntaxVersion?: string;
+  createdAt?: string;
+}
 
 export interface Pricing {
   id?: string;
