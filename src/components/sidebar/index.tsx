@@ -33,10 +33,10 @@ const Sidebar = () => {
     .slice(1)
     .map(str => {
       const match = str.match(/(.+)X(\d+)/);
-      if (match) return [match[1], parseInt(match[2], 10)];
+      if (match) return [match[1], Number(match[2])];
       return null;
     })
-    .filter(Boolean) as [string, number][];
+    .filter((item): item is [string, number] => !!item && typeof item[1] === 'number' && item[1] > 0);
 
   useEffect(() => {
     axios.get('/contracts/pricing')
