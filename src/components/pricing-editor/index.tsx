@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PlansEditor } from './PlansEditor';
 import { AddOnsEditor } from './AddOnsEditor';
 import ConfirmPricingModal from './ConfirmPricingModal';
+import { useTimeline } from '../../contexts/timelineContext';
 
 interface PricingEditorProps {
   readonly open: boolean;
@@ -18,6 +19,7 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
   const [editedAddOns, setEditedAddOns] = useState<Record<string, AddOn> | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const { addEvent } = useTimeline();
 
   // Handler para cerrar al hacer click fuera del sidebar
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -113,12 +115,36 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
     };
 
     setIsSubmitting(true);
-
-    await axios.post('/contracts/pricing', newPricing);
-    setIsSubmitting(false);
-    onClose();
-    setEditedPlans(undefined);
-    setEditedAddOns(undefined);
+    try {
+      await axios.post('/contracts/pricing', newPricing);
+      // Evento de provider: pricing changed
+      const providerEventId = addEvent({
+        type: 'provider',
+        label: `Pricing updated (${Object.keys(editedPlans).length} plans, ${Object.keys(cleanedAddOns || {}).length} add-ons)`,
+        plansSnapshot: { ...editedPlans },
+        addOnsSnapshot: { ...cleanedAddOns }
+      });
+      // Actualizar contrato del usuario al primer plan del nuevo pricing
+      const firstPlanKey = Object.keys(editedPlans)[0];
+      await axios.put('/contracts', {
+        contractedServices: { tomatometer: newPricing.version || '1.0.0' },
+        subscriptionPlans: { tomatometer: firstPlanKey },
+        subscriptionAddOns: { tomatometer: {} },
+      });
+      // Evento de user: suscripción cambiada automáticamente por el proveedor
+      addEvent({
+        type: 'user',
+        label: `Auto-subscribed to ${firstPlanKey}`,
+        linkedId: providerEventId
+      });
+      setIsSubmitting(false);
+      onClose();
+      setEditedPlans(undefined);
+      setEditedAddOns(undefined);
+    } catch (err) {
+      setIsSubmitting(false);
+      console.error('Error submitting pricing:', err);
+    }
   };
 
   return (

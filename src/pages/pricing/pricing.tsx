@@ -10,6 +10,7 @@ import { PlansGrid } from '../../components/pricing/PlansGrid';
 import { AddOnsGrid } from '../../components/pricing/AddOnsGrid';
 import { FeatureTable } from '../../components/pricing/FeatureTable';
 import PricingLoader from '../../components/loading/PricingLoader';
+import { useTimeline } from '../../contexts/timelineContext';
 
 const PricingPage = () => {
   const [pricing, setPricing] = useState<Pricing | null>(null);
@@ -20,6 +21,7 @@ const PricingPage = () => {
   const { setCurrentSubscription } = subscription;
   const tokenService = usePricingToken();
   const { toggles } = useContext(SettingsContext);
+  const { addEvent } = useTimeline();
 
   // Notification state
   const [notification, setNotification] = useState<string | null>(null);
@@ -70,6 +72,10 @@ const PricingPage = () => {
       setNotification('Plan changed successfully!');
       setTimeout(() => setNotification(null), 2500);
     }
+    addEvent({
+      type: 'user',
+      label: `User changed plan to ${planKey}`
+    });
   };
 
   const handleAddonChange = async (addonKey: string, value: number) => {
@@ -84,6 +90,10 @@ const PricingPage = () => {
       setNotification('Add-on selection updated!');
       setTimeout(() => setNotification(null), 2500);
     }
+    addEvent({
+      type: 'user',
+      label: `User updated add-ons (${addonKey}: ${value})`
+    });
   };
 
   // Loader: only render main UI if both userContract and pricing are loaded

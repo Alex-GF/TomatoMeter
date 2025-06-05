@@ -12,6 +12,7 @@ import { usePricingToken, useSpaceClient } from 'space-react-client';
 import { renewToken } from '../../utils/helpers';
 import PricingEditor from '../../components/pricing-editor';
 import { useSubscription } from '../../hooks/useSubscription';
+import { TimelineDual } from '../../components/timeline/TimelineDual';
 
 export const SIDEBAR_ITEMS = [
   { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
@@ -71,6 +72,10 @@ export function DemoApp() {
   return (
     <SettingsContext.Provider value={settingsValue}>
       <div className="relative h-screen w-screen bg-gray-200">
+        {/* TimelineDual at the top, outside main app block */}
+        <div className="w-full flex justify-center pt-4 pb-2 z-30 absolute top-0">
+          <TimelineDual />
+        </div>
         {/* Floating button to open Pricing Editor */}
         <button
           onClick={() => setPricingEditorOpen(true)}

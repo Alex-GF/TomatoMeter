@@ -5,6 +5,7 @@ import { SettingsContext, SettingsToggle } from './contexts/settingsContext';
 import { PageProvider } from './contexts/pageContext';
 import { type SpaceConfiguration } from 'space-react-client';
 import { SpaceProvider } from 'space-react-client';
+import { TimelineProvider } from './contexts/timelineContext';
 
 export default function App() {
   const [toggles, setToggles] = useState<SettingsToggle>({
@@ -31,15 +32,19 @@ export default function App() {
 
   return (
     <SpaceProvider config={spaceConfig}>
-      <div className="flex h-screen w-screen">
-          <PageProvider>
-            <SettingsContext.Provider value={{ toggles, setToggles }}>
-              <SubscriptionProvider>
-                <DemoApp />
-              </SubscriptionProvider>
-            </SettingsContext.Provider>
-          </PageProvider>
+      <TimelineProvider>
+        <div className="flex flex-col h-screen w-screen">
+          <div className="flex flex-1">
+            <PageProvider>
+              <SettingsContext.Provider value={{ toggles, setToggles }}>
+                <SubscriptionProvider>
+                  <DemoApp />
+                </SubscriptionProvider>
+              </SettingsContext.Provider>
+            </PageProvider>
+          </div>
         </div>
+      </TimelineProvider>
     </SpaceProvider>
   );
 }
