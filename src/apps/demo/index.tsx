@@ -35,8 +35,8 @@ export function DemoApp() {
 
   useEffect(() => {
     renewToken(tokenService);
-    const onPricingCreated = async (data: { serviceName: string; pricingVersion: string }) => {
-      axios.get('/contracts/pricing').then(response => {
+    const onPricingCreated = async (data: { serviceName: string; pricingVersion: string }) => {  
+      axios.get(`/pricings/${data.serviceName}/${data.pricingVersion}`).then(response => {
         const pricing = response.data;
         axios
           .put('/contracts', {
