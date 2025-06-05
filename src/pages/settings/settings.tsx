@@ -82,7 +82,7 @@ const Settings = () => {
           if (option.featureId === '') {
             return (
               <SettingsOption
-                  key={new Date().getTime()}
+                  key={option.name}
                   idx={idx}
                   option={option}
                   customDuration={customDuration}
@@ -94,7 +94,7 @@ const Settings = () => {
             <Feature id={option.featureId}>
               <On>
                 <SettingsOption
-                  key={new Date().getTime()}
+                  key={option.name}
                   idx={idx}
                   option={option}
                   customDuration={customDuration}
@@ -103,7 +103,7 @@ const Settings = () => {
               </On>
               <Default>
                 <SettingsOption
-                  key={new Date().getTime()}
+                  key={option.name + '-premium'}
                   idx={idx}
                   option={option}
                   premium={true}
