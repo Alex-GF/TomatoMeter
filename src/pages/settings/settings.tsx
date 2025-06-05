@@ -50,6 +50,11 @@ const settingsOptions = [
     description: 'Show a motivational quote at the start of each pomodoro.',
     featureId: 'tomatometer-motivationalQuotes',
   },
+  {
+    name: 'Show plan/add-on notifications',
+    description: 'Show a popup notification when you change your plan or add-ons.',
+    featureId: '', // No feature gating, siempre visible
+  },
 ];
 
 const Settings = () => {
@@ -74,6 +79,17 @@ const Settings = () => {
       </motion.h1>
       <div className="flex flex-col gap-6">
         {settingsOptions.map((option, idx) => {
+          if (option.featureId === '') {
+            return (
+              <SettingsOption
+                  key={new Date().getTime()}
+                  idx={idx}
+                  option={option}
+                  customDuration={customDuration}
+                  setCustomDuration={setCustomDuration}
+                />
+            )
+          }
           return (
             <Feature id={option.featureId}>
               <On>

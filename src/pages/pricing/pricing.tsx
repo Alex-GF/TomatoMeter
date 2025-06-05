@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SubscriptionContext } from '../../contexts/subscriptionContext';
+import { SettingsContext } from '../../contexts/settingsContext';
 import { updateContract } from '../../utils/contracts';
 import { usePricingToken } from 'space-react-client';
 import axios from '../../lib/axios';
@@ -18,6 +19,10 @@ const PricingPage = () => {
   if (!subscription) throw new Error('SubscriptionContext not found');
   const { setCurrentSubscription } = subscription;
   const tokenService = usePricingToken();
+  const { toggles } = useContext(SettingsContext);
+
+  // Notification state
+  const [notification, setNotification] = useState<string | null>(null);
 
   // Fetch pricing and contract
   useEffect(() => {
@@ -61,6 +66,10 @@ const PricingPage = () => {
       ...Object.entries(selectedAddOns).map(([k, v]) => `${k}X${v}`),
     ]);
     await updateContract(planKey, selectedAddOns, tokenService);
+    if (toggles['Show plan/add-on notifications']) {
+      setNotification('Plan changed successfully!');
+      setTimeout(() => setNotification(null), 2500);
+    }
   };
 
   const handleAddonChange = async (addonKey: string, value: number) => {
@@ -71,6 +80,10 @@ const PricingPage = () => {
       ...Object.entries(newAddOns).map(([k, v]) => `${k}X${v}`),
     ]);
     await updateContract(selectedPlan!, newAddOns, tokenService);
+    if (toggles['Show plan/add-on notifications']) {
+      setNotification('Add-on selection updated!');
+      setTimeout(() => setNotification(null), 2500);
+    }
   };
 
   // Loader: only render main UI if both userContract and pricing are loaded
@@ -92,6 +105,18 @@ const PricingPage = () => {
   // UI
   return (
     <div className="h-full w-full overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-8 flex flex-col gap-8 transition-colors duration-500">
+      <AnimatePresence>
+        {notification && (
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            className="fixed top-8 left-1/2 z-50 -translate-x-1/2 bg-purple-600 text-white px-6 py-3 rounded-xl shadow-lg font-bold text-lg"
+          >
+            {notification}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

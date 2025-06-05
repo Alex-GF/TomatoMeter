@@ -12,6 +12,7 @@ export default function App() {
     'Dark mode': false,
     'Custom pomodoro duration': false,
     'Motivational quotes': false,
+    'Show plan/add-on notifications': true,
   });
 
   const spaceConfig: SpaceConfiguration = {
