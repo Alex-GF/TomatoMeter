@@ -74,7 +74,9 @@ const PricingPage = () => {
     }
     addEvent({
       type: 'user',
-      label: `User changed plan to ${planKey}`
+      label: `User changed plan to ${planKey}`,
+      plansSnapshot: { [planKey]: plans[planKey] },
+      addOnsSnapshot: { ...selectedAddOns }
     });
   };
 
@@ -92,7 +94,9 @@ const PricingPage = () => {
     }
     addEvent({
       type: 'user',
-      label: `User updated add-ons (${addonKey}: ${value})`
+      label: `User updated add-ons (${addonKey}: ${value})`,
+      plansSnapshot: selectedPlan ? { [selectedPlan]: plans[selectedPlan] } : {},
+      addOnsSnapshot: { ...newAddOns }
     });
   };
 

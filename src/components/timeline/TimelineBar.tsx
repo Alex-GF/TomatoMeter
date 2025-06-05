@@ -145,6 +145,29 @@ function DotWithTooltip({ event, idx, type, x, visible, dotSize, timelineHeight 
               )}
             </div>
           )}
+          {/* Mostrar snapshot de suscripción para eventos de usuario */}
+          {type === 'user' && event.plansSnapshot && (
+            <div className="mt-2">
+              <div className="font-bold text-xs mb-1 text-purple-600 dark:text-yellow-300">Plan</div>
+              <div className="text-xs text-gray-700 dark:text-gray-200">
+                {Object.values(event.plansSnapshot)[0]?.name || Object.keys(event.plansSnapshot)[0]}
+              </div>
+              {event.addOnsSnapshot && Object.keys(event.addOnsSnapshot).length > 0 && (
+                <>
+                  <div className="font-bold text-xs mb-1 text-purple-600 dark:text-yellow-300">Add-ons</div>
+                  <ul className="max-h-32 overflow-y-auto pr-2">
+                    {Object.entries(event.addOnsSnapshot).map(([addOnKey, qty]) => (
+                      typeof qty === 'number' && qty > 0 ? (
+                        <li key={addOnKey} className="text-xs text-gray-700 dark:text-gray-200">
+                          <span className="font-semibold">{addOnKey}</span>{qty > 1 ? ` ×${qty}` : ''}
+                        </li>
+                      ) : null
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          )}
           <div className="mt-1 text-[10px] text-gray-400">{new Date(event.timestamp).toLocaleString()}</div>
         </motion.div>
       )}

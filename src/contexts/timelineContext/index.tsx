@@ -12,7 +12,7 @@ export interface TimelineEvent {
   linkedId?: string;
   // For provider events: snapshot of pricing state
   plansSnapshot?: Record<string, import('../../types').Plan>;
-  addOnsSnapshot?: Record<string, import('../../types').AddOn>;
+  addOnsSnapshot?: Record<string, import('../../types').AddOn> | Record<string, number>;
   timelineIndex?: number; // posición global en el timeline
 }
 
