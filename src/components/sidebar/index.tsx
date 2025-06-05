@@ -51,7 +51,7 @@ const Sidebar = () => {
             splittedPlans[planName] = 'cheap';
           } else if (((planDetails as Plan).price as number) < priceSplit * 2) {
             splittedPlans[planName] = 'medium';
-          } else if (((planDetails as Plan).price as number) <= priceSplit * 3) {
+          } else if (((planDetails as Plan).price as number) >= priceSplit * 2) {
             splittedPlans[planName] = 'expensive';
           }else{
             throw new Error(`Invalid price for plan ${planName}: ${(planDetails as Plan).price}`);
