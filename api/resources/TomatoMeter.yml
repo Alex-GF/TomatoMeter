@@ -72,13 +72,13 @@ usageLimits:
     linkedFeatures:
       - pomodoroTimer
 plans:
-  BASIC:
+  basic:
     description: Basic plan
     price: 0.0
     unit: user/month
     features: null
     usageLimits: null
-  ADVANCED:
+  advanced:
     description: Advanced plan
     price: 3.99
     unit: user/month
@@ -92,7 +92,7 @@ plans:
     usageLimits:
       maxPomodoroTimers:
         value: 10
-  PREMIUM:
+  premium:
     description: Premium plan
     price: 9.99
     unit: user/month
