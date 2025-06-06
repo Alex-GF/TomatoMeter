@@ -68,8 +68,18 @@ const Sidebar = () => {
   return (
     <div className="flex h-full min-w-72 w-72 flex-col items-center bg-gray-900 px-4 py-10 text-white">
       <div className="mb-8 text-center">
-        <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-white text-black">
-          <span className="text-[40px] font-bold">U</span>
+        <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-white text-black overflow-hidden">
+          {/* Default user avatar SVG */}
+          <svg
+            viewBox="0 0 90 90"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-full"
+          >
+            <circle cx="45" cy="45" r="45" fill="#F3F4F6" />
+            <circle cx="45" cy="38" r="18" fill="#D1D5DB" />
+            <ellipse cx="45" cy="70" rx="24" ry="14" fill="#D1D5DB" />
+          </svg>
         </div>
         <h1 className="mt-4 text-xl font-semibold">Welcome</h1>
         <motion.div
