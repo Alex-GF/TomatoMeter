@@ -1,27 +1,30 @@
-import { useContext } from 'react';
-import { SIDEBAR_ITEMS } from '../../apps/demo';
-import { SubscriptionContext } from '../../contexts/subscriptionContext';
+import { useEffect, useState } from 'react';
+import { SIDEBAR_ITEMS } from '../../constants/sidebarItems';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCrown, FaGem, FaRegStar } from 'react-icons/fa';
 import { usePage } from '../../contexts/pageContext';
-import { revertCamelCaseToString } from '../../utils/helpers';
+import { computePriceSplit, revertCamelCaseToString } from '../../utils/helpers';
+import axios from '../../lib/axios';
+import { Plan } from '../../types';
+import { useSubscription } from '../../hooks/useSubscription';
 
 const PLAN_ICONS: Record<string, JSX.Element> = {
-  PREMIUM: <FaCrown className="inline-block text-yellow-300 mr-2 animate-bounce" size={22} />,
-  ADVANCED: <FaGem className="inline-block text-blue-300 mr-2 animate-pulse" size={20} />,
-  BASIC: <FaRegStar className="inline-block text-gray-200 mr-2" size={20} />,
+  expensive: <FaCrown className="inline-block text-yellow-300 mr-2 animate-bounce" size={22} />,
+  medium: <FaGem className="inline-block text-blue-300 mr-2 animate-pulse" size={20} />,
+  cheap: <FaRegStar className="inline-block text-gray-200 mr-2" size={20} />,
 };
 
 const PLAN_COLORS: Record<string, string> = {
-  PREMIUM: 'from-yellow-400 to-yellow-600',
-  ADVANCED: 'from-blue-400 to-blue-600',
-  BASIC: 'from-gray-400 to-gray-600',
+  expensive: 'from-yellow-400 to-yellow-600',
+  medium: 'from-blue-400 to-blue-600',
+  cheap: 'from-gray-400 to-gray-600',
 };
 
 const Sidebar = () => {
-  const subscription = useContext(SubscriptionContext);
-  if (!subscription) throw new Error('SubscriptionContext not found');
-  const { currentSubscription } = subscription;
+
+  const [plans, setPlans] = useState<Record<string, "cheap" | "medium" | "expensive">>({});
+
+  const {currentSubscription} = useSubscription();
   const { selectedPage, setSelectedPage } = usePage();
 
   // Parse currentSubscription to extract plan and addons
@@ -30,16 +33,53 @@ const Sidebar = () => {
     .slice(1)
     .map(str => {
       const match = str.match(/(.+)X(\d+)/);
-      if (match) return [match[1], parseInt(match[2], 10)];
+      if (match) return [match[1], Number(match[2])];
       return null;
     })
-    .filter(Boolean) as [string, number][];
+    .filter((item): item is [string, number] => !!item && typeof item[1] === 'number' && item[1] > 0);
+
+  useEffect(() => {
+    axios.get('/contracts/pricing')
+      .then(response => {
+        const pricing = response.data;
+        const priceSplit = computePriceSplit(pricing.plans);
+        const splittedPlans: Record<string, "cheap" | "medium" | "expensive"> = {};
+        Object.entries(pricing.plans).forEach(([planName, planDetails]) => {
+          if (typeof (planDetails as Plan).price === "string"){
+            splittedPlans[planName] = 'expensive';
+          }else if (((planDetails as Plan).price as number) < priceSplit) {
+            splittedPlans[planName] = 'cheap';
+          } else if (((planDetails as Plan).price as number) < priceSplit * 2) {
+            splittedPlans[planName] = 'medium';
+          } else if (((planDetails as Plan).price as number) >= priceSplit * 2) {
+            splittedPlans[planName] = 'expensive';
+          }else{
+            throw new Error(`Invalid price for plan ${planName}: ${(planDetails as Plan).price}`);
+          }
+        });
+
+        setPlans(splittedPlans);
+      })
+      .catch(error => {
+        console.error('Error fetching pricing data:', error);
+      })
+  }, [currentSubscription]);
 
   return (
-    <div className="flex h-full min-w-72 flex-col items-center bg-gray-900 px-4 py-10 text-white">
+    <div className="flex h-full min-w-72 w-72 flex-col items-center bg-gray-900 px-4 py-10 text-white">
       <div className="mb-8 text-center">
-        <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-white text-black">
-          <span className="text-[40px] font-bold">U</span>
+        <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-white text-black overflow-hidden">
+          {/* Default user avatar SVG */}
+          <svg
+            viewBox="0 0 90 90"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-full"
+          >
+            <circle cx="45" cy="45" r="45" fill="#F3F4F6" />
+            <circle cx="45" cy="38" r="18" fill="#D1D5DB" />
+            <ellipse cx="45" cy="70" rx="24" ry="14" fill="#D1D5DB" />
+          </svg>
         </div>
         <h1 className="mt-4 text-xl font-semibold">Welcome</h1>
         <motion.div
@@ -47,12 +87,12 @@ const Sidebar = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 120, damping: 12 }}
           className={`mt-4 rounded-2xl p-0.5 bg-gradient-to-r ${
-            PLAN_COLORS[planName] || PLAN_COLORS['BASIC']
+            PLAN_COLORS[plans[planName]] || PLAN_COLORS['cheap']
           } shadow-xl`}
         >
           <div className="flex flex-col items-center rounded-2xl bg-gray-900/90 px-5 py-4 min-w-[180px]">
             <div className="flex items-center gap-2 mb-1">
-              {PLAN_ICONS[planName] || PLAN_ICONS['BASIC']}
+              {PLAN_ICONS[plans[planName]] || PLAN_ICONS['cheap']}
               <span className="text-lg font-bold tracking-wide uppercase">{planName} Plan</span>
             </div>
             <AnimatePresence>
@@ -90,9 +130,9 @@ const Sidebar = () => {
               transition={{ delay: 0.5 }}
               className="mt-3 text-[11px] text-gray-300 font-medium"
             >
-              {planName === 'PREMIUM' && 'You have access to all features!'}
-              {planName === 'ADVANCED' && 'Most features unlocked. Upgrade for more.'}
-              {planName === 'BASIC' && 'Basic features enabled. Upgrade for more!'}
+              {plans[planName] === 'expensive' && 'Full power unlocked for your team!'}
+              {plans[planName] === 'medium' && 'Almost everything is now at your fingertips!'}
+              {plans[planName] === 'cheap' && 'You\'re all set with the essentials!'}
             </motion.div>
           </div>
         </motion.div>

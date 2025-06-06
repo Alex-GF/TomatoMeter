@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Default, feature, Feature, On } from 'pricing4react';
+import { Default, Feature, On } from 'space-react-client';
 import SettingsOption from '../../components/settings-option';
 import { usePage } from '../../contexts/pageContext';
 
@@ -50,6 +50,11 @@ const settingsOptions = [
     description: 'Show a motivational quote at the start of each pomodoro.',
     featureId: 'tomatometer-motivationalQuotes',
   },
+  {
+    name: 'Show plan/add-on notifications',
+    description: 'Show a popup notification when you change your plan or add-ons.',
+    featureId: '', // No feature gating, siempre visible
+  },
 ];
 
 const Settings = () => {
@@ -74,11 +79,22 @@ const Settings = () => {
       </motion.h1>
       <div className="flex flex-col gap-6">
         {settingsOptions.map((option, idx) => {
+          if (option.featureId === '') {
+            return (
+              <SettingsOption
+                  key={option.name}
+                  idx={idx}
+                  option={option}
+                  customDuration={customDuration}
+                  setCustomDuration={setCustomDuration}
+                />
+            )
+          }
           return (
-            <Feature expression={feature(option.featureId)}>
+            <Feature id={option.featureId}>
               <On>
                 <SettingsOption
-                  key={new Date().getTime()}
+                  key={option.name}
                   idx={idx}
                   option={option}
                   customDuration={customDuration}
@@ -87,7 +103,7 @@ const Settings = () => {
               </On>
               <Default>
                 <SettingsOption
-                  key={new Date().getTime()}
+                  key={option.name + '-premium'}
                   idx={idx}
                   option={option}
                   premium={true}

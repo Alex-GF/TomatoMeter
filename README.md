@@ -33,45 +33,23 @@ You can launch the entire demo locally using Docker.
 
 Before running the demo, you need to have a SPACE instance running. You can do this by following these steps:
 
-1. Clone the space repository and navigate to its folder:
+1. Clone the repository, navigate to its folder and run SPACE using docker compose:
 
 ```bash
-git clone https://github.com/Alex-GF/space-demo.git
-cd space-demo
-```
-
-2. Create a `.env` file with the minimum required variables and test data:
-
-> For a quicker setup, we recommend running the following command to create a simple `.env` file.
-
-```bash
-cat <<EOF > .env
-# ---------- CACHE CONFIGURATION (Redis) ----------
-
-REDIS_URL=redis://localhost:6379
-
-# ---------- JWT CONFIGURATION ----------
-
-JWT_SECRET=test_secret
-JWT_SALT='wgv~eb6v=VWwC9GIG1q6rZ]J.tUM(M'
-JWT_EXPIRATION=1d
-
-# ---------- DEFAULT USER CONFIGURATION ----------
-
-ADMIN_USER=admin
-ADMIN_PASSWORD=4dm1n
-EOF
-```
-
-3. Run the SPACE instance using Docker Compose:
-
-```bash
-cd docker/production
-
+git clone https://github.com/Alex-GF/space.git
+cd space
 docker compose up -d
 ```
 
-Then wait for the SPACE instance to start. If everything is set up correctly, your space instance should be running at [http://localhost:5403](http://localhost:5403/api/v1/healthcheck).
+Then wait for the SPACE instance to start. If everything is set up correctly, your space instance should be running at [http://localhost:5403](http://localhost:5403).
+
+If you want to explore SPACE, you can log in into the app using the following default credentials:
+
+- **Username:** `admin`
+- **Password:** `space4all`
+
+> [!NOTE]
+> If you are interested in learning more about SPACE, you can check out the [SPACE documentation](https://github.com/Alex-GF/space#readme) for more details on how to set it up, configure it, and use its features.
 
 ### Run TomatoMeter (demo application)
 
@@ -84,8 +62,9 @@ git clone https://github.com/Alex-GF/space-demo.git
 cd space-demo
 ```
 
-2. Generate a `.env` file that sets the environment variable *SPACE_API_KEY*:
+2. Generate a `.env` file that sets the both the domain where SPACE is hosted and the API Key that will be used by the demo application to connect to SPACE. This file is **required** for the demo to work properly.
 
+> [!TIP]
 > For quiker setup, you can run the following command to create a `.env` file with the necessary configuration. This will run a script that rerieves the API key of an admin user from the SPACE instance you started earlier (considering that you used the configuration provided in this tutorial to do so).
 
 ```bash

@@ -1,138 +1,115 @@
-import { useContext, useState } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import Sidebar from '../../components/sidebar';
-import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
-import WeeklyProductivity from '../../pages/weekly-productivity/weekly-productivity';
 import { SettingsContext } from '../../contexts/settingsContext';
-import Pricing from '../../pages/pricing/pricing';
-import { usePage } from '../../contexts/pageContext';
-import DailySummaryPage from '../../pages/daily-summary/daily-summary';
-import Settings from '../../pages/settings/settings';
-import { motion, AnimatePresence } from 'framer-motion';
 import axios from '../../lib/axios';
+import { usePricingToken, useSpaceClient } from 'space-react-client';
+import { renewToken } from '../../utils/helpers';
+import PricingEditor from '../../components/pricing-editor';
+import { useSubscription } from '../../hooks/useSubscription';
+import { TimelineDual } from '../../components/timeline/TimelineDual';
+import { SIDEBAR_ITEMS } from '../../constants/sidebarItems';
+import { usePage } from '../../contexts/pageContext';
 
-export const SIDEBAR_ITEMS = [
-  { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
-  { name: 'Daily Summary', component: <DailySummaryPage /> },
-  { name: 'Weekly Productivity', component: <WeeklyProductivity /> },
-  { name: 'Pricing', component: <Pricing /> },
-  { name: 'Settings', component: <Settings /> },
-];
+// SIDEBAR_ITEMS debe moverse fuera de este archivo para evitar el error de Fast Refresh.
+// Puedes moverlo a un archivo como src/constants/sidebarItems.ts y exportarlo desde allí.
+// Por ahora, lo dejamos aquí para mantener la funcionalidad, pero considera refactorizarlo.
 
 export function DemoApp() {
   const { toggles, setToggles } = useContext(SettingsContext);
+  const { setCurrentSubscription } = useSubscription();
   const { selectedPage } = usePage();
-  const [showModal, setShowModal] = useState(false);
-  const [triggered, setTriggered] = useState(false);
-  const [currentPricingVersion, setCurrentPricingVersion] = useState('1.0.0');
+  const [reloadTrigger, setReloadTrigger] = useState<number>(0);
+  const [isPricingEditorOpen, setPricingEditorOpen] = useState<boolean>(false);
 
-  async function handleTrigger() {
-    const currentContract = (await axios.get('/contracts')).data.contract;
+  const spaceClient = useSpaceClient();
+  const tokenService = usePricingToken();
 
-    if (!triggered && currentContract.contractedServices.tomatometer === '1.0.0') {
-      try{
-        await axios.post('/pricing/trigger');
-        setShowModal(true);
-        setTriggered(true);
-        setCurrentPricingVersion("2.0.0");
-      }catch (error) {
-        setShowModal(true);
-        setTriggered(true);
-        setCurrentPricingVersion("2.0.0");
-      }
-    }else{
-      const newVersion = currentContract.contractedServices.tomatometer === '1.0.0' ? '2.0.0' : '1.0.0';
-      await axios.put('/contracts', {
-        contractedServices: {
-          tomatometer: newVersion,
-        },
-        subscriptionPlans: {
-          tomatometer: 'BASIC',
-        },
-        subscriptionAddOns: {
-          tomatometer: {},
-        },
-      })
+  const settingsValue = useMemo(() => ({ toggles, setToggles }), [toggles, setToggles]);
 
-      setShowModal(true);
-      setCurrentPricingVersion(newVersion);
-    }
-  }
+  useEffect(() => {
+    renewToken(tokenService);
+    const onPricingCreated = async (data: { serviceName: string; pricingVersion: string }) => {  
+      axios.get(`/pricings/${data.serviceName}/${data.pricingVersion}`).then(response => {
+        const pricing = response.data;
+        axios
+          .put('/contracts', {
+            contractedServices: {
+              tomatometer: data.pricingVersion || '1.0.0',
+            },
+            subscriptionPlans: {
+              tomatometer: Object.keys(pricing.plans)[0]
+            },
+            subscriptionAddOns: {},
+          })
+          .then(() => {
+            renewToken(tokenService).then(() => {
+              setCurrentSubscription([Object.keys(pricing.plans)[0]]);
+              setReloadTrigger(prev => prev + 1);
+            });
+          });
+      });
+    };
+    const onPricingArchived = async () => {
+      await renewToken(tokenService);
+      setReloadTrigger(prev => prev + 1);
+    };
+    spaceClient.on('pricing_created', onPricingCreated);
+    spaceClient.on('pricing_archived', onPricingArchived);
+    return () => {
+      spaceClient.off('pricing_created', onPricingCreated);
+      spaceClient.off('pricing_archived', onPricingArchived);
+    };
+  }, [spaceClient, tokenService, setCurrentSubscription]);
 
   return (
-    <SettingsContext.Provider value={{ toggles, setToggles }}>
-      <main className="flex h-screen items-center justify-center bg-gray-200 p-[5vw] relative">
-        <div className="h-[75vh] w-[75vw] max-w-[1500px] overflow-hidden rounded-[25px] bg-white shadow-lg">
-          <div className="flex h-full bg-demo-primary">
-            <Sidebar />
-            <div className="my-6 mr-6 flex flex-grow flex-col overflow-hidden rounded-[25px]">
-              <div className={`flex h-full w-full items-center justify-center bg-white`}>
-                <div className="w-full h-full overflow-y-auto">
-                  {SIDEBAR_ITEMS.find(item => item.name === selectedPage)!.component}
+    <SettingsContext.Provider value={settingsValue}>
+      <div className="relative h-screen w-screen bg-gray-200">
+        {/* TimelineDual at the top, outside main app block */}
+        <div className="fixed w-full left-0 top-0 flex justify-center pt-4 pb-2 z-50 bg-gray-200/95 transition-all">
+          <TimelineDual />
+        </div>
+        {/* Floating button to open Pricing Editor */}
+        <button
+          onClick={() => setPricingEditorOpen(true)}
+          className="fixed top-8 left-8 z-50 bg-white shadow-lg rounded-full px-5 py-2 font-semibold text-demo-primary hover:bg-gray-100 transition-all border border-gray-200 flex items-center gap-2"
+        >
+          <svg
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Edit Pricing
+        </button>
+        {/* Sidebar de Pricing Editor a la izquierda */}
+        <PricingEditor
+          open={isPricingEditorOpen}
+          onClose={() => setPricingEditorOpen(false)}
+          side="left"
+        />
+        {/* Main app centered */}
+        <main className="flex h-screen items-center justify-center pt-[120px]">
+          <div className="h-[75vh] w-[75vw] max-w-[1500px] overflow-hidden rounded-[25px] bg-white shadow-lg">
+            <div className="flex h-full bg-demo-primary">
+              <Sidebar />
+              <div
+                key={reloadTrigger}
+                className="my-6 mr-6 flex flex-grow flex-col overflow-hidden rounded-[25px]"
+              >
+                <div className={`flex h-full w-full items-center justify-center bg-white`}>
+                  <div className="w-full h-full overflow-y-auto">
+                    {SIDEBAR_ITEMS.find(item => item.name === selectedPage)!.component}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        {/* Animated button below the main window */}
-        <div className="flex w-full justify-center mt-6 absolute bottom-8 left-0 right-0 p-4">
-          <motion.button
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.96 }}
-            className="rounded-full bg-gradient-to-r from-purple-500 to-blue-700 dark:from-yellow-400 dark:to-yellow-600 px-8 py-3 text-lg font-bold text-white shadow-lg hover:from-purple-600 hover:to-blue-800 dark:hover:from-yellow-500 dark:hover:to-yellow-700 transition-all duration-300"
-            onClick={handleTrigger}
-          >
-            Trigger Pricing Update
-          </motion.button>
-        </div>
-        {/* Modal for pricing update */}
-        <AnimatePresence>
-          {showModal && (
-            <motion.div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/70"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 200 }}
-                className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-10 flex flex-col items-center max-w-[90vw] w-[400px]"
-              >
-                <motion.div
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
-                  className="mb-4"
-                >
-                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none" className="mx-auto">
-                    <circle cx="12" cy="12" r="10" fill="#6366f1" className="dark:fill-yellow-400" />
-                    <path d="M8 12.5l2.5 2.5 5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </motion.div>
-                <h2 className="text-2xl font-bold text-purple-700 dark:text-yellow-300 mb-2 text-center">
-                  Pricing Version Updated!
-                </h2>
-                <p className="text-md text-gray-600 dark:text-gray-300 mb-6 text-center">
-                  TomatoMeter pricing has been successfully updated to <span className="font-bold text-blue-600 dark:text-yellow-200">version {currentPricingVersion}</span>.<br />
-                </p>
-                <p className="text-md text-gray-600 dark:text-gray-300 mb-6 text-center">
-                  This new version restricts access to weekly productivity for <strong>BASIC</strong> users and <strong>limits the amount of daily pomodoro timers to 1</strong>.
-                </p>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="mt-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 dark:from-yellow-400 dark:to-yellow-600 px-6 py-2 font-bold text-white shadow hover:from-blue-600 hover:to-purple-700 dark:hover:from-yellow-500 dark:hover:to-yellow-700 transition"
-                  onClick={() => setShowModal(false)}
-                >
-                  Close
-                </motion.button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+        </main>
+      </div>
     </SettingsContext.Provider>
   );
 }
