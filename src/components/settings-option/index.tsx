@@ -53,9 +53,7 @@ export default function SettingsOption({idx, option, premium, customDuration, se
         >
           <motion.span
             layout
-            className={`absolute left-1 top-1 w-6 h-6 rounded-full bg-white dark:bg-gray-800 shadow-md transition-transform duration-300 ${
-              toggles[option.name as keyof SettingsToggle] ? 'translate-x-6' : ''
-            }`}
+            className={`absolute left-1 top-1 w-6 h-6 rounded-full bg-white dark:bg-gray-800 shadow-md`}
             animate={{ x: toggles[option.name as keyof SettingsToggle] ? 24 : 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           />

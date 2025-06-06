@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { ExpenseItemProps } from "../../types";
+import { ExpenseItemProps } from "../../main";
 
 export function generateExpense(): ExpenseItemProps{
     return {

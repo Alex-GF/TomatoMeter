@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatDuration, intervalToDuration } from 'date-fns';
 import axios from '../../lib/axios';
-import { Default, feature, Feature, On } from 'pricing4react';
+import { Default, Feature, On } from 'space-react-client';
 import { usePage } from '../../contexts/pageContext';
 
 interface Session {
@@ -108,7 +108,7 @@ const WeeklyProductivity = () => {
   }
 
   return (
-    <Feature expression={feature('tomatometer-basicAnalytics')}>
+    <Feature id={'tomatometer-basicAnalytics'}>
       <On>
         <div className="flex h-full w-full flex-col justify-center gap-8 overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 p-8 transition-colors duration-500 dark:from-gray-900 dark:to-gray-800">
           {/* TomatoScore */}
@@ -150,7 +150,7 @@ const WeeklyProductivity = () => {
 
           {/* Advanced Analytics (Premium) */}
 
-          <Feature expression={feature('tomatometer-advancedAnalytics')}>
+          <Feature id={'tomatometer-advancedAnalytics'}>
             <On>
               <section className="flex w-full flex-col justify-center gap-6 md:flex-row">
                 {/* Average daily study time widget */}
@@ -248,7 +248,7 @@ const WeeklyProductivity = () => {
 
           {/* Advanced Analytics (Premium) */}
 
-          <Feature expression={feature('tomatometer-advancedAnalytics')}>
+          <Feature id={'tomatometer-advancedAnalytics'}>
             <On>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -278,7 +278,7 @@ const WeeklyProductivity = () => {
                     Max streak: {maxStreak} days
                   </span>
                 </div>
-                <Feature expression={feature('tomatometer-exportDataToJson')}>
+                <Feature id={'tomatometer-exportDataToJson'}>
                   <On>
                     <div className="flex flex-1 flex-col items-center">
                       <span className="mb-2 text-lg font-bold text-yellow-900 dark:text-yellow-100">

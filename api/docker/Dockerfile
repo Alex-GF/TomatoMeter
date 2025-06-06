@@ -19,8 +19,8 @@ COPY ./api/docker/tsconfig.json .
 RUN mkdir src
 COPY ./api ./api
 
-ARG SPACE_URL
-ENV SPACE_URL=$SPACE_URL
+ARG VITE_SPACE_URL
+ENV VITE_SPACE_URL=$VITE_SPACE_URL
 
 # Build your application
 RUN pnpm exec tsc -p ./tsconfig.json && \
