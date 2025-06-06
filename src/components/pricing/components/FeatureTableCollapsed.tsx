@@ -30,7 +30,7 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
             </tr>
           </thead>
           <tbody>
-            {featureKeys.map((featureKey, fIdx) => (
+            {featureKeys.map((featureKey) => (
               <tr key={featureKey}>
                 <td className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 border-l-4 border-purple-200 dark:border-yellow-300 min-w-[240px] max-w-[320px] w-full">
                   {camelToTitle(features[featureKey].name) ?? camelToTitle(featureKey)}
@@ -53,7 +53,7 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
                   className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${getPlanColor(idx)} text-white shadow min-w-[180px] w-[180px]`}
                   style={{ width: 160 }}
                 >
-                  {plans[planKey].name ?? camelToTitle(planKey)}
+                  {plans[planKey].name ? camelToTitle(plans[planKey].name).toUpperCase() : camelToTitle(planKey).toUpperCase()}
                 </th>
               ))}
             </tr>
@@ -67,7 +67,7 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
                 transition={{ delay: 0.3 + fIdx * 0.04 }}
                 className="bg-white dark:bg-gray-900/80 hover:bg-purple-50 dark:hover:bg-gray-800/80 transition"
               >
-                {planKeys.map((planKey, idx) => {
+                {planKeys.map((planKey) => {
                   const plan = plans[planKey];
                   const value = plan.features?.[featureKey];
                   const enabled = features[featureKey].valueType === 'BOOLEAN' ? value === true : !!value;

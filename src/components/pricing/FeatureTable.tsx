@@ -1,8 +1,4 @@
-import { motion } from 'framer-motion';
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { Plan, AddOn, UsageLimit, PricingFeature } from '../../types';
-import { getPlanColor } from './PlanColorPalette';
-import { camelToTitle } from '../../utils/helpers';
 import { FeatureTableSimple } from './components/FeatureTableSimple';
 import { FeatureTableCollapsed } from './components/FeatureTableCollapsed';
 

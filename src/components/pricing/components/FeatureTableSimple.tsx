@@ -31,7 +31,7 @@ export function FeatureTableSimple({ plans, features, usageLimits, addOns, selec
                 className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${getPlanColor(idx)} text-white shadow min-w-[200px] w-[200px]`}
                 style={{ width: 160 }}
               >
-                {plans[planKey].name ?? camelToTitle(planKey)}
+                {plans[planKey].name ? camelToTitle(plans[planKey].name).toUpperCase() : camelToTitle(planKey).toUpperCase()}
               </th>
             ))}
           </tr>

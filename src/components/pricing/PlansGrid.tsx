@@ -2,12 +2,6 @@ import { motion } from 'framer-motion';
 import { Plan, PricingFeature } from '../../types';
 import { camelToTitle } from '../../utils/helpers';
 
-// const PLAN_COLORS: Record<string, string> = {
-//   BASIC: 'from-purple-400 to-purple-600',
-//   ADVANCED: 'from-blue-400 to-blue-600',
-//   PREMIUM: 'from-green-400 to-green-600',
-// };
-
 interface PlansGridProps {
   plans: Record<string, Plan>;
   features: Record<string, PricingFeature>;
@@ -36,7 +30,7 @@ export function PlansGrid({ plans, features, selectedPlan, onSelect }: PlansGrid
             onClick={() => onSelect(planKey)}
           >
             <span className="text-xl font-bold text-purple-700 dark:text-yellow-300 mb-2">
-              {plan.name ? camelToTitle(plan.name) : camelToTitle(planKey)}
+              {plan.name ? camelToTitle(plan.name).toUpperCase() : camelToTitle(planKey).toUpperCase()}
             </span>
             <span className="text-3xl font-extrabold text-purple-900 dark:text-yellow-200 mb-2">
               {plan.price}
