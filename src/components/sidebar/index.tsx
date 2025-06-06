@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SIDEBAR_ITEMS } from '../../apps/demo';
+import { SIDEBAR_ITEMS } from '../../constants/sidebarItems';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCrown, FaGem, FaRegStar } from 'react-icons/fa';
 import { usePage } from '../../contexts/pageContext';

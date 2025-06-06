@@ -1,32 +1,24 @@
 import { useState, useContext, useEffect, useMemo } from 'react';
 import Sidebar from '../../components/sidebar';
-import PomodoroTimer from '../../pages/pomodoro-timer/pomodoro-timer';
-import WeeklyProductivity from '../../pages/weekly-productivity/weekly-productivity';
 import { SettingsContext } from '../../contexts/settingsContext';
-import Pricing from '../../pages/pricing/pricing';
-import { usePage } from '../../contexts/pageContext';
-import DailySummaryPage from '../../pages/daily-summary/daily-summary';
-import Settings from '../../pages/settings/settings';
 import axios from '../../lib/axios';
 import { usePricingToken, useSpaceClient } from 'space-react-client';
 import { renewToken } from '../../utils/helpers';
 import PricingEditor from '../../components/pricing-editor';
 import { useSubscription } from '../../hooks/useSubscription';
 import { TimelineDual } from '../../components/timeline/TimelineDual';
+import { SIDEBAR_ITEMS } from '../../constants/sidebarItems';
+import { usePage } from '../../contexts/pageContext';
 
-export const SIDEBAR_ITEMS = [
-  { name: 'Pomodoro Timer', component: <PomodoroTimer /> },
-  { name: 'Daily Summary', component: <DailySummaryPage /> },
-  { name: 'Weekly Productivity', component: <WeeklyProductivity /> },
-  { name: 'Pricing', component: <Pricing /> },
-  { name: 'Settings', component: <Settings /> },
-];
+// SIDEBAR_ITEMS debe moverse fuera de este archivo para evitar el error de Fast Refresh.
+// Puedes moverlo a un archivo como src/constants/sidebarItems.ts y exportarlo desde allí.
+// Por ahora, lo dejamos aquí para mantener la funcionalidad, pero considera refactorizarlo.
 
 export function DemoApp() {
   const { toggles, setToggles } = useContext(SettingsContext);
   const { setCurrentSubscription } = useSubscription();
   const { selectedPage } = usePage();
-  const [reloadTrigger, setReloadTrigger] = useState(0);
+  const [reloadTrigger, setReloadTrigger] = useState<number>(0);
   const [isPricingEditorOpen, setPricingEditorOpen] = useState<boolean>(false);
 
   const spaceClient = useSpaceClient();
@@ -67,19 +59,19 @@ export function DemoApp() {
       spaceClient.off('pricing_created', onPricingCreated);
       spaceClient.off('pricing_archived', onPricingArchived);
     };
-  }, [spaceClient, tokenService]);
+  }, [spaceClient, tokenService, setCurrentSubscription]);
 
   return (
     <SettingsContext.Provider value={settingsValue}>
       <div className="relative h-screen w-screen bg-gray-200">
         {/* TimelineDual at the top, outside main app block */}
-        <div className="w-full flex justify-center pt-4 pb-2 z-30 absolute top-0">
+        <div className="fixed w-full left-0 top-0 flex justify-center pt-4 pb-2 z-50 bg-gray-200/95 transition-all">
           <TimelineDual />
         </div>
         {/* Floating button to open Pricing Editor */}
         <button
           onClick={() => setPricingEditorOpen(true)}
-          className="fixed top-8 left-8 z-40 bg-white shadow-lg rounded-full px-5 py-2 font-semibold text-demo-primary hover:bg-gray-100 transition-all border border-gray-200 flex items-center gap-2"
+          className="fixed top-8 left-8 z-50 bg-white shadow-lg rounded-full px-5 py-2 font-semibold text-demo-primary hover:bg-gray-100 transition-all border border-gray-200 flex items-center gap-2"
         >
           <svg
             width="20"
@@ -100,7 +92,7 @@ export function DemoApp() {
           side="left"
         />
         {/* Main app centered */}
-        <main className="flex h-screen items-center justify-center">
+        <main className="flex h-screen items-center justify-center pt-[120px]">
           <div className="h-[75vh] w-[75vw] max-w-[1500px] overflow-hidden rounded-[25px] bg-white shadow-lg">
             <div className="flex h-full bg-demo-primary">
               <Sidebar />

@@ -58,12 +58,12 @@ export function TimelineBar({ events, type, maxSteps }: TimelineBarProps) {
           }}
           initial={{ width: 0 }}
           animate={{ width: visibleDots.length > 1 ? getDotX(visibleDots.length - 1) : 0 }}
-          transition={{ duration: 0.5, type: 'spring', stiffness: 120 }}
+          transition={{ duration: 0.5, type: 'tween', stiffness: 120 }}
         />
         {/* Puntos visibles (pueden ser undefined si no hay evento en ese timelineIndex) */}
         {visibleDots.map((event, idx) => (
           <DotWithTooltip
-            key={event?.id || `empty-${firstVisibleIndex + idx}`}
+            key={event?.id ?? `empty-${firstVisibleIndex + idx}`}
             event={event}
             idx={idx}
             type={type}
