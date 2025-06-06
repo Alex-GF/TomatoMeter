@@ -50,8 +50,7 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
               {planKeys.map((planKey, idx) => (
                 <th
                   key={planKey}
-                  className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${getPlanColor(idx)} text-white shadow min-w-[180px] w-[180px]`}
-                  style={{ width: 160 }}
+                  className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${getPlanColor(idx)} text-white shadow w-[240px]`}
                 >
                   {plans[planKey].name ? camelToTitle(plans[planKey].name).toUpperCase() : camelToTitle(planKey).toUpperCase()}
                 </th>
@@ -76,8 +75,8 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
                     return (
                       <td
                         key={planKey}
-                        className="text-center px-6 py-1 min-w-[180px] w-[180px]"
-                        style={{ width: 160 }}
+                        className="text-center px-6 py-1 min-w-[210px] w-[210px]"
+                        style={{ width: 210 }}
                       >
                         <span className="inline-block rounded-full bg-gradient-to-r from-green-400 to-green-600 dark:from-yellow-400 dark:to-yellow-600 px-3 py-1 text-xs font-bold text-white shadow animate-pulse">
                           {plan.usageLimits?.[linkedLimit.name] ?? linkedLimit.defaultValue} / {linkedLimit.period?.unit?.toLowerCase() ?? 'period'}
@@ -89,8 +88,8 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
                     return (
                       <td
                         key={planKey}
-                        className="text-center px-6 py-2 min-w-[180px] w-[180px]"
-                        style={{ width: 160 }}
+                        className="text-center px-6 py-2 min-w-[210px] w-[210px]"
+                        style={{ width: 210 }}
                       >
                         <FaCheckCircle className="mx-auto text-green-500 dark:text-yellow-300 animate-pop" size={20} />
                       </td>
@@ -106,8 +105,8 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
                     return (
                       <td
                         key={planKey}
-                        className="text-center px-6 py-2 min-w-[180px] w-[180px]"
-                        style={{ width: 160 }}
+                        className="text-center px-6 py-2 min-w-[210px] w-[210px]"
+                        style={{ width: 210 }}
                       >
                         <span className="text-sm text-gray-500 dark:text-gray-300">Add-on</span>
                       </td>
@@ -116,8 +115,8 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
                   return (
                     <td
                       key={planKey}
-                      className="text-center px-6 py-2 min-w-[180px] w-[180px]"
-                      style={{ width: 160 }}
+                      className="text-center px-6 py-2 min-w-[210px] w-[210px]"
+                      style={{ width: 210 }}
                     >
                       <FaTimesCircle className="mx-auto text-gray-300 dark:text-gray-600" size={20} />
                     </td>
@@ -134,9 +133,10 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
                     whileTap={{ scale: 0.96 }}
                     onClick={() => onSelect(planKey)}
                     className={`w-full px-4 py-2 font-bold shadow transition text-white text-base bg-gradient-to-r ${getPlanColor(idx)}`}
-                    aria-label={`Select ${plans[planKey].name ?? camelToTitle(planKey)} plan`}
+                    aria-label={`Select ${plans[planKey].name ? camelToTitle(plans[planKey].name).toUpperCase() : camelToTitle(planKey).toUpperCase()} plan`}
+                    style={{ minWidth: 210, width: 210 }}
                   >
-                    {selectedPlan === planKey ? 'Current Plan' : `Select ${plans[planKey].name ?? camelToTitle(planKey)}`}
+                    {selectedPlan === planKey ? 'Current Plan' : `Select ${plans[planKey].name ? camelToTitle(plans[planKey].name).toUpperCase() : camelToTitle(planKey).toUpperCase()}`}
                   </motion.button>
                 </td>
               ))}
