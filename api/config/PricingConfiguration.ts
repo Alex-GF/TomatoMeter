@@ -1,13 +1,7 @@
 import { PricingContext } from 'pricing4ts/server';
+import { container } from './container';
 
 export class PricingConfiguration extends PricingContext{
-
-    private userPlan: string = "basic";
-    private userContext: Record<string, boolean | string | number> = {
-        user: "test",
-        maxPomodoroTimers: 1,
-    }
-
     constructor() {
         super();
     }
@@ -19,17 +13,12 @@ export class PricingConfiguration extends PricingContext{
         return "secret";
     }
     getSubscriptionContext(): Record<string, boolean | string | number> {
-        return this.userContext;
+        return container.userContract.usageLevels;
     }
     getUserPlan(): string {
-        return this.userPlan;
+        return container.userContract.subscriptionPlans.tomatometer;
     }
-
-    setUserPlan(userPlan: string): void {
-        this.userPlan = userPlan;
-    }
-
-    setUserContext(userContext: Record<string, boolean | string | number>): void {
-        this.userContext = userContext;
+    getUserAddOns(): string[] {
+        return Object.keys(container.userContract.subscriptionAddOns.tomatometer).filter(key => container.userContract.subscriptionAddOns.tomatometer[key] > 0);
     }
 }

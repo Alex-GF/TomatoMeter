@@ -1,7 +1,8 @@
 import { faker } from '@faker-js/faker';
+import { container } from '../config/container';
 
 function populatePomodoroSessions(pomodoroSessions: Map<string, { duration: number, productivity: number, date: string }[]>): void {
-  const userId = 'demo-user';
+  const userId = container.userContract.userContact.userId;
   const now = new Date();
   const sessions: { duration: number, productivity: number, date: string }[] = [];
   for (let d = 0; d < 30; d++) {

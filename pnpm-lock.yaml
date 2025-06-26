@@ -51,8 +51,8 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0(@openfeature/web-sdk@1.5.0(@openfeature/core@1.8.0))(minizinc@4.4.3)(react-router-dom@7.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       pricing4ts:
-        specifier: ^0.10.0
-        version: 0.10.0(@openfeature/core@1.8.0)(minizinc@4.4.3)
+        specifier: ^0.10.1
+        version: 0.10.1(@openfeature/core@1.8.0)(minizinc@4.4.3)
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
@@ -2031,8 +2031,8 @@ packages:
     peerDependencies:
       react-router-dom: '>=6.15.0'
 
-  pricing4ts@0.10.0:
-    resolution: {integrity: sha512-r07+UNnr375/qr2qeq0NdoZ1aXO8Y+aNEfQnIe7JY8SAznvY43cXnnYh0Hq8TE5t+xCVbZYYhDl/B4lQljltJg==}
+  pricing4ts@0.10.1:
+    resolution: {integrity: sha512-2IgkSiMt+dBLpZUXu3Mj8725l+oKS3wdJGiSTuXAM4+eWplZtq5MBsk1GP7KwkHif9me3BTQx5FDbGZMVXJ3lg==}
     peerDependencies:
       minizinc: ^4.3.5
 
@@ -4398,7 +4398,7 @@ snapshots:
       - '@openfeature/web-sdk'
       - minizinc
 
-  pricing4ts@0.10.0(@openfeature/core@1.8.0)(minizinc@4.4.3):
+  pricing4ts@0.10.1(@openfeature/core@1.8.0)(minizinc@4.4.3):
     dependencies:
       '@openfeature/server-sdk': 1.18.0(@openfeature/core@1.8.0)
       '@types/papaparse': 5.3.16

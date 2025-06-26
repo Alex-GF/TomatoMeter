@@ -37,7 +37,7 @@
     "helmet": "^8.0.0",
     "js-yaml": "^4.1.0",
     "pricing4react": "^2.2.0",
-    "pricing4ts": "^0.10.0",
+    "pricing4ts": "^0.10.1",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

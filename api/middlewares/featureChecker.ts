@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { generateUserPricingToken } from 'pricing4ts/server';
 
-const featureChecker = (req: Request, res: Response, next: NextFunction) => {
-  
+const featureChecker = (req: Request, res: Response, next: NextFunction) => {  
   const setHeaders = async () => {
     // Add the Pricing-Token header after the request is processed
-    res.setHeader('Pricing-Token', generateUserPricingToken());
+    const generatedToken = generateUserPricingToken();
+    res.setHeader('Pricing-Token', generatedToken);
   };
 
   const wrap = async (method: keyof typeof res) => {

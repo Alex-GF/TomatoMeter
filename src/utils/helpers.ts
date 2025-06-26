@@ -22,7 +22,7 @@ export async function renewToken(): Promise<void> {
   return axios.post('/contracts/renew-token').then(response => {
     const pricingToken = response.data.pricingToken;
 
-    localStorage.setItem("pricingToken", JSON.parse(pricingToken));
+    localStorage.setItem("pricingToken", JSON.stringify(pricingToken));
   });
 }
 
