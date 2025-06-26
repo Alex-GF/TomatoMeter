@@ -1,17 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
-import { container } from '../config/container';
-import { testUserId } from '../utils/configurators';
+import { generateUserPricingToken } from 'pricing4ts/server';
 
 const featureChecker = (req: Request, res: Response, next: NextFunction) => {
   
   const setHeaders = async () => {
     // Add the Pricing-Token header after the request is processed
-    res.setHeader('Pricing-Token', await container.spaceClient?.features.generateUserPricingToken(testUserId));
+    res.setHeader('Pricing-Token', generateUserPricingToken());
   };
 
   const wrap = async (method: keyof typeof res) => {
-    const original = res[method] as Function;
-    res[method] = async function (...args: any[]) {
+    const original = res[method];
+    res[method] = async function (...args) {
       await setHeaders();
       return original.apply(this, args);
     };

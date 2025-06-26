@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Default, Feature, On } from 'space-react-client';
+import { Default, feature, Feature, On } from 'pricing4react';
 import SettingsOption from '../../components/settings-option';
 import { usePage } from '../../contexts/pageContext';
 
@@ -91,7 +91,7 @@ const Settings = () => {
             )
           }
           return (
-            <Feature id={option.featureId}>
+            <Feature expression={feature(option.featureId)}>
               <On>
                 <SettingsOption
                   key={option.name}

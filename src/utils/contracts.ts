@@ -1,8 +1,7 @@
-import { TokenService } from 'space-react-client';
 import axios from '../lib/axios';
 import { renewToken } from './helpers';
 
-export async function updateContract(plan: string, addons: Record<string, number>, tokenService: TokenService) {
+export async function updateContract(plan: string, addons: Record<string, number>) {
   
   const currentContract = (await axios.get('/contracts')).data.contract;
 
@@ -19,7 +18,7 @@ export async function updateContract(plan: string, addons: Record<string, number
     }
   });
 
-  await renewToken(tokenService);
+  await renewToken();
 }
 
 export const toSubscriptionArr = (plan: string, addons?: { [key: string]: number }) => {

@@ -1,12 +1,11 @@
 import { Router } from 'express';
-import { SpaceServiceOperations } from '../utils/spaceOperations';
-
+import { PricingContextManager } from 'pricing4ts/server';
 
 const router = Router();
 
 router.route('/pricings/:serviceName/:pricingVersion')
   .get(async (req, res) => {
-    const pricing = await SpaceServiceOperations.getPricing(req.params.serviceName, req.params.pricingVersion)
+    const pricing = PricingContextManager.getContext().getPricing();
 
     res.status(200).json(pricing);
   });

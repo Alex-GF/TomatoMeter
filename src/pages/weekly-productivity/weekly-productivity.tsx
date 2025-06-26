@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatDuration, intervalToDuration } from 'date-fns';
 import axios from '../../lib/axios';
-import { Default, Feature, On } from 'space-react-client';
+import { Default, feature, Feature, On } from 'pricing4react';
 import { usePage } from '../../contexts/pageContext';
 
 interface Session {
@@ -56,6 +56,8 @@ const WeeklyProductivity = () => {
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const { setSelectedPage } = usePage();
+
   useEffect(() => {
     fetchWeeklyStats().then(data => {
       setStats(data);
@@ -79,7 +81,6 @@ const WeeklyProductivity = () => {
   const maxProductivity = Math.max(...stats.dailyProductivity, 1);
   const normalizedStudy = stats.dailyStudy.map(v => v / maxStudy);
   const normalizedProductivity = stats.dailyProductivity.map(v => v / maxProductivity);
-  const { setSelectedPage } = usePage();
 
   const weekDays = getWeekDays();
 
@@ -108,7 +109,7 @@ const WeeklyProductivity = () => {
   }
 
   return (
-    <Feature id={'tomatometer-basicAnalytics'}>
+    <Feature expression={feature('basicAnalytics')}>
       <On>
         <div className="flex h-full w-full flex-col justify-center gap-8 overflow-y-auto bg-gradient-to-br from-purple-100 to-blue-100 p-8 transition-colors duration-500 dark:from-gray-900 dark:to-gray-800">
           {/* TomatoScore */}
@@ -150,7 +151,7 @@ const WeeklyProductivity = () => {
 
           {/* Advanced Analytics (Premium) */}
 
-          <Feature id={'tomatometer-advancedAnalytics'}>
+          <Feature expression={feature('advancedAnalytics')}>
             <On>
               <section className="flex w-full flex-col justify-center gap-6 md:flex-row">
                 {/* Average daily study time widget */}
@@ -248,7 +249,7 @@ const WeeklyProductivity = () => {
 
           {/* Advanced Analytics (Premium) */}
 
-          <Feature id={'tomatometer-advancedAnalytics'}>
+          <Feature expression={feature('advancedAnalytics')}>
             <On>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -278,7 +279,7 @@ const WeeklyProductivity = () => {
                     Max streak: {maxStreak} days
                   </span>
                 </div>
-                <Feature id={'tomatometer-exportDataToJson'}>
+                <Feature expression={feature('exportDataToJson')}>
                   <On>
                     <div className="flex flex-1 flex-col items-center">
                       <span className="mb-2 text-lg font-bold text-yellow-900 dark:text-yellow-100">

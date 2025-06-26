@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SettingsContext } from '../../contexts/settingsContext';
 import { useMotivationalQuotes } from '../settings/settings';
 import notificationSound from '../../static/sounds/notification.mp3';
-import { Default, Feature, On } from 'space-react-client';
+import { Default, feature, Feature, On } from 'pricing4react';
 import axios from '../../lib/axios';
 import { usePage } from '../../contexts/pageContext';
 
@@ -99,7 +99,7 @@ const PomodoroTimer = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-br from-purple-600 to-blue-500 dark:from-gray-900 dark:to-gray-800 transition-colors duration-500">
-      <Feature id={'tomatometer-motivationalQuotes'}>
+      <Feature expression={feature('motivationalQuotes')}>
         <On>
           {showQuote && quote && (
             <motion.div
@@ -139,7 +139,7 @@ const PomodoroTimer = () => {
             {minutes}:{seconds}
           </motion.span>
         </motion.div>
-        <Feature id={'tomatometer-pomodoroTimer'}>
+        <Feature expression={feature('pomodoroTimer')}>
           <On>
             <div className="flex gap-4">
               <motion.button

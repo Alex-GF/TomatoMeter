@@ -1,4 +1,3 @@
-import { TokenService } from 'space-react-client';
 import axios from '../lib/axios';
 
 export function formatToCamelCase(str: string): string {
@@ -19,11 +18,11 @@ export function revertCamelCaseToString(str: string): string {
     .replace(/\b\w/g, char => char.toUpperCase());
 }
 
-export async function renewToken(tokenService: TokenService): Promise<void> {
+export async function renewToken(): Promise<void> {
   return axios.post('/contracts/renew-token').then(response => {
     const pricingToken = response.data.pricingToken;
 
-    tokenService.updatePricingToken(pricingToken);
+    localStorage.setItem("pricingToken", JSON.parse(pricingToken));
   });
 }
 

@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SubscriptionContext } from '../../contexts/subscriptionContext';
 import { SettingsContext } from '../../contexts/settingsContext';
 import { updateContract } from '../../utils/contracts';
-import { usePricingToken } from 'space-react-client';
 import axios from '../../lib/axios';
 import { Pricing, Contract } from '../../types';
 import { PlansGrid } from '../../components/pricing/PlansGrid';
@@ -19,7 +18,6 @@ const PricingPage = () => {
   const subscription = useContext(SubscriptionContext);
   if (!subscription) throw new Error('SubscriptionContext not found');
   const { setCurrentSubscription } = subscription;
-  const tokenService = usePricingToken();
   const { toggles } = useContext(SettingsContext);
   const { addEvent } = useTimeline();
 
@@ -67,7 +65,7 @@ const PricingPage = () => {
       planKey,
       ...Object.entries(selectedAddOns).map(([k, v]) => `${k}X${v}`),
     ]);
-    await updateContract(planKey, selectedAddOns, tokenService);
+    await updateContract(planKey, selectedAddOns);
     if (toggles['Show plan/add-on notifications']) {
       setNotification('Plan changed successfully!');
       setTimeout(() => setNotification(null), 2500);
@@ -87,7 +85,7 @@ const PricingPage = () => {
       selectedPlan!,
       ...Object.entries(newAddOns).map(([k, v]) => `${k}X${v}`),
     ]);
-    await updateContract(selectedPlan!, newAddOns, tokenService);
+    await updateContract(selectedPlan!, newAddOns);
     if (toggles['Show plan/add-on notifications']) {
       setNotification('Add-on selection updated!');
       setTimeout(() => setNotification(null), 2500);

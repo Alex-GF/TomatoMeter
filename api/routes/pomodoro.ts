@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { populatePomodoroSessions } from '../utils/generators';
+import { evaluateFeature } from 'pricing4ts/server';
 import { container } from '../config/container';
-import { testUserId } from '../utils/configurators';
 
 const router = Router();
 
@@ -12,17 +12,13 @@ populatePomodoroSessions(pomodoroSessions);
 // Save pomodoro session duration
 router.post('/pomodoro/session', async (req, res) => {
   
-  const canSavePomodoroSession = await container.spaceClient?.features.evaluate(testUserId, 'tomatometer-pomodoroTimer', {
-    "tomatometer-maxPomodoroTimers": 1
-  }, {
-    server: true
-  });
+  const canSavePomodoroSession = evaluateFeature('pomodoroTimer');
 
   if (!canSavePomodoroSession){
     return res.status(403).json({ error: 'Feature not enabled for this user. Limit has been reached.' });
   }
   
-  const userId = 'demo-user';
+  const userId = container.userContract.userContact.userId;
   const { duration } = req.body;
   if (!pomodoroSessions.has(userId)) pomodoroSessions.set(userId, []);
   pomodoroSessions.get(userId)!.push({ duration, productivity: 0, date: new Date().toISOString() });
@@ -31,7 +27,7 @@ router.post('/pomodoro/session', async (req, res) => {
 
 // Save productivity score
 router.post('/pomodoro/productivity', (req, res) => {
-  const userId = 'demo-user';
+  const userId = container.userContract.userContact.userId;
   const { score } = req.body;
   const sessions = pomodoroSessions.get(userId);
   if (sessions && sessions.length > 0) {
@@ -42,7 +38,7 @@ router.post('/pomodoro/productivity', (req, res) => {
 
 // Weekly stats endpoint
 router.get('/pomodoro/weekly', (req, res) => {
-  const userId = 'demo-user';
+  const userId = container.userContract.userContact.userId;
   const sessions = (pomodoroSessions.get(userId) || []).filter(s => s.productivity > 0);
   const now = new Date();
   const weekDays: string[] = [];
@@ -78,7 +74,7 @@ router.get('/pomodoro/weekly', (req, res) => {
 
 // Daily summary endpoint
 router.get('/pomodoro/daily', (req, res) => {
-  const userId = 'demo-user';
+  const userId = container.userContract.userContact.userId;
   const sessions = (pomodoroSessions.get(userId) || []).filter(s => s.productivity > 0);
   const now = new Date();
   const thirtyDaysAgo = new Date(now);

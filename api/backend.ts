@@ -4,13 +4,14 @@ import pricingRoutes from './routes/pricing';
 import pomodoroRoutes from './routes/pomodoro';
 import contractsRoutes from './routes/contract';
 import featureChecker from './middlewares/featureChecker';
-import { configureSpaceClient } from './utils/configurators';
 import cors from 'cors';
+import { PricingConfiguration } from './config/PricingConfiguration';
+import { PricingContextManager } from 'pricing4ts/server';
 
 const app: express.Server = express();
 const port = 8080;
 
-configureSpaceClient();
+PricingContextManager.registerContext(new PricingConfiguration());
 
 app.use(express.json());
 app.use(cors({
