@@ -93,6 +93,9 @@ importers:
       artillery:
         specifier: ^2.0.23
         version: 2.0.23(@types/node@22.15.29)(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      artillery-plugin-fake-data:
+        specifier: ^1.14.0
+        version: 1.14.0
       concurrently:
         specifier: ^9.1.2
         version: 9.1.2

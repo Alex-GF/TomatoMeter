@@ -19,7 +19,6 @@ router.get('/contracts/pricing', async (req, res) => {
 router.get('/contracts/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
-
     res.status(200).json({ contract: getContractForUser(userId as string) });
   } catch {
     res.status(500).json({ error: 'Failed to fetch contract' });

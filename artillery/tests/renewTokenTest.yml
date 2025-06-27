@@ -15,23 +15,59 @@ config:
       arrivalRate: 10
       rampTo: 30
       name: Spike phase
+  processor: '../processors/renewTokenProcessor.cjs'
+  variables:
+    plan:
+      - 'basic'
+      - 'advanced'
+      - 'premium'
+    addOn:
+      - 'extraTimers'
+      - 'exportAsJson'
   # Load & configure a couple of useful plugins
   # https://artillery.io/docs/reference/extensions
   plugins:
     apdex:
       threshold: 500
     metrics-by-endpoint: {}
+    fake-data: {}
 scenarios:
   - flow:
       - post:
-          url: '/renewToken'
+          url: '/users'
+          beforeRequest: getRandomCredentials
+          headers:
+            Content-Type: application/json
           json:
-            token: 'test-token'
+            userId: '{{ generatedUserId }}'
+          capture:
+            - json: '$.id'
+              as: 'userId'
       - loop:
           - get:
-              url: '/dino'
+              url: '/contracts/pricing'
+              headers:
+                user-id: '{{ userId }}'
           - get:
-              url: '/pony'
-          - get:
-              url: '/armadillo'
+              url: '/contracts/{{ userId }}'
+              headers:
+                user-id: '{{ userId }}'
+          - put:
+              url: '/contracts/{{ userId }}'
+              headers:
+                Content-Type: application/json
+                user-id: '{{ userId }}'
+              json:
+                contractedServices:
+                  tomatometer: 1.0.0
+                subscriptionPlans:
+                  tomatometer: '{{ plan }}'
+                subscriptionAddOns:
+                  tomatometer: 
+                    '{{ addOn }}': 1
+          - post:
+              url: '/contracts/renew-token'
+              headers:
+                Content-Type: application/json
+                user-id: '{{ userId }}'
         count: 100

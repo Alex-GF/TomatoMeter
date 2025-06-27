@@ -18,31 +18,25 @@ export class PricingConfiguration extends PricingContext {
     const currentUserContract = container.userContracts.find(
       c => c.userContact.userId === currentUser
     );
-    if (!currentUserContract) {
-      throw new Error(`Contract for user ${currentUser} not found`);
-    }
-    return currentUserContract.usageLevels;
+    
+    return currentUserContract?.usageLevels ?? {};
   }
   getUserPlan(): string {
     const currentUser = getCurrentUser();
     const currentUserContract = container.userContracts.find(
       c => c.userContact.userId === currentUser
     );
-    if (!currentUserContract) {
-      throw new Error(`Contract for user ${currentUser} not found`);
-    }
-    return currentUserContract.subscriptionPlans.tomatometer;
+
+    return currentUserContract?.subscriptionPlans.tomatometer ?? "basic";
   }
   getUserAddOns(): string[] {
     const currentUser = getCurrentUser();
     const currentUserContract = container.userContracts.find(
       c => c.userContact.userId === currentUser
     );
-    if (!currentUserContract) {
-      throw new Error(`Contract for user ${currentUser} not found`);
-    }
-    return Object.keys(currentUserContract.subscriptionAddOns.tomatometer).filter(
-      key => currentUserContract.subscriptionAddOns.tomatometer[key] > 0
+
+    return Object.keys(currentUserContract?.subscriptionAddOns.tomatometer ?? {}).filter(
+      key => currentUserContract?.subscriptionAddOns.tomatometer[key] ?? 0 > 0
     );
   }
 }
