@@ -1,8 +1,8 @@
-export type PricingToCreate = Omit<Pricing, "createdAt"> & {
+export type PricingToCreate = Omit<Pricing, 'createdAt'> & {
   saasName?: string;
   syntaxVersion?: string;
   createdAt?: string;
-}
+};
 
 export interface Pricing {
   id?: string;
@@ -64,8 +64,8 @@ export interface Plan {
   description?: string;
   price: string | number;
   private?: boolean;
-  features: Record<string, string | boolean>;
-  usageLimits?: Record<string, number | boolean>;
+  features: Record<string, PricingFeature>;
+  usageLimits?: Record<string, UsageLimit>;
 }
 
 export interface AddOn {
@@ -76,9 +76,9 @@ export interface AddOn {
   availableFor?: string[];
   dependsOn?: string[];
   excludes?: string[];
-  features?: Record<string, string | boolean>;
-  usageLimits?: Record<string, number | boolean>;
-  usageLimitsExtensions?: Record<string, number>;
+  features?: Record<string, { value: string | boolean }>;
+  usageLimits?: Record<string, { value: number | boolean }>;
+  usageLimitsExtensions?: Record<string, { value: number }>;
   subscriptionConstraints?: SubscriptionConstraint;
 }
 

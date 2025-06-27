@@ -42,7 +42,7 @@ export function PlansGrid({ plans, features, selectedPlan, onSelect }: PlansGrid
             <ul className="flex flex-col gap-2 mb-4">
               {featureKeys.map((featureKey) => {
                 const feature = features[featureKey];
-                const value = plan.features?.[featureKey];
+                const value = plan.features?.[featureKey].value ?? plan.features?.[featureKey].defaultValue;
                 const enabled = feature.valueType === 'BOOLEAN' ? value === true : !!value;
                 return (
                   <li
@@ -63,7 +63,7 @@ export function PlansGrid({ plans, features, selectedPlan, onSelect }: PlansGrid
               <div className="text-xs text-gray-400 dark:text-gray-300">
                 {Object.entries(plan.usageLimits).map(([limitKey, limitValue]) => (
                   <div key={limitKey}>
-                    {camelToTitle(limitKey)}: {String(limitValue)}
+                    {camelToTitle(limitKey)}: {String(limitValue.value ?? limitValue.defaultValue)}
                   </div>
                 ))}
               </div>

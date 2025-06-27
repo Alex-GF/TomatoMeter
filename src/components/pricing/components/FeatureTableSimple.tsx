@@ -50,7 +50,7 @@ export function FeatureTableSimple({ plans, features, usageLimits, addOns, selec
               </td>
               {planKeys.map(planKey => {
                 const plan = plans[planKey];
-                const value = plan.features?.[featureKey];
+                const value = plan.features?.[featureKey].value ?? plan.features?.[featureKey].defaultValue;
                 const enabled = features[featureKey].valueType === 'BOOLEAN' ? value === true : !!value;
                 // Si la feature está vinculada a un usage limit y está activa, mostrar el límite
                 const linkedLimit = Object.values(usageLimits).find(lim => lim.linkedFeatures?.includes(featureKey));
@@ -62,7 +62,7 @@ export function FeatureTableSimple({ plans, features, usageLimits, addOns, selec
                       style={{ width: 160 }}
                     >
                       <span className="inline-block rounded-full bg-gradient-to-r from-green-400 to-green-600 dark:from-yellow-400 dark:to-yellow-600 px-3 py-1 text-xs font-bold text-white shadow animate-pulse">
-                        {plan.usageLimits?.[linkedLimit.name] ?? linkedLimit.defaultValue} / {linkedLimit.period?.unit?.toLowerCase() ?? 'period'}
+                        {plan.usageLimits?.[linkedLimit.name].value ?? linkedLimit.defaultValue} / {linkedLimit.period?.unit?.toLowerCase() ?? 'period'}
                       </span>
                     </td>
                   );
