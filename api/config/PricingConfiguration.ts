@@ -18,7 +18,7 @@ export class PricingConfiguration extends PricingContext {
     const currentUserContract = container.userContracts.find(
       c => c.userContact.userId === currentUser
     );
-    
+
     return currentUserContract?.usageLevels ?? {};
   }
   getUserPlan(): string {

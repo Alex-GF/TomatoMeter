@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { populatePomodoroSessions } from '../utils/generators';
 import { evaluateFeature } from 'pricing4ts/server';
 import { getCurrentUser } from '../middlewares/requestContext';
+import { getContractForUser, updateContractForUser } from '../config/container';
 
 const router = Router();
 
@@ -11,7 +12,6 @@ populatePomodoroSessions(pomodoroSessions);
 
 // Save pomodoro session duration
 router.post('/pomodoro/session', async (req, res) => {
-  
   const canSavePomodoroSession = evaluateFeature('pomodoroTimer');
 
   if (!canSavePomodoroSession){
@@ -19,9 +19,24 @@ router.post('/pomodoro/session', async (req, res) => {
   }
   
   const userId = getCurrentUser() ?? "testUserId";
-  const { duration } = req.body;
+  const { duration, productivity } = req.body;
   if (!pomodoroSessions.has(userId)) pomodoroSessions.set(userId, []);
-  pomodoroSessions.get(userId)!.push({ duration, productivity: 0, date: new Date().toISOString() });
+  pomodoroSessions.get(userId)!.push({ duration, productivity: productivity ?? 0, date: new Date().toISOString() });
+  
+  const oldUserContract = getContractForUser(userId);
+
+  if (!oldUserContract) {
+    return res.status(404).json({ error: 'User contract not found' });
+  }
+
+  const newUserContract = {
+    ...oldUserContract,
+    usageLevels: {
+      ...oldUserContract.usageLevels,
+      maxPomodoroTimers: (oldUserContract.usageLevels.maxPomodoroTimers || 0) + 1,
+    },
+  };
+  updateContractForUser(userId, newUserContract);
   res.status(200).json({ success: true });
 });
 

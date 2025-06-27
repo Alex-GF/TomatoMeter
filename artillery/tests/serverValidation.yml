@@ -43,30 +43,12 @@ scenarios:
             - json: '$.id'
               as: 'userId'
       - loop:
-          - get:
-              url: '/contracts/pricing'
-              headers:
-                user-id: '{{ userId }}'
-          - get:
-              url: '/contracts/{{ userId }}'
-              headers:
-                user-id: '{{ userId }}'
-          - put:
-              url: '/contracts/{{ userId }}'
+          - post:
+              url: '/pomodoro/session'
               headers:
                 Content-Type: application/json
                 user-id: '{{ userId }}'
               json:
-                contractedServices:
-                  tomatometer: 1.0.0
-                subscriptionPlans:
-                  tomatometer: '{{ plan }}'
-                subscriptionAddOns:
-                  tomatometer: 
-                    '{{ addOn }}': 1
-          - post:
-              url: '/contracts/renew-token'
-              headers:
-                Content-Type: application/json
-                user-id: '{{ userId }}'
-        count: 100
+                duration: 25
+                productivity: 3              
+        count: 10

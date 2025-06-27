@@ -23,8 +23,6 @@ router.post('/users', async (req, res) => {
       return res.status(400).json({ error: 'User ID is required' });
     }
 
-    console.log('Creating user with ID:', userId);
-
     container.users.push({ id: userId });
     container.userContracts.push({
       userContact: {
