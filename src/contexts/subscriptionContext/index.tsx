@@ -20,7 +20,7 @@ export function SubscriptionProvider({
     const [currentSubscription, setCurrentSubscription] = useState<string[]>(["BASIC"]);
 
   useEffect(() => {
-    axios.get('/contracts').then((response) => {
+    axios.get('/contracts/testUserId').then((response) => {
       const subscriptionPlan = response.data.contract.subscriptionPlans.tomatometer;
       const subscriptionAddons = response.data.contract.subscriptionAddOns.tomatometer;
 

@@ -3,10 +3,10 @@ import { renewToken } from './helpers';
 
 export async function updateContract(plan: string, addons: Record<string, number>) {
   
-  const currentContract = (await axios.get('/contracts')).data.contract;
+  const currentContract = (await axios.get('/contracts/testUserId')).data.contract;
 
   // Update user contract
-  await axios.put('/contracts', {
+  await axios.put('/contracts/testUserId', {
     contractedServices: {
       tomatometer: currentContract.contractedServices.tomatometer || '1.0.0',
     },

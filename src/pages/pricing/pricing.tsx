@@ -26,7 +26,7 @@ const PricingPage = () => {
 
   // Fetch pricing and contract
   useEffect(() => {
-    axios.get('/contracts').then(response => {
+    axios.get('/contracts/testUserId').then(response => {
       setUserContract(response.data.contract);
     });
     axios.get('/contracts/pricing').then(response => {
