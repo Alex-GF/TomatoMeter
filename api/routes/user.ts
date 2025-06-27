@@ -19,6 +19,26 @@ router.post('/users', async (req, res) => {
     const userId = req.body.userId;
 
     container.users.push({ id: userId });
+    container.userContracts.push({
+      userContact: {
+        userId: userId,
+        username: userId + "-username",
+      },
+      usageLevels: {
+        maxPomodoroTimers: 1,
+      },
+      contractedServices: {
+        tomatometer: '1.0.0',
+      },
+      subscriptionPlans: {
+        tomatometer: 'basic',
+      },
+      subscriptionAddOns: {
+        tomatometer: {
+          extraTimers: 2,
+        },
+      },
+    },);
     res.status(200).json({ id: userId });
   } catch {
     res.status(500).json({ error: 'Failed to create user' });
