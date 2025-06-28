@@ -32,7 +32,7 @@ export function DemoApp() {
       axios.get(`/pricings/${data.serviceName}/${data.pricingVersion}`).then(response => {
         const pricing = response.data;
         axios
-          .put('/contracts', {
+          .put('/contracts/test-user-id', {
             contractedServices: {
               tomatometer: data.pricingVersion || '1.0.0',
             },
