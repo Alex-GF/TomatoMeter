@@ -1,0 +1,71 @@
+config:
+  # This is a test server run by team Artillery
+  # It's designed to be highly scalable
+  target: http://localhost:8080/api
+  phases:
+    - duration: 60 # Seconds that this phase will last
+      arrivalRate: 5 # 1 new virtual user per second
+      rampTo: 10 # gradually ramp up to 5 new users per second
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 50
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 100
+      name: Spike phase
+  processor: '../processors/authProcessor.cjs'
+  variables:
+    plan:
+      - 'basic'
+      - 'advanced'
+      - 'premium'
+    addOn:
+      - 'extraTimers'
+      - 'exportAsJson'
+  # Load & configure a couple of useful plugins
+  # https://artillery.io/docs/reference/extensions
+  plugins:
+    apdex:
+      threshold: 300
+    metrics-by-endpoint: {}
+    fake-data: {}
+scenarios:
+  - flow:
+      - post:
+          url: '/contracts'
+          beforeRequest: getRandomCredentials
+          headers:
+            Content-Type: application/json
+            user-id: '{{ generatedUserId }}'
+          capture:
+            - json: '$.userContact.userId'
+              as: 'userId'
+      - loop:
+          - get:
+              url: '/contracts/pricing'
+              headers:
+                user-id: '{{ userId }}'
+          - get:
+              url: '/contracts/{{ userId }}'
+              headers:
+                user-id: '{{ userId }}'
+          - put:
+              url: '/contracts/{{ userId }}'
+              headers:
+                Content-Type: application/json
+                user-id: '{{ userId }}'
+              json:
+                contractedServices:
+                  tomatometer: 1.0.0
+                subscriptionPlans:
+                  tomatometer: '{{ plan }}'
+                subscriptionAddOns:
+                  tomatometer: 
+                    '{{ addOn }}': 1
+          - post:
+              url: '/contracts/renew-token'
+              headers:
+                Content-Type: application/json
+                user-id: '{{ userId }}'
+        count: 100

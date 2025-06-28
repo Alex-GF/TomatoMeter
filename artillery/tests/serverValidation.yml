@@ -1,0 +1,54 @@
+config:
+  # This is a test server run by team Artillery
+  # It's designed to be highly scalable
+  target: http://localhost:8080/api
+  phases:
+    - duration: 60 # Seconds that this phase will last
+      arrivalRate: 5 # 1 new virtual user per second
+      rampTo: 10 # gradually ramp up to 5 new users per second
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 50
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 100
+      name: Spike phase
+  processor: '../processors/authProcessor.cjs'
+  variables:
+    plan:
+      - 'basic'
+      - 'advanced'
+      - 'premium'
+    addOn:
+      - 'extraTimers'
+      - 'exportAsJson'
+  # Load & configure a couple of useful plugins
+  # https://artillery.io/docs/reference/extensions
+  plugins:
+    apdex:
+      threshold: 300
+    metrics-by-endpoint: {}
+    fake-data: {}
+scenarios:
+  - flow:
+      - post:
+          url: '/users'
+          beforeRequest: getRandomCredentials
+          headers:
+            Content-Type: application/json
+          json:
+            userId: '{{ generatedUserId }}'
+          capture:
+            - json: '$.id'
+              as: 'userId'
+      - loop:
+          - post:
+              url: '/pomodoro/session'
+              headers:
+                Content-Type: application/json
+                user-id: '{{ userId }}'
+              json:
+                duration: 25
+                productivity: 3              
+        count: 20

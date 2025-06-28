@@ -5,12 +5,15 @@ import { SpaceServiceOperations } from '../utils/spaceOperations';
 import { Pricing } from '../types';
 import yaml from 'js-yaml';
 import { Readable } from 'stream';
+import { getCurrentUser } from '../middlewares/requestContext';
 
 const router = Router();
 
 router.get('/contracts/pricing', async (req, res) => {
   try {
-    const contract = await container.spaceClient?.contracts.getContract(testUserId);
+    const userId = getCurrentUser() ?? testUserId;
+    
+    const contract = await container.spaceClient?.contracts.getContract(userId);
 
     const currentPricingVersion = contract?.contractedServices.tomatometer;
 
@@ -137,8 +140,10 @@ router.put('/contracts/:userId', async (req, res) => {
 
 router.post('/contracts/renew-token', async (req, res) => {
   try {
-    const userId = req.body.userId || testUserId;
+    const userId = getCurrentUser() ?? testUserId;
+
     const token = await container.spaceClient?.features.generateUserPricingToken(userId);
+    
     res.status(200).json({ pricingToken: token });
   } catch {
     res.status(500).json({ error: 'Failed to renew token' });
@@ -146,9 +151,10 @@ router.post('/contracts/renew-token', async (req, res) => {
 });
 
 // Generate a new contract for user with id: userId
-router.post('/contracts/:userId', async (req, res) => {
+router.post('/contracts', async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = getCurrentUser() ?? testUserId;
+
     const contractData = {
       userContact: {
         userId: userId,
@@ -170,8 +176,8 @@ router.post('/contracts/:userId', async (req, res) => {
       },
     }
 
-    await container.spaceClient?.contracts.addContract(contractData);
-    res.status(201).json({ message: 'Contract created successfully' });
+    const createdContract = await container.spaceClient?.contracts.addContract(contractData);
+    res.status(201).json(createdContract);
   }catch (error) {
     res.status(500).json({ error: 'Failed to create contract', details: (error as Error).message });
   }

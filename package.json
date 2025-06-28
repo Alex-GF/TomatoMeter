@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "description": "This is a demo project that uses pricing-driven feature flags driven by different solutions",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "load-test:renew-token": "artillery run ./artillery/tests/renewTokenTest.yml --output ./artillery/results/renewTokenReport.json && artillery report --output ./artillery/results/renewTokenReport.html ./artillery/results/renewTokenReport.json",
+    "load-test:server-feature-validation": "artillery run ./artillery/tests/serverValidation.yml --output ./artillery/results/serverValidationReport.json && artillery report --output ./artillery/results/serverValidationReport.html ./artillery/results/serverValidationReport.json",
+    "load-test": "pnpm run load-test:server-feature-validation && pnpm run load-test:renew-token",
     "dev:server": "export SPACE_URL=\"http://localhost:3000\" && npx tsx --watch ./api/backend.ts",
     "dev:client": "concurrently \"vite\" \"tailwindcss -i ./src/static/css/app.css -o ./src/static/css/tailwind.css --watch\"",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
@@ -49,9 +51,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
+    "@types/artillery": "^1.7.4",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.2",
+    "artillery": "^2.0.23",
     "concurrently": "^9.1.2",
     "eslint": "^9.11.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
