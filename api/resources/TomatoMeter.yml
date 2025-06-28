@@ -125,7 +125,7 @@ addOns:
   exportAsJson:
     description: Export as JSON description
     availableFor:
-      - PREMIUM
+      - premium
     price: 2.00
     unit: /month
     features:

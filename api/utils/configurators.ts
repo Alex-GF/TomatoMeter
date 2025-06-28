@@ -47,8 +47,6 @@ async function spaceSynchronizationCallback() {
 
   try {
     await SpaceServiceOperations.getService('TomatoMeter');
-
-    console.log('TomatoMeter service and test user contract already exist, skipping creation');
   } catch {
     await SpaceServiceOperations.addService('./api/resources/TomatoMeter.yml');
 
@@ -57,6 +55,8 @@ async function spaceSynchronizationCallback() {
 }
 
 async function pricingCreatedCallback(data: { serviceName: string; pricingVersion: string }) {
+  console.log("callback runned")
+  
   const pricing = await SpaceServiceOperations.getPricing(data.serviceName, data.pricingVersion);
 
   container.spaceClient?.contracts
@@ -67,7 +67,7 @@ async function pricingCreatedCallback(data: { serviceName: string; pricingVersio
           tomatometer: data.pricingVersion,
         },
         subscriptionPlans: {
-          tomatometer: Object.keys(pricing?.plans ?? {})[0] || 'BASIC',
+          tomatometer: Object.keys(pricing?.plans ?? {})[0] || 'basic',
         },
         subscriptionAddOns: {},
       });
@@ -82,7 +82,7 @@ async function pricingCreatedCallback(data: { serviceName: string; pricingVersio
           tomatometer: '1.0.0',
         },
         subscriptionPlans: {
-          tomatometer: 'BASIC',
+          tomatometer: 'basic',
         },
         subscriptionAddOns: {},
       });

@@ -8,7 +8,7 @@ interface SubscriptionContextType {
 }
 
 export const SubscriptionContext = createContext<SubscriptionContextType | undefined>({
-    currentSubscription: ["BASIC"],
+    currentSubscription: ["basic"],
     setCurrentSubscription: () => {},
 });
 
@@ -17,7 +17,7 @@ export function SubscriptionProvider({
 }: {
     children: React.ReactNode;
 }): JSX.Element {
-    const [currentSubscription, setCurrentSubscription] = useState<string[]>(["BASIC"]);
+    const [currentSubscription, setCurrentSubscription] = useState<string[]>(["basic"]);
 
   useEffect(() => {
     axios.get('/contracts').then((response) => {
