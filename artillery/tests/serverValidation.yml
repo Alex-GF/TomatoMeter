@@ -51,4 +51,4 @@ scenarios:
               json:
                 duration: 25
                 productivity: 3              
-        count: 10
+        count: 20

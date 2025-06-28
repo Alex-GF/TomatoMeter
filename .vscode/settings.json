@@ -3,7 +3,8 @@
     "https://www.artillery.io/schema.json": [
       "file:///Users/alex/Desktop/Doctorado/space-demo/artillery/tests/renewTokenTest.yml",
       "file:///Users/alex/Desktop/Doctorado/space-demo/artillery/tests/renewTokenTest%20copy.yml",
-      "file:///Users/alex/Desktop/Doctorado/space-demo/artillery/tests/serverValidation.yml"
+      "file:///Users/alex/Desktop/Doctorado/space-demo/artillery/tests/serverValidation.yml",
+      "file:///Users/alex/Desktop/Doctorado/space-demo-pricing4saas/artillery/tests/serverValidation.yml"
     ]
   }
 }
