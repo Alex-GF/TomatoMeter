@@ -4,7 +4,9 @@
       "file:///Users/alex/Desktop/Doctorado/space-demo/artillery/tests/renewTokenTest.yml",
       "file:///Users/alex/Desktop/Doctorado/space-demo/artillery/tests/renewTokenTest%20copy.yml",
       "file:///Users/alex/Desktop/Doctorado/space-demo/artillery/tests/serverValidation.yml",
-      "file:///Users/alex/Desktop/Doctorado/space-demo-pricing4saas/artillery/tests/serverValidation.yml"
+      "file:///Users/alex/Desktop/Doctorado/space-demo-pricing4saas/artillery/tests/serverValidation.yml",
+      "file:///Users/alex/Desktop/Doctorado/space-demo-pricing4saas/artillery/tests/renewTokenTest.yml",
+      "git:/Users/alex/Desktop/Doctorado/space-demo-pricing4saas/artillery/tests/renewTokenTest.yml?%7B%22path%22%3A%22%2FUsers%2Falex%2FDesktop%2FDoctorado%2Fspace-demo-pricing4saas%2Fartillery%2Ftests%2FrenewTokenTest.yml%22%2C%22ref%22%3A%22~%22%7D"
     ]
   }
 }

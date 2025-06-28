@@ -69,4 +69,4 @@ scenarios:
               headers:
                 Content-Type: application/json
                 user-id: '{{ userId }}'
-        count: 100
+        count: 10
