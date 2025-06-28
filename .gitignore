@@ -131,5 +131,3 @@ dist
 
 # pnpm store
 pnpm-workspace.yaml
-
-artillery/results/*
