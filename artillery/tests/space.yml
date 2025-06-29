@@ -1,7 +1,7 @@
 config:
   # This is a test server run by team Artillery
   # It's designed to be highly scalable
-  target: http://localhost:8080/api
+  target: http://localhost/api/v1
   phases:
     - duration: 60 # Seconds that this phase will last
       arrivalRate: 5 # 1 new virtual user per second
@@ -27,7 +27,7 @@ config:
   # https://artillery.io/docs/reference/extensions
   plugins:
     apdex:
-      threshold: 1000
+      threshold: 300
     metrics-by-endpoint: {}
     fake-data: {}
 scenarios:
@@ -37,24 +37,30 @@ scenarios:
           beforeRequest: getRandomCredentials
           headers:
             Content-Type: application/json
-            user-id: '{{ generatedUserId }}'
-          capture:
+            x-api-key: 'b723fa3454933c95de3426cc3553cd68df88b81c3af3bba83943b3c1d78c1b05'
+          json:
+            userContact:
+              userId: '{{ generatedUserId }}'
+              username: '{{ generatedUserId }}'
+            billingPeriod:
+              autoRenew: true
+              renewalDays: 365
+            contractedServices:
+              tomatometer: "1.0.0"
+            subscriptionPlans:
+              tomatometer: "basic"
+            subscriptionAddOns:
+              tomatometer:
+                extraTimers: 1
+          capture: 
             - json: '$.userContact.userId'
               as: 'userId'
       - loop:
-          - get:
-              url: '/contracts/pricing'
-              headers:
-                user-id: '{{ userId }}'
-          - get:
-              url: '/contracts/{{ userId }}'
-              headers:
-                user-id: '{{ userId }}'
           - put:
               url: '/contracts/{{ userId }}'
               headers:
                 Content-Type: application/json
-                user-id: '{{ userId }}'
+                x-api-key: 'b723fa3454933c95de3426cc3553cd68df88b81c3af3bba83943b3c1d78c1b05'
               json:
                 contractedServices:
                   tomatometer: 1.0.0
@@ -64,8 +70,8 @@ scenarios:
                   tomatometer: 
                     '{{ addOn }}': 1
           - post:
-              url: '/contracts/renew-token'
+              url: '/features/{{ userId }}/pricing-token'
               headers:
                 Content-Type: application/json
-                user-id: '{{ userId }}'
+                x-api-key: 'b723fa3454933c95de3426cc3553cd68df88b81c3af3bba83943b3c1d78c1b05'
         count: 10

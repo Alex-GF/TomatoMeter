@@ -27,7 +27,7 @@ config:
   # https://artillery.io/docs/reference/extensions
   plugins:
     apdex:
-      threshold: 1000
+      threshold: 300
     metrics-by-endpoint: {}
     fake-data: {}
 scenarios:
