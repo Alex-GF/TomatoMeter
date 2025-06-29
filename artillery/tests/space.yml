@@ -48,10 +48,10 @@ scenarios:
             contractedServices:
               tomatometer: "1.0.0"
             subscriptionPlans:
-              tomatometer: "basic"
+              tomatometer: '{{ plan }}'
             subscriptionAddOns:
               tomatometer:
-                extraTimers: 1
+                '{{ addOn }}': 1
           capture: 
             - json: '$.userContact.userId'
               as: 'userId'
