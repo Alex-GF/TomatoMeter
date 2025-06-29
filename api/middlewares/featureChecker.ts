@@ -8,7 +8,12 @@ const featureChecker = (req: Request, res: Response, next: NextFunction) => {
   const setHeaders = async () => {
     // Add the Pricing-Token header after the request is processed
     const userId = getCurrentUser() ?? testUserId;
-    res.setHeader('Pricing-Token', await container.spaceClient?.features.generateUserPricingToken(userId));
+    try{
+      const token = await container.spaceClient?.features.generateUserPricingToken(userId);
+      res.setHeader('Pricing-Token', token);
+    }catch (error) {
+      console.error('Error generating pricing token:', error);
+    }
   };
 
   const wrap = async (method: keyof typeof res) => {
