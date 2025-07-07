@@ -1,0 +1,36 @@
+config:
+  # This is a test server run by team Artillery
+  # It's designed to be highly scalable
+  target: http://localhost/api/v1
+  phases:
+    - duration: 60 # Seconds that this phase will last
+      arrivalRate: 5 # 1 new virtual user per second
+      rampTo: 10 # gradually ramp up to 5 new users per second
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 50
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 100
+      name: Spike phase
+  payload:
+    path: '../data/generated_users.csv'
+    fields:
+      - userId
+  # Load & configure a couple of useful plugins
+  # https://artillery.io/docs/reference/extensions
+  plugins:
+    apdex:
+      threshold: 300
+    metrics-by-endpoint: {}
+    fake-data: {}
+scenarios:
+  - flow:
+      - loop:
+          - post:
+              url: '/features/{{ userId }}/pricing-token'
+              headers:
+                Content-Type: application/json
+                x-api-key: '982687123ca0e2985eac3aee9a7d31eb98ba4e0e8abd690402ef537416be072d'
+        count: 10

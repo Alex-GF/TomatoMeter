@@ -1,7 +1,7 @@
 #!/bin/bash
 
 API_URL="http://localhost/api/v1/contracts"
-API_KEY="fe5cf1d79449898fcc2868f6ce0aa1a833b0a82841628cef3821dc3451254d53"
+API_KEY="982687123ca0e2985eac3aee9a7d31eb98ba4e0e8abd690402ef537416be072d"
 TOTAL_REQUESTS=5250
 OUTPUT_CSV="./generated_users.csv"
 
@@ -63,10 +63,10 @@ for ((i = 1; i <= TOTAL_REQUESTS; i++)); do
     }')
 
   # Send the request and wait for the response
-  response=$(curl -s -X POST "$API_URL" \
+  curl -s -X POST "$API_URL" \
     -H "Content-Type: application/json" \
     -H "x-api-key: $API_KEY" \
-    -d "$payload")
+    -d "$payload"
 
   # Optionally, you can log the response if needed
   # echo "Response: $response"
