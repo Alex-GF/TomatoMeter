@@ -14,14 +14,18 @@ router.post('/pomodoro/session', async (req, res) => {
   
   const userId = getCurrentUser() ?? 'test-user-id';
 
-  const canSavePomodoroSession = await container.spaceClient?.features.evaluate(userId, 'tomatometer-pomodoroTimer', {
-    "tomatometer-maxPomodoroTimers": 1
-  }, {
-    server: true
-  });
+  try{
+    const canSavePomodoroSession = await container.spaceClient?.features.evaluate(userId, 'tomatometer-pomodoroTimer', {
+      "tomatometer-maxPomodoroTimers": 1
+    }, {
+      server: true
+    });
 
-  if (!canSavePomodoroSession){
-    return res.status(403).json({ error: 'Feature not enabled for this user. Limit has been reached.' });
+    if (!canSavePomodoroSession){
+      return res.status(403).json({ error: 'Feature not enabled for this user. Limit has been reached.' });
+    }
+  }catch (error) {
+    console.log('Error checking feature:', error);
   }
   
   const { duration, productivity} = req.body;
