@@ -9,7 +9,8 @@
 3. [About the Demo Application & Pricing](#about-the-demo-application--pricing)
 4. [Project Structure](#project-structure)
 5. [Tech Stack](#tech-stack)
-6. [Disclaimer & License](#disclaimer--license)
+6. [SPACE Load Testing](#space-load-testing)
+7. [Disclaimer & License](#disclaimer--license)
 
 ---
 
@@ -157,6 +158,88 @@ The repository is organized as follows:
 </div>
 
 ---
+
+## SPACE Load Testing
+
+If you want to replicate the results presented in the paper presenting SPACE (submitted to ICSOC'25), you must follow these steps:
+
+### 1. Deploy SPACE using kubernetes
+
+Before running the demo, you need to have a kubernetes deployment of SPACE running. 
+
+Considering that you already have a cluster (we recommend using kubeadm from docker-desktop if want to run tests locally), you just need to clone the [SPACE repository](https://github.com/Alex-GF/space) and navigate to the `k8s` folder:
+
+```bash
+git clone https://github.com/Alex-GF/space.git
+cd space/k8s
+```
+
+Then, you just need to run the deploy.sh script to deploy SPACE in your kubernetes cluster:
+
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+Then wait for the SPACE pods to start. If everything is set up correctly, you must have 3 replicas of the `server` pod running, and should be able to access SPACE at [http://localhost](http://localhost).
+
+If you want to explore SPACE, you can log in into the app using the following default credentials (this will be needed for retrieving the API key in the next step):
+
+- **Username:** `admin`
+- **Password:** `space4all`
+
+> [!NOTE]
+> If you are interested in learning more about SPACE, you can check out the [SPACE documentation](https://github.com/Alex-GF/space#readme) for more details on how to set it up, configure it, and use its features.
+
+### 2. Configure the project for load testing
+
+This demo project rely on [artillery](https://www.artillery.io) to develop, run and evaluate load tests. Therefore, in order to ensure a seamless integration between Tomatometer, SPACE and artillery.io (the service where artillery insights are stored), you must follow these steps:
+
+1. Install the dependencies of the project:
+
+    ```bash
+    pnpm install
+    # or
+    npm install
+    # or
+    yarn install
+    ```
+
+2. Connect to [artillery.io](https://www.artillery.io) using your github account and generate an API key. Once logged, you can find your API key in `settings -> API Keys`.
+
+3. Generate a `.env` file following the structure of `.env.example`.
+
+    To retrieve the SPACE API key, you must log in into SPACE and navigate to `Access Control`. Once you are there, you can copy the API key of the admin user.
+
+    Once you have obtained both the SPACE API key and the Artillery.io API key, your `.env` file should look like this:
+
+    ```bash
+    VITE_SPACE_URL=http://localhost
+    VITE_SPACE_API_KEY=96ff87ecdf9df3971ea98f51cc37edd301a34391fd89a7b96a7436246d8f0ac6
+    ARTILLERY_KEY=a9_koizwzxadtywh677t9hwg9pvogmr600f
+    ```
+
+    > [!WARNING]
+    > The script for retrieving the SPACE API key presented in [Live Demo with Docker](#live-demo-with-docker) will not work in this setup, since SPACE has been deployed through Kubernetes.
+
+### 3. Run the load tests
+
+After configuring the project, you can either run all tests at once, or run them individually.
+
+- **To run all tests at once**, just run on the root folder:
+
+```bash
+pnpm run load-test
+```
+
+- **To run individual tests**, you can use the commands with the `load-test` prefix in the `package.json` file. For example, to run the `tomatometer-renew-only` test, you can run:
+
+```bash
+pnpm run load-test:tomatometer-renew-only
+```
+
+>[!IMPORTANT]
+> With this setup, you will run the load tests against the SPACE instance running in your kubernetes cluster, which by default has 3 space-server replicas configured. If you want to increase/decrease the number of replicas, you can do so by modifying the `replicas` field in the `k8s/pods/server-deployment.yaml` file (which can be found on the [SPACE repository](https://github.com/Alex-GF/space/blob/main/k8s/pods/server-deployment.yaml)) and applying the changes with `kubectl apply -f k8s/pods/server-deployment.yaml`.
 
 ## Disclaimer & License
 
