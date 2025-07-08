@@ -152,7 +152,7 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-40 flex"
+            className="fixed inset-0 z-[60] flex"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
