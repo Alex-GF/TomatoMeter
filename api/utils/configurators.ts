@@ -1,4 +1,4 @@
-import { connect } from 'space-node-client';
+import { CacheType, connect } from 'space-node-client';
 import { container } from '../config/container';
 import dotenv from 'dotenv';
 import { SpaceServiceOperations } from './spaceOperations';
@@ -12,6 +12,11 @@ export function configureSpaceClient() {
     url: process.env.VITE_SPACE_URL || 'http://localhost:5403',
     apiKey: process.env.VITE_SPACE_API_KEY || 'your-api-key',
     timeout: 5000,
+    cache: {
+      enabled: true,
+      ttl: 60 * 60 * 1000, // 1 hour
+      type: CacheType.BUILTIN
+    }
   });
 
   container.spaceClient.on('synchronized', spaceSynchronizationCallback);
@@ -47,8 +52,6 @@ async function spaceSynchronizationCallback() {
 
   try {
     await SpaceServiceOperations.getService('TomatoMeter');
-
-    console.log('TomatoMeter service and test user contract already exist, skipping creation');
   } catch {
     await SpaceServiceOperations.addService('./api/resources/TomatoMeter.yml');
 
@@ -57,6 +60,8 @@ async function spaceSynchronizationCallback() {
 }
 
 async function pricingCreatedCallback(data: { serviceName: string; pricingVersion: string }) {
+  console.log("callback runned")
+  
   const pricing = await SpaceServiceOperations.getPricing(data.serviceName, data.pricingVersion);
 
   container.spaceClient?.contracts
@@ -67,7 +72,7 @@ async function pricingCreatedCallback(data: { serviceName: string; pricingVersio
           tomatometer: data.pricingVersion,
         },
         subscriptionPlans: {
-          tomatometer: Object.keys(pricing?.plans ?? {})[0] || 'BASIC',
+          tomatometer: Object.keys(pricing?.plans ?? {})[0] || 'basic',
         },
         subscriptionAddOns: {},
       });
@@ -82,7 +87,7 @@ async function pricingCreatedCallback(data: { serviceName: string; pricingVersio
           tomatometer: '1.0.0',
         },
         subscriptionPlans: {
-          tomatometer: 'BASIC',
+          tomatometer: 'basic',
         },
         subscriptionAddOns: {},
       });

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { populatePomodoroSessions } from '../utils/generators';
 import { container } from '../config/container';
-import { testUserId } from '../utils/configurators';
+import { getCurrentUser } from '../middlewares/requestContext';
 
 const router = Router();
 
@@ -12,20 +12,25 @@ populatePomodoroSessions(pomodoroSessions);
 // Save pomodoro session duration
 router.post('/pomodoro/session', async (req, res) => {
   
-  const canSavePomodoroSession = await container.spaceClient?.features.evaluate(testUserId, 'tomatometer-pomodoroTimer', {
-    "tomatometer-maxPomodoroTimers": 1
-  }, {
-    server: true
-  });
+  const userId = getCurrentUser() ?? 'test-user-id';
 
-  if (!canSavePomodoroSession){
-    return res.status(403).json({ error: 'Feature not enabled for this user. Limit has been reached.' });
+  try{
+    const canSavePomodoroSession = await container.spaceClient?.features.evaluate(userId, 'tomatometer-pomodoroTimer', {
+      "tomatometer-maxPomodoroTimers": 1
+    }, {
+      server: true
+    });
+
+    if (!canSavePomodoroSession){
+      return res.status(403).json({ error: 'Feature not enabled for this user. Limit has been reached.' });
+    }
+  }catch (error) {
+    console.log('Error checking feature:', error);
   }
   
-  const userId = 'demo-user';
-  const { duration } = req.body;
+  const { duration, productivity} = req.body;
   if (!pomodoroSessions.has(userId)) pomodoroSessions.set(userId, []);
-  pomodoroSessions.get(userId)!.push({ duration, productivity: 0, date: new Date().toISOString() });
+  pomodoroSessions.get(userId)!.push({ duration, productivity: productivity ?? 0, date: new Date().toISOString() });
   res.status(200).json({ success: true });
 });
 

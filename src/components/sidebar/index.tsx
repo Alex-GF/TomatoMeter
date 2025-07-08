@@ -28,7 +28,7 @@ const Sidebar = () => {
   const { selectedPage, setSelectedPage } = usePage();
 
   // Parse currentSubscription to extract plan and addons
-  const planName = currentSubscription[0] || 'BASIC';
+  const planName = currentSubscription[0] || 'basic';
   const activeAddons = currentSubscription
     .slice(1)
     .map(str => {

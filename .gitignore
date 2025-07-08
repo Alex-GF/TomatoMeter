@@ -131,3 +131,5 @@ dist
 
 # pnpm store
 pnpm-workspace.yaml
+
+artillery/data/*.csv

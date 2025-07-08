@@ -6,6 +6,7 @@ import contractsRoutes from './routes/contract';
 import featureChecker from './middlewares/featureChecker';
 import { configureSpaceClient } from './utils/configurators';
 import cors from 'cors';
+import { runWithUser } from './middlewares/requestContext';
 
 const app: express.Server = express();
 const port = 8080;
@@ -16,9 +17,14 @@ app.use(express.json());
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  exposedHeaders: ['Pricing-Token'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Pricing-Token'],
+  exposedHeaders: ['Pricing-Token', 'user-id'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Pricing-Token', 'user-id'],
 }));
+
+app.use((req, res, next) => {
+  const userId = req.headers['user-id']?.toString() ?? 'anonymous';
+  runWithUser(userId, () => next());
+});
 
 app.use(featureChecker);
 
