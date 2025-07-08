@@ -8,7 +8,6 @@
     "load-test:space-renew-only": "artillery run ./artillery/tests/space-renew-only.yml --name \"space-renew-only\" --record --key a9_koizwzxadtywh677t9hwg9pvogmr600f",
     "load-test:tomatometer-validate-only": "artillery run ./artillery/tests/tomatometer-validate-only.yml --name \"tomatometer-validate-only\" --record --key a9_koizwzxadtywh677t9hwg9pvogmr600f",
     "load-test:space-validate-only": "artillery run ./artillery/tests/space-validate-only.yml --name \"space-validate-only\" --record --key a9_koizwzxadtywh677t9hwg9pvogmr600f",
-    "load-test": "pnpm run load-test:server-feature-validation && pnpm run load-test:renew-token",
     "dev:server": "export SPACE_URL=\"http://localhost:3000\" && npx tsx --watch ./api/backend.ts",
     "dev:client": "concurrently \"vite\" \"tailwindcss -i ./src/static/css/app.css -o ./src/static/css/tailwind.css --watch\"",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
