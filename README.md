@@ -9,7 +9,8 @@
 3. [About the Demo Application & Pricing](#about-the-demo-application--pricing)
 4. [Project Structure](#project-structure)
 5. [Tech Stack](#tech-stack)
-6. [Disclaimer & License](#disclaimer--license)
+6. [Pricing4SaaS Load Testing](#pricing4saas-load-testing)
+7. [Disclaimer & License](#disclaimer--license)
 
 ---
 
@@ -157,6 +158,48 @@ The repository is organized as follows:
 </div>
 
 ---
+
+## Load Testing
+
+If you want to replicate the results presented in the paper presenting SPACE (submitted to ICSOC'25), you must follow these steps:
+
+### 1. Configure the project for load testing
+
+This demo project rely on [artillery](https://www.artillery.io) to develop, run and evaluate load tests. Therefore, in order to ensure a seamless integration between Tomatometer and artillery.io (the service where artillery insights are stored), you must follow these steps:
+
+1. Install the dependencies of the project:
+
+    ```bash
+    pnpm install
+    # or
+    npm install
+    # or
+    yarn install
+    ```
+
+2. Connect to [artillery.io](https://www.artillery.io) using your github account and generate an API key. Once logged, you can find your API key in `settings -> API Keys`.
+
+3. Generate a `.env` file following the structure of `.env.example`. Considering that you already have your artilleri.io API key, your `.env` file should look like this:
+
+    ```bash
+    ARTILLERY_KEY=a9_koizwzxadtywh677t9hwg9pvogmr600f # The artillery API key
+    ```
+
+### 2. Run the load tests
+
+After configuring the project, you can either run all tests at once, or run them individually.
+
+- **To run all tests at once**, just run on the root folder:
+
+```bash
+pnpm run load-test
+```
+
+- **To run individual tests**, you can use the commands with the `load-test` prefix in the `package.json` file. For example, to run the `renew-only` test, you can run:
+
+```bash
+pnpm run load-test:renew-only
+```
 
 ## Disclaimer & License
 

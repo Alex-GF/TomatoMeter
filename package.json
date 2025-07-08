@@ -4,8 +4,9 @@
   "version": "1.0.0",
   "description": "This is a demo project that uses pricing-driven feature flags driven by different solutions",
   "scripts": {
-    "load-test:renew-only": "artillery run ./artillery/tests/renew-only.yml --name \"pricing4saas-renew-only\" --record --key a9_koizwzxadtywh677t9hwg9pvogmr600f",
-    "load-test:validate-only": "artillery run ./artillery/tests/validate-only.yml --name \"pricing4saas-validate-only\" --record --key a9_koizwzxadtywh677t9hwg9pvogmr600f",
+    "load-test:renew-only": "artillery run ./artillery/tests/renew-only.yml --name \"pricing4saas-renew-only\" --record --key $ARTILLERY_KEY",
+    "load-test:validate-only": "artillery run ./artillery/tests/validate-only.yml --name \"pricing4saas-validate-only\" --record --key $ARTILLERY_KEY",
+    "load-test": "npm run load-test:renew-only && npm run load-test:validate-only",
     "dev:server": "export SPACE_URL=\"http://localhost:3000\" && npx tsx --watch ./api/backend.ts",
     "dev:client": "concurrently \"vite\" \"tailwindcss -i ./src/static/css/app.css -o ./src/static/css/tailwind.css --watch\"",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
