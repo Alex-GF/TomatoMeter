@@ -219,8 +219,8 @@ This demo project rely on [artillery](https://www.artillery.io) to develop, run 
     ARTILLERY_KEY=a9_koizwzxadtywh677t9hwg9pvogmr600f
     ```
 
-    > [!WARNING]
-    > The script for retrieving the SPACE API key presented in [Live Demo with Docker](#live-demo-with-docker) will not work in this setup, since SPACE has been deployed through Kubernetes.
+> [!WARNING]
+> The script for retrieving the SPACE API key presented in [Live Demo with Docker](#live-demo-with-docker) will not work in this setup, since SPACE has been deployed through Kubernetes.
 
 ### 3. Run the load tests
 
