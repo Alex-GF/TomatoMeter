@@ -20,7 +20,9 @@ export function revertCamelCaseToString(str: string): string {
 }
 
 export async function renewToken(tokenService: TokenService): Promise<void> {
-  return axios.post('/contracts/renew-token').then(response => {
+  return axios.post('/contracts/renew-token', {
+    userId: 'test-user-id' // Replace with actual user ID if needed
+  }).then(response => {
     const pricingToken = response.data.pricingToken;
 
     tokenService.updatePricingToken(pricingToken);

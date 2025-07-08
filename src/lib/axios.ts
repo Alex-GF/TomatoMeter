@@ -4,6 +4,7 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8080/api',
   headers: {
     'Content-Type': 'application/json',
+    'user-id': "test-user-id"
   },
 });
 

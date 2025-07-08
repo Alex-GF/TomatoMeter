@@ -5,22 +5,15 @@ import { SpaceServiceOperations } from '../utils/spaceOperations';
 import { Pricing } from '../types';
 import yaml from 'js-yaml';
 import { Readable } from 'stream';
+import { getCurrentUser } from '../middlewares/requestContext';
 
 const router = Router();
 
-// Update user's contract
-router.get('/contracts', async (req, res) => {
-  try {
-    const contract = await container.spaceClient?.contracts.getContract(testUserId);
-    res.status(200).json({ contract: contract });
-  } catch {
-    res.status(500).json({ error: 'Failed to fetch contract' });
-  }
-});
-
 router.get('/contracts/pricing', async (req, res) => {
   try {
-    const contract = await container.spaceClient?.contracts.getContract(testUserId);
+    const userId = getCurrentUser() ?? testUserId;
+    
+    const contract = await container.spaceClient?.contracts.getContract(userId);
 
     const currentPricingVersion = contract?.contractedServices.tomatometer;
 
@@ -34,6 +27,18 @@ router.get('/contracts/pricing', async (req, res) => {
     );
 
     res.status(200).json(pricing);
+  } catch {
+    res.status(500).json({ error: 'Failed to fetch contract' });
+  }
+});
+
+// Update user's contract
+router.get('/contracts/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const contract = await container.spaceClient?.contracts.getContract(userId);
+    res.status(200).json({ contract: contract });
   } catch {
     res.status(500).json({ error: 'Failed to fetch contract' });
   }
@@ -122,9 +127,11 @@ router.post('/contracts/pricing', async (req, res) => {
 });
 
 // Update user's contract
-router.put('/contracts', async (req, res) => {
+router.put('/contracts/:userId', async (req, res) => {
   try {
-    await container.spaceClient?.contracts.updateContractSubscription(testUserId, req.body);
+    const userId = req.params.userId;
+
+    await container.spaceClient?.contracts.updateContractSubscription(userId, req.body);
     res.status(200).json({ message: 'Contract updated successfully' });
   } catch {
     res.status(500).json({ error: 'Failed to update contract' });
@@ -133,11 +140,47 @@ router.put('/contracts', async (req, res) => {
 
 router.post('/contracts/renew-token', async (req, res) => {
   try {
-    const token = await container.spaceClient?.features.generateUserPricingToken(testUserId);
+    const userId = getCurrentUser() ?? testUserId;
+
+    const token = await container.spaceClient?.features.generateUserPricingToken(userId);
+    
     res.status(200).json({ pricingToken: token });
   } catch {
     res.status(500).json({ error: 'Failed to renew token' });
   }
 });
+
+// Generate a new contract for user with id: userId
+router.post('/contracts', async (req, res) => {
+  try {
+    const userId = getCurrentUser() ?? testUserId;
+
+    const contractData = {
+      userContact: {
+        userId: userId,
+        username: userId + "-username",
+      },
+      usageLevels: {
+        maxPomodoroTimers: 1,
+      },
+      contractedServices: {
+        tomatometer: '1.0.0',
+      },
+      subscriptionPlans: {
+        tomatometer: 'basic',
+      },
+      subscriptionAddOns: {
+        tomatometer: {
+          extraTimers: 2,
+        },
+      },
+    }
+
+    const createdContract = await container.spaceClient?.contracts.addContract(contractData);
+    res.status(201).json(createdContract);
+  }catch (error) {
+    res.status(500).json({ error: 'Failed to create contract', details: (error as Error).message });
+  }
+})
 
 export default router;

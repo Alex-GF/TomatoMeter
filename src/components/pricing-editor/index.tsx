@@ -126,7 +126,7 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
       });
       // Actualizar contrato del usuario al primer plan del nuevo pricing
       const firstPlanKey = Object.keys(editedPlans)[0];
-      await axios.put('/contracts', {
+      await axios.put('/contracts/test-user-id', {
         contractedServices: { tomatometer: newPricing.version || '1.0.0' },
         subscriptionPlans: { tomatometer: firstPlanKey },
         subscriptionAddOns: { tomatometer: {} },
