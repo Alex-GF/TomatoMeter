@@ -22,14 +22,18 @@ config:
   # https://artillery.io/docs/reference/extensions
   plugins:
     apdex:
-      threshold: 500
+      threshold: 300
     metrics-by-endpoint: {}
+    fake-data: {}
 scenarios:
   - flow:
       - loop:
           - post:
-              url: '/contracts/renew-token'
+              url: '/pomodoro/session'
               headers:
                 Content-Type: application/json
                 user-id: '{{ userId }}'
+              json:
+                duration: 25
+                productivity: 3              
         count: 10

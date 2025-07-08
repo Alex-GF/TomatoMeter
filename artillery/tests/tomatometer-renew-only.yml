@@ -14,15 +14,10 @@ config:
     - duration: 30
       arrivalRate: 100
       name: Spike phase
-  processor: '../processors/authProcessor.cjs'
-  variables:
-    plan:
-      - 'basic'
-      - 'advanced'
-      - 'premium'
-    addOn:
-      - 'extraTimers'
-      - 'exportAsJson'
+  payload:
+    path: '../data/generated_users.csv'
+    fields:
+      - userId
   # Load & configure a couple of useful plugins
   # https://artillery.io/docs/reference/extensions
   plugins:
@@ -32,16 +27,6 @@ config:
     fake-data: {}
 scenarios:
   - flow:
-      - post:
-          url: '/users'
-          beforeRequest: getRandomCredentials
-          headers:
-            Content-Type: application/json
-          json:
-            userId: '{{ generatedUserId }}'
-          capture:
-            - json: '$.id'
-              as: 'userId'
       - loop:
           - post:
               url: '/pomodoro/session'
@@ -51,4 +36,4 @@ scenarios:
               json:
                 duration: 25
                 productivity: 3              
-        count: 20
+        count: 10

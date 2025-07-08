@@ -1,7 +1,7 @@
 #!/bin/bash
 
 API_URL="http://localhost/api/v1/contracts"
-API_KEY="982687123ca0e2985eac3aee9a7d31eb98ba4e0e8abd690402ef537416be072d"
+API_KEY="96ff87ecdf9df3971ea98f51cc37edd301a34391fd89a7b96a7436246d8f0ac6"
 TOTAL_REQUESTS=5250
 OUTPUT_CSV="./generated_users.csv"
 

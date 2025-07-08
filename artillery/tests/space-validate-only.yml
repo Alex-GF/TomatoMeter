@@ -29,7 +29,7 @@ scenarios:
   - flow:
       - loop:
           - post:
-              url: '/features/{{ userId }}/pricing-token'
+              url: '/features/{{ userId }}/tomatometer-pomodoroTimer'
               headers:
                 Content-Type: application/json
                 x-api-key: '96ff87ecdf9df3971ea98f51cc37edd301a34391fd89a7b96a7436246d8f0ac6'
