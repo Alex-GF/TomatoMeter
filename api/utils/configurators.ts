@@ -60,7 +60,6 @@ async function spaceSynchronizationCallback() {
 }
 
 async function pricingCreatedCallback(data: { serviceName: string; pricingVersion: string }) {
-  console.log("callback runned")
   
   const pricing = await SpaceServiceOperations.getPricing(data.serviceName, data.pricingVersion);
 
