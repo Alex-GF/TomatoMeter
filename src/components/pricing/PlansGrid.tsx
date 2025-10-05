@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Plan, PricingFeature } from '../../types';
-import { camelToTitle } from '../../utils/helpers';
+import { humanizeFeatureName } from '../../utils/helpers';
 
 interface PlansGridProps {
   plans: Record<string, Plan>;
@@ -30,7 +30,7 @@ export function PlansGrid({ plans, features, selectedPlan, onSelect }: PlansGrid
             onClick={() => onSelect(planKey)}
           >
             <span className="text-xl font-bold text-purple-700 dark:text-yellow-300 mb-2">
-              {plan.name ? camelToTitle(plan.name).toUpperCase() : camelToTitle(planKey).toUpperCase()}
+              {plan.name ? humanizeFeatureName(plan.name).toUpperCase() : humanizeFeatureName(planKey).toUpperCase()}
             </span>
             <span className="text-3xl font-extrabold text-purple-900 dark:text-yellow-200 mb-2">
               {plan.price}
@@ -53,7 +53,7 @@ export function PlansGrid({ plans, features, selectedPlan, onSelect }: PlansGrid
                         : 'text-gray-400 dark:text-gray-500 line-through'
                     }`}
                   >
-                    {enabled ? '✔️' : '✖️'} {feature.name ?? camelToTitle(featureKey)}
+                    {enabled ? '✔️' : '✖️'} {feature.name ? humanizeFeatureName(feature.name) : humanizeFeatureName(featureKey)}
                   </li>
                 );
               })}
@@ -63,7 +63,7 @@ export function PlansGrid({ plans, features, selectedPlan, onSelect }: PlansGrid
               <div className="text-xs text-gray-400 dark:text-gray-300">
                 {Object.entries(plan.usageLimits).map(([limitKey, limitValue]) => (
                   <div key={limitKey}>
-                    {camelToTitle(limitKey)}: {String(limitValue)}
+                    {humanizeFeatureName(limitKey)}: {String(limitValue)}
                   </div>
                 ))}
               </div>

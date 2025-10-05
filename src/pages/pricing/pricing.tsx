@@ -68,7 +68,9 @@ const PricingPage = () => {
       planKey,
       ...Object.entries(selectedAddOns).map(([k, v]) => `${k}X${v}`),
     ]);
+    
     await updateContract(planKey, selectedAddOns, axiosInstance, tokenService);
+    
     if (toggles['Show plan/add-on notifications']) {
       setNotification('Plan changed successfully!');
       setTimeout(() => setNotification(null), 2500);
@@ -79,6 +81,7 @@ const PricingPage = () => {
       plansSnapshot: { [planKey]: plans[planKey] },
       addOnsSnapshot: { ...selectedAddOns }
     });
+
   };
 
   const handleAddonChange = async (addonKey: string, value: number) => {

@@ -19,7 +19,7 @@ export async function updateContract(plan: string, addons: Record<string, number
     }
   });
 
-  await renewToken(tokenService);
+  renewToken(tokenService);
 }
 
 export const toSubscriptionArr = (plan: string, addons?: { [key: string]: number }) => {

@@ -1,5 +1,4 @@
 import { TokenService } from 'space-react-client';
-import axios from '../lib/axios';
 
 export function formatToCamelCase(str: string): string {
   return str
@@ -28,6 +27,24 @@ export function camelToTitle(str: string) {
     .replace(/([A-Z])/g, ' $1')
     .replace(/^./, s => s.toUpperCase())
     .replace(/_/g, ' ');
+}
+
+// Ensure a feature name is presented in human readable form.
+// If the name already contains spaces or non-camel separators, we normalize capitalization.
+export function humanizeFeatureName(name?: string) {
+  if (!name) return '';
+  // Replace underscores/dashes with spaces
+  const normalized = name.replace(/[_-]+/g, ' ').trim();
+  // If it contains spaces it might already be human, so just capitalize each word
+  if (normalized.includes(' ')) {
+    return normalized
+      .toLowerCase()
+      .split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  }
+  // Otherwise assume camelCase or PascalCase and convert
+  return camelToTitle(normalized).replace(/\s+/g, ' ').trim();
 }
 
 // Helper: convert string to camelCase
