@@ -32,7 +32,6 @@ app.use(featureChecker);
 app.use('/api', healthRoutes);
 app.use('/api', pricingRoutes);
 app.use('/api', pomodoroRoutes);
-app.use('/api', pomodoroRoutes);
 app.use('/api', contractsRoutes);
 
 app.listen(port, () => {

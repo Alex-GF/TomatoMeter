@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatDuration, intervalToDuration } from 'date-fns';
-import axios from '../../lib/axios';
 import { Default, Feature, On } from 'space-react-client';
 import { usePage } from '../../contexts/pageContext';
+import { AxiosInstance } from 'axios';
+import useAxios from '../../hooks/useAxios';
 
 interface Session {
   duration: number; // seconds
@@ -21,8 +22,8 @@ interface WeeklyStats {
   sessions: Session[];
 }
 
-const fetchWeeklyStats = async (): Promise<WeeklyStats> => {
-  const res = await axios.get('/pomodoro/weekly');
+const fetchWeeklyStats = async (axiosInstance: AxiosInstance): Promise<WeeklyStats> => {
+  const res = await axiosInstance.get('/pomodoro/weekly');
 
   return res.data;
 };
@@ -56,8 +57,10 @@ const WeeklyProductivity = () => {
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const axiosInstance = useAxios();
+
   useEffect(() => {
-    fetchWeeklyStats().then(data => {
+    fetchWeeklyStats(axiosInstance).then(data => {
       setStats(data);
       setLoading(false);
     });

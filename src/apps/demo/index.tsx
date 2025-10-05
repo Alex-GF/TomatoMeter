@@ -1,14 +1,14 @@
 import { useState, useContext, useEffect, useMemo } from 'react';
 import Sidebar from '../../components/sidebar';
 import { SettingsContext } from '../../contexts/settingsContext';
-import axios from '../../lib/axios';
-import { usePricingToken, useSpaceClient } from 'space-react-client';
+import { useTokenService, useSpaceClient } from 'space-react-client';
 import { renewToken } from '../../utils/helpers';
 import PricingEditor from '../../components/pricing-editor';
 import { useSubscription } from '../../hooks/useSubscription';
 import { TimelineDual } from '../../components/timeline/TimelineDual';
 import { SIDEBAR_ITEMS } from '../../constants/sidebarItems';
 import { usePage } from '../../contexts/pageContext';
+import useAxios from '../../hooks/useAxios';
 
 // SIDEBAR_ITEMS debe moverse fuera de este archivo para evitar el error de Fast Refresh.
 // Puedes moverlo a un archivo como src/constants/sidebarItems.ts y exportarlo desde allí.
@@ -22,35 +22,22 @@ export function DemoApp() {
   const [isPricingEditorOpen, setPricingEditorOpen] = useState<boolean>(false);
 
   const spaceClient = useSpaceClient();
-  const tokenService = usePricingToken();
+  const tokenService = useTokenService();
+  const axiosInstance = useAxios();
 
   const settingsValue = useMemo(() => ({ toggles, setToggles }), [toggles, setToggles]);
 
   useEffect(() => {
     renewToken(tokenService);
     const onPricingCreated = async (data: { serviceName: string; pricingVersion: string }) => {  
-      axios.get(`/pricings/${data.serviceName}/${data.pricingVersion}`).then(response => {
-        const pricing = response.data;
-        axios
-          .put('/contracts/test-user-id', {
-            contractedServices: {
-              tomatometer: data.pricingVersion || '1.0.0',
-            },
-            subscriptionPlans: {
-              tomatometer: Object.keys(pricing.plans)[0]
-            },
-            subscriptionAddOns: {},
-          })
-          .then(() => {
-            renewToken(tokenService).then(() => {
-              setCurrentSubscription([Object.keys(pricing.plans)[0]]);
-              setReloadTrigger(prev => prev + 1);
-            });
-          });
-      });
+      axiosInstance.put('/contracts/pricing', { serviceName: data.serviceName, pricingVersion: data.pricingVersion })
+        .then((pricing: any) => {
+          setCurrentSubscription([Object.keys(pricing.plans)[0]]);
+          setReloadTrigger(prev => prev + 1);
+        });
     };
     const onPricingArchived = async () => {
-      await renewToken(tokenService);
+      renewToken(tokenService);
       setReloadTrigger(prev => prev + 1);
     };
     spaceClient.on('pricing_created', onPricingCreated);

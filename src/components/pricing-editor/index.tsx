@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Pricing, Plan, AddOn, PricingToCreate } from '../../types';
-import axios from '../../lib/axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlansEditor } from './PlansEditor';
 import { AddOnsEditor } from './AddOnsEditor';
 import ConfirmPricingModal from './ConfirmPricingModal';
 import { useTimeline } from '../../contexts/timelineContext';
+import useAxios from '../../hooks/useAxios';
 
 interface PricingEditorProps {
   readonly open: boolean;
@@ -20,6 +20,7 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const { addEvent } = useTimeline();
+  const axiosInstance = useAxios();
 
   // Handler para cerrar al hacer click fuera del sidebar
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -31,7 +32,7 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
 
   useEffect(() => {
     if (open) {
-      axios
+      axiosInstance
         .get('/contracts/pricing')
         .then(response => {
           const fetchedPricing: Pricing = response.data;
@@ -116,7 +117,7 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
 
     setIsSubmitting(true);
     try {
-      await axios.post('/contracts/pricing', newPricing);
+      await axiosInstance.post('/contracts/pricing', newPricing);
       // Evento de provider: pricing changed
       const providerEventId = addEvent({
         type: 'provider',
@@ -126,11 +127,6 @@ export default function PricingEditor({ open, onClose, side = 'right' }: Pricing
       });
       // Actualizar contrato del usuario al primer plan del nuevo pricing
       const firstPlanKey = Object.keys(editedPlans)[0];
-      await axios.put('/contracts/test-user-id', {
-        contractedServices: { tomatometer: newPricing.version || '1.0.0' },
-        subscriptionPlans: { tomatometer: firstPlanKey },
-        subscriptionAddOns: { tomatometer: {} },
-      });
       // Evento de user: suscripción cambiada automáticamente por el proveedor
       addEvent({
         type: 'user',

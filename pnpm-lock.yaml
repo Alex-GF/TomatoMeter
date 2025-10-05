@@ -72,8 +72,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0
       space-react-client:
-        specifier: ^0.2.3
-        version: 0.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.3.0
+        version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsc-alias:
         specifier: 1.8.16
         version: 1.8.16
@@ -4802,8 +4802,8 @@ packages:
     resolution: {integrity: sha512-13FsdrANVB6zuzuIJYrElCCEYWwSOwfKtu86haHXg+nKSuvl4OTnmSNmh8l3s+XGQKQWspLQd+s6n0LJ2XMTjw==}
     engines: {node: '>=16.0.0'}
 
-  space-react-client@0.2.3:
-    resolution: {integrity: sha512-lMzVUtfkDaAWCdbJHezVrbNwcdkrzNLorBCfeIY2z9Fkq3Xb9yLGkLvn91kd0oPv3tJF6zIxMtuD3cpmbpePvA==}
+  space-react-client@0.3.0:
+    resolution: {integrity: sha512-Ji1o6NwLQcmxtxSR8ary5znG+U4TK7eJmAhS3pDdmzkkybuBIWJW6zEo0NLfxHWbzofC0iqAcgksUasN72GCLw==}
     peerDependencies:
       react: ^18.3.1
       react-dom: ^18.3.1
@@ -11112,7 +11112,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  space-react-client@0.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  space-react-client@0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       axios: 1.9.0(debug@4.4.1)
       react: 18.3.1
