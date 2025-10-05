@@ -72,7 +72,9 @@ const PomodoroTimer = () => {
       {
         headers: { 'Content-Type': 'application/json' },
       }
-    );
+    ).catch(() => {
+      window.location.reload();
+    });
   };
 
   const handleProductivitySubmit = async (score: number) => {

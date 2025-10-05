@@ -8,7 +8,7 @@ features:
     description: Tomato timer feature
     valueType: BOOLEAN
     defaultValue: true
-    expression: pricingContext['features']['pomodoroTimer'] && subscriptionContext['maxPomodoroTimers'] <= pricingContext['usageLimits']['maxPomodoroTimers']
+    expression: pricingContext['features']['pomodoroTimer'] && subscriptionContext['maxPomodoroTimers'] < pricingContext['usageLimits']['maxPomodoroTimers']
     type: DOMAIN
   soundNotifications:
     description: Rings a sound everytime a timer finishes or is stopped

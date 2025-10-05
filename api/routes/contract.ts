@@ -22,7 +22,7 @@ router.get('/contracts/pricing', async (req, res) => {
     }
 
     const pricing: Pricing = await SpaceServiceOperations.getPricing(
-      'TomatoMeter',
+      'tomatometer',
       currentPricingVersion
     );
 
@@ -103,7 +103,7 @@ router.post('/contracts/pricing', async (req, res) => {
   try {
     let submittedPricing = req.body;
     submittedPricing = processPricing(submittedPricing);
-    submittedPricing.saasName = 'TomatoMeter';
+    submittedPricing.saasName = 'tomatometer';
     submittedPricing.syntaxVersion = '3.0';
     const [major, minor, patch] = submittedPricing.version.split('.').map(Number);
     submittedPricing.version = `${major}.${minor + 1}.${patch}`;
