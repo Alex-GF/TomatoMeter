@@ -52,7 +52,7 @@ features:
     description: "Unlock a new set of advanced analytics widgets in your weekly productivity view, including detailed insights into average work sessions, productivity trends, pomodoro streaks, and more."
     valueType: BOOLEAN
     defaultValue: false
-    expression: pricingContext['features']['customPomodoroDuration']
+    expression: pricingContext['features']['advancedAnalytics']
     type: INFORMATION
   exportDataToJson:
     description: Allows you to export structured data into a JSON file, making it easy to store, share, or process the data in other tools or systems. This feature ensures that your data is serialized in a clean, consistent format, suitable for backups, debugging, or integrations.
