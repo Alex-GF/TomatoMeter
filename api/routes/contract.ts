@@ -22,7 +22,7 @@ router.get('/contracts/pricing', async (req, res) => {
     }
 
     const pricing: Pricing = await SpaceServiceOperations.getPricing(
-      'TomatoMeter',
+      'tomatometer',
       currentPricingVersion
     );
 
