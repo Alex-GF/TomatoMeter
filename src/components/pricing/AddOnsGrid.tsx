@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { AddOn } from '../../types';
-import { camelToTitle } from '../../utils/helpers';
+import { humanizeFeatureName } from '../../utils/helpers';
 
 interface AddOnsGridProps {
   addOns: Record<string, AddOn>;
@@ -31,7 +31,7 @@ export function AddOnsGrid({ addOns, selectedAddOns, selectedPlan, onChange }: A
             }`}
           >
             <span className="text-lg font-bold text-purple-700 dark:text-yellow-300 mb-1">
-              {camelToTitle(addon.name) ?? camelToTitle(addonKey)}
+              {addon.name ? humanizeFeatureName(addon.name) : humanizeFeatureName(addonKey)}
             </span>
             <span className="text-2xl font-extrabold text-purple-900 dark:text-yellow-200 mb-1">
               {addon.price}

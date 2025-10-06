@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import axios from '../../lib/axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
+import useAxios from '../../hooks/useAxios';
+import { AxiosInstance } from 'axios';
 
 interface Session {
   duration: number; // seconds
@@ -13,8 +14,8 @@ interface DailyStats {
   sessions: Session[];
 }
 
-const fetchDailyStats = async (): Promise<DailyStats> => {
-  const res = await axios.get('/pomodoro/daily');
+const fetchDailyStats = async (axiosInstance: AxiosInstance): Promise<DailyStats> => {
+  const res = await axiosInstance.get('/pomodoro/daily');
   return res.data;
 };
 
@@ -38,9 +39,10 @@ const DailySummaryList = () => {
   const [allLoaded, setAllLoaded] = useState(false);
   const [displayedDays, setDisplayedDays] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const axiosInstance = useAxios();
 
   useEffect(() => {
-    fetchDailyStats().then(data => {
+    fetchDailyStats(axiosInstance).then(data => {
       setStats(data);
       setLoading(false);
       // Show first PAGE_SIZE days

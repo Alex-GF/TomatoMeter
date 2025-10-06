@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AddOn, PricingFeature, UsageLimit } from "../../types";
 import { AnimatePresence, motion } from "framer-motion";
-import { camelToTitle, toCamelCase } from "../../utils/helpers";
+import { humanizeFeatureName, toCamelCase } from "../../utils/helpers";
 
 function Toggle({ checked, onChange }: { readonly checked: boolean; readonly onChange: (v: boolean) => void }) {
   return (
@@ -126,7 +126,7 @@ export function AddOnsEditor({
               <div className="space-y-2">
                 {Object.entries(features).map(([featureKey, feature]) => (
                   <div key={featureKey} className="flex items-center justify-between">
-                    <span className="text-xs text-gray-700">{camelToTitle(featureKey)}</span>
+                    <span className="text-xs text-gray-700">{humanizeFeatureName(featureKey)}</span>
                     {feature.valueType === 'BOOLEAN' ? (
                       <Toggle
                         checked={!!addOn.features?.[featureKey]}
@@ -155,7 +155,7 @@ export function AddOnsEditor({
               <div className="space-y-2">
                 {usageLimits && Object.entries(usageLimits).map(([limitKey, limit]) => (
                   <div key={limitKey} className="flex items-center justify-between">
-                    <span className="text-xs text-gray-700">{camelToTitle(limitKey)}</span>
+                    <span className="text-xs text-gray-700">{humanizeFeatureName(limitKey)}</span>
                     {limit.valueType === 'BOOLEAN' ? (
                       <Toggle
                         checked={!!addOn.usageLimits?.[limitKey]}
@@ -186,7 +186,7 @@ export function AddOnsEditor({
             <div className="space-y-2">
               {usageLimits && Object.entries(usageLimits).map(([limitKey]) => (
                 <div key={limitKey} className="flex items-center justify-between">
-                  <span className="text-xs text-gray-700">{camelToTitle(limitKey)}</span>
+                  <span className="text-xs text-gray-700">{humanizeFeatureName(limitKey)}</span>
                   <input
                     type="number"
                     className="border rounded px-2 py-1 text-xs w-20"
@@ -232,7 +232,7 @@ export function AddOnsEditor({
                 setIsScalable(!!addOn.usageLimitsExtensions && Object.keys(addOn.usageLimitsExtensions).length > 0);
               }}
             >
-              <span className="font-medium text-blue-700">{camelToTitle(addOn.name)}</span>
+              <span className="font-medium text-blue-700">{humanizeFeatureName(addOn.name)}</span>
               <button
                 className="text-red-500 hover:text-red-700 text-xs ml-2"
                 onClick={e => {

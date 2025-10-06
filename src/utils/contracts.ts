@@ -1,13 +1,13 @@
 import { TokenService } from 'space-react-client';
-import axios from '../lib/axios';
 import { renewToken } from './helpers';
+import { AxiosInstance } from 'axios';
 
-export async function updateContract(plan: string, addons: Record<string, number>, tokenService: TokenService) {
+export async function updateContract(plan: string, addons: Record<string, number>, axiosInstance: AxiosInstance, tokenService: TokenService) {
   
-  const currentContract = (await axios.get('/contracts/test-user-id')).data.contract;
+  const currentContract = (await axiosInstance.get('/contracts/test-user-id')).data.contract;
 
   // Update user contract
-  await axios.put('/contracts/test-user-id', {
+  await axiosInstance.put('/contracts/test-user-id', {
     contractedServices: {
       tomatometer: currentContract.contractedServices.tomatometer || '1.0.0',
     },
@@ -19,7 +19,7 @@ export async function updateContract(plan: string, addons: Record<string, number
     }
   });
 
-  await renewToken(tokenService);
+  renewToken(tokenService);
 }
 
 export const toSubscriptionArr = (plan: string, addons?: { [key: string]: number }) => {

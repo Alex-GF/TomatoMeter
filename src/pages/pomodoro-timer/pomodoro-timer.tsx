@@ -4,8 +4,8 @@ import { SettingsContext } from '../../contexts/settingsContext';
 import { useMotivationalQuotes } from '../settings/settings';
 import notificationSound from '../../static/sounds/notification.mp3';
 import { Default, Feature, On } from 'space-react-client';
-import axios from '../../lib/axios';
 import { usePage } from '../../contexts/pageContext';
+import useAxios from '../../hooks/useAxios';
 
 const PomodoroTimer = () => {
   const { toggles } = useContext(SettingsContext);
@@ -22,6 +22,7 @@ const PomodoroTimer = () => {
   const [intervalId, setIntervalId] = useState<number | null>(null);
 
   const {setSelectedPage} = usePage();
+  const axiosInstance = useAxios();
 
   const enableSound = toggles['Enable sound notifications'];
 
@@ -66,7 +67,7 @@ const PomodoroTimer = () => {
   };
 
   const handleSaveSession = async (duration: number) => {
-    await axios.post(
+    await axiosInstance.post(
       '/pomodoro/session',
       { duration },
       {
@@ -80,7 +81,7 @@ const PomodoroTimer = () => {
   const handleProductivitySubmit = async (score: number) => {
     setProductivity(score);
     setShowModal(false);
-    await axios.post(
+    await axiosInstance.post(
       '/pomodoro/productivity',
       { score },
       {

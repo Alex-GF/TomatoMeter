@@ -1,12 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Pricing, Plan, UsageLimit } from "../../types";
 import { AnimatePresence, motion } from "framer-motion";
-import { toCamelCase } from "../../utils/helpers";
-
-// Utilidad para transformar camelCase a texto con espacios
-function camelToTitle(str: string) {
-  return str.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
-}
+import { toCamelCase, humanizeFeatureName } from "../../utils/helpers";
 
 // Toggle switch visual
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -104,7 +99,7 @@ export function PlansEditor({
   // Cuando se inicia la edición, mostrar el nombre legible
   const startEditing = (planKey: string) => {
     setEditingPlan(planKey);
-    setDisplayName(camelToTitle(localPlans[planKey]?.name ?? planKey));
+  setDisplayName(humanizeFeatureName(localPlans[planKey]?.name ?? planKey));
   };
 
   return (
@@ -172,14 +167,14 @@ export function PlansEditor({
                     )}
                   </div>
                 ) : (
-                  <button
+                    <button
                     className="font-bold text-blue-700 text-base cursor-text bg-transparent border-none p-0"
                     onClick={() => startEditing(planKey)}
                     onKeyDown={e => {
                       if (e.key === 'Enter' || e.key === ' ') startEditing(planKey);
                     }}
                   >
-                    {camelToTitle(plan.name ?? planKey)}
+                    {humanizeFeatureName(plan.name ?? planKey)}
                   </button>
                 )}
                 <button
@@ -214,7 +209,7 @@ export function PlansEditor({
                   return (
                     <div key={featureKey} className="py-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{camelToTitle(featureKey)}</span>
+                        <span className="text-sm font-medium">{humanizeFeatureName(featureKey)}</span>
                         {feature.valueType === 'BOOLEAN' ? (
                           <Toggle
                             checked={!!value}
@@ -242,7 +237,7 @@ export function PlansEditor({
                               const limitValue = plan.usageLimits?.[limit.name] ?? limit.defaultValue;
                               return (
                                 <div key={limit.name} className="flex items-center justify-between">
-                                  <span className="text-xs text-gray-600">{camelToTitle(limit.name)}</span>
+                                  <span className="text-xs text-gray-600">{humanizeFeatureName(limit.name)}</span>
                                   {limit.valueType === 'BOOLEAN' ? (
                                     <Toggle
                                       checked={!!limitValue}

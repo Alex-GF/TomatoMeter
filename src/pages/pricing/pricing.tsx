@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SubscriptionContext } from '../../contexts/subscriptionContext';
 import { SettingsContext } from '../../contexts/settingsContext';
 import { updateContract } from '../../utils/contracts';
-import { usePricingToken } from 'space-react-client';
-import axios from '../../lib/axios';
+import { useTokenService } from 'space-react-client';
 import { Pricing, Contract } from '../../types';
 import { PlansGrid } from '../../components/pricing/PlansGrid';
 import { AddOnsGrid } from '../../components/pricing/AddOnsGrid';
 import { FeatureTable } from '../../components/pricing/FeatureTable';
 import PricingLoader from '../../components/loading/PricingLoader';
 import { useTimeline } from '../../contexts/timelineContext';
+import useAxios from '../../hooks/useAxios';
 
 const PricingPage = () => {
   const [pricing, setPricing] = useState<Pricing | null>(null);
@@ -19,19 +19,20 @@ const PricingPage = () => {
   const subscription = useContext(SubscriptionContext);
   if (!subscription) throw new Error('SubscriptionContext not found');
   const { setCurrentSubscription } = subscription;
-  const tokenService = usePricingToken();
+  const tokenService = useTokenService();
   const { toggles } = useContext(SettingsContext);
   const { addEvent } = useTimeline();
+  const axiosInstance = useAxios();
 
   // Notification state
   const [notification, setNotification] = useState<string | null>(null);
 
   // Fetch pricing and contract
   useEffect(() => {
-    axios.get('/contracts/test-user-id').then(response => {
+    axiosInstance.get('/contracts/test-user-id').then(response => {
       setUserContract(response.data.contract);
     });
-    axios.get('/contracts/pricing').then(response => {
+    axiosInstance.get('/contracts/pricing').then(response => {
       setPricing(response.data);
     });
   }, []);
@@ -67,7 +68,9 @@ const PricingPage = () => {
       planKey,
       ...Object.entries(selectedAddOns).map(([k, v]) => `${k}X${v}`),
     ]);
-    await updateContract(planKey, selectedAddOns, tokenService);
+    
+    await updateContract(planKey, selectedAddOns, axiosInstance, tokenService);
+    
     if (toggles['Show plan/add-on notifications']) {
       setNotification('Plan changed successfully!');
       setTimeout(() => setNotification(null), 2500);
@@ -78,6 +81,7 @@ const PricingPage = () => {
       plansSnapshot: { [planKey]: plans[planKey] },
       addOnsSnapshot: { ...selectedAddOns }
     });
+
   };
 
   const handleAddonChange = async (addonKey: string, value: number) => {
@@ -87,7 +91,7 @@ const PricingPage = () => {
       selectedPlan!,
       ...Object.entries(newAddOns).map(([k, v]) => `${k}X${v}`),
     ]);
-    await updateContract(selectedPlan!, newAddOns, tokenService);
+    await updateContract(selectedPlan!, newAddOns, axiosInstance, tokenService);
     if (toggles['Show plan/add-on notifications']) {
       setNotification('Add-on selection updated!');
       setTimeout(() => setNotification(null), 2500);

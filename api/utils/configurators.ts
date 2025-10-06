@@ -20,7 +20,7 @@ export function configureSpaceClient() {
   });
 
   container.spaceClient.on('synchronized', spaceSynchronizationCallback);
-  container.spaceClient.on('pricing_created', pricingCreatedCallback);
+
   container.spaceClient.on('error', (error: Error) => {
     console.log('------- Cannot connect to SPACE -------');
     console.error(error);
@@ -54,41 +54,44 @@ async function spaceSynchronizationCallback() {
     await SpaceServiceOperations.getService('TomatoMeter');
   } catch {
     await SpaceServiceOperations.addService('./api/resources/TomatoMeter.yml');
+  }
 
-    console.log('TomatoMeter service and test user contract created successfully');
+  try{
+    await container.spaceClient.contracts.getContract(testUserId);
+    await resetContractUsageLevels();
+    console.log("Contract exists, usage levels reset");
+  }catch{
+    container.spaceClient.contracts.addContract({
+      userContact: {
+        userId: testUserId,
+        username: "testUser",
+      },
+      billingPeriod: {
+        autoRenew: true,
+        renewalDays: 30,
+      },
+      contractedServices: {
+        tomatometer: "1.0.0",
+      },
+      subscriptionPlans: {
+        tomatometer: "basic",
+      },
+      subscriptionAddOns: {},
+    });
   }
 }
 
-async function pricingCreatedCallback(data: { serviceName: string; pricingVersion: string }) {
+async function resetContractUsageLevels(){
   
-  const pricing = await SpaceServiceOperations.getPricing(data.serviceName, data.pricingVersion);
+  const response = await fetch(`${container.spaceClient!.httpUrl}/contracts/${testUserId}/usageLevels?reset=true`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': container.spaceClient!.apiKey,
+    },
+  })
 
-  container.spaceClient?.contracts
-    .getContract(testUserId)
-    .then(async () => {
-      await container.spaceClient?.contracts.updateContractSubscription(testUserId, {
-        contractedServices: {
-          tomatometer: data.pricingVersion,
-        },
-        subscriptionPlans: {
-          tomatometer: Object.keys(pricing?.plans ?? {})[0] || 'basic',
-        },
-        subscriptionAddOns: {},
-      });
-    })
-    .catch(async () => {
-      await container.spaceClient?.contracts.addContract({
-        userContact: {
-          userId: testUserId,
-          username: 'Test User',
-        },
-        contractedServices: {
-          tomatometer: '1.0.0',
-        },
-        subscriptionPlans: {
-          tomatometer: 'basic',
-        },
-        subscriptionAddOns: {},
-      });
-    });
+  console.log("Usage levels reset");
+  
+  return response;
 }

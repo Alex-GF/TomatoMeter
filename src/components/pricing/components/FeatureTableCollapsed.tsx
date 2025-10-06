@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { Plan, AddOn, UsageLimit, PricingFeature } from '../../../types';
 import { getPlanColor } from '../PlanColorPalette';
-import { camelToTitle } from '../../../utils/helpers';
+import { humanizeFeatureName } from '../../../utils/helpers';
 
 interface FeatureTableProps {
   plans: Record<string, Plan>;
@@ -33,7 +33,7 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
             {featureKeys.map((featureKey) => (
               <tr key={featureKey}>
                 <td className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 border-l-4 border-purple-200 dark:border-yellow-300 min-w-[240px] max-w-[320px] w-full">
-                  {camelToTitle(features[featureKey].name) ?? camelToTitle(featureKey)}
+                  {humanizeFeatureName(features[featureKey].name) || humanizeFeatureName(featureKey)}
                 </td>
               </tr>
             ))}
@@ -52,7 +52,7 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
                   key={planKey}
                   className={`text-center text-lg font-bold px-6 py-2 bg-gradient-to-r ${getPlanColor(idx)} text-white shadow w-[240px]`}
                 >
-                  {plans[planKey].name ? camelToTitle(plans[planKey].name).toUpperCase() : camelToTitle(planKey).toUpperCase()}
+                  {plans[planKey].name ? humanizeFeatureName(plans[planKey].name).toUpperCase() : humanizeFeatureName(planKey).toUpperCase()}
                 </th>
               ))}
             </tr>
@@ -133,10 +133,10 @@ export function FeatureTableCollapsed({ plans, features, usageLimits, addOns, se
                     whileTap={{ scale: 0.96 }}
                     onClick={() => onSelect(planKey)}
                     className={`w-full px-4 py-2 font-bold shadow transition text-white text-base bg-gradient-to-r ${getPlanColor(idx)}`}
-                    aria-label={`Select ${plans[planKey].name ? camelToTitle(plans[planKey].name).toUpperCase() : camelToTitle(planKey).toUpperCase()} plan`}
+                    aria-label={`Select ${plans[planKey].name ? humanizeFeatureName(plans[planKey].name).toUpperCase() : humanizeFeatureName(planKey).toUpperCase()} plan`}
                     style={{ minWidth: 210, width: 210 }}
                   >
-                    {selectedPlan === planKey ? 'Current Plan' : `Select ${plans[planKey].name ? camelToTitle(plans[planKey].name).toUpperCase() : camelToTitle(planKey).toUpperCase()}`}
+                    {selectedPlan === planKey ? 'Current Plan' : `Select ${plans[planKey].name ? humanizeFeatureName(plans[planKey].name).toUpperCase() : humanizeFeatureName(planKey).toUpperCase()}`}
                   </motion.button>
                 </td>
               ))}

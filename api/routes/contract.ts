@@ -118,12 +118,35 @@ router.post('/contracts/pricing', async (req, res) => {
 
     await SpaceServiceOperations.addPricing('tomatometer', undefined, stream);
 
-    
-
     res.status(200).json({ message: 'Pricing received successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to submit pricing', details: (error as Error).message });
   }
+});
+
+router.put('/contracts/pricing', async (req, res) => {
+  
+  const pricing = await SpaceServiceOperations.getPricing(req.body.serviceName, req.body.pricingVersion);
+  
+  if (pricing.version !== "1.0.0"){
+    container.spaceClient?.contracts
+    .getContract(testUserId)
+    .then(async () => {
+      await container.spaceClient?.contracts.updateContractSubscription(testUserId, {
+        contractedServices: {
+          tomatometer: pricing.version,
+        },
+        subscriptionPlans: {
+          tomatometer: Object.keys(pricing?.plans ?? {})[0] || 'basic',
+        },
+        subscriptionAddOns: {},
+      });
+    })
+    
+    return res.status(200).json(pricing);
+  }
+
+  return res.status(400).json({ error: 'The pricing created is 1.0.0, we do not need to update the contract.' });
 });
 
 // Update user's contract

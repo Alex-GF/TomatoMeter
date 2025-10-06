@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaCrown, FaGem, FaRegStar } from 'react-icons/fa';
 import { usePage } from '../../contexts/pageContext';
 import { computePriceSplit, revertCamelCaseToString } from '../../utils/helpers';
-import axios from '../../lib/axios';
 import { Plan } from '../../types';
 import { useSubscription } from '../../hooks/useSubscription';
+import useAxios from '../../hooks/useAxios';
 
 const PLAN_ICONS: Record<string, JSX.Element> = {
   expensive: <FaCrown className="inline-block text-yellow-300 mr-2 animate-bounce" size={22} />,
@@ -26,6 +26,7 @@ const Sidebar = () => {
 
   const {currentSubscription} = useSubscription();
   const { selectedPage, setSelectedPage } = usePage();
+  const axiosInstance = useAxios();
 
   // Parse currentSubscription to extract plan and addons
   const planName = currentSubscription[0] || 'basic';
@@ -39,7 +40,7 @@ const Sidebar = () => {
     .filter((item): item is [string, number] => !!item && typeof item[1] === 'number' && item[1] > 0);
 
   useEffect(() => {
-    axios.get('/contracts/pricing')
+    axiosInstance.get('/contracts/pricing')
       .then(response => {
         const pricing = response.data;
         const priceSplit = computePriceSplit(pricing.plans);
