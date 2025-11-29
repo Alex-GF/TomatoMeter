@@ -1,5 +1,4 @@
 import { TokenService } from 'space-react-client';
-import { renewToken } from './helpers';
 import { AxiosInstance } from 'axios';
 
 export async function updateContract(plan: string, addons: Record<string, number>, axiosInstance: AxiosInstance, tokenService: TokenService) {
@@ -18,8 +17,6 @@ export async function updateContract(plan: string, addons: Record<string, number
       tomatometer: addons
     }
   });
-
-  renewToken(tokenService);
 }
 
 export const toSubscriptionArr = (plan: string, addons?: { [key: string]: number }) => {

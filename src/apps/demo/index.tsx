@@ -28,16 +28,17 @@ export function DemoApp() {
   const settingsValue = useMemo(() => ({ toggles, setToggles }), [toggles, setToggles]);
 
   useEffect(() => {
-    renewToken(tokenService);
     const onPricingCreated = async (data: { serviceName: string; pricingVersion: string }) => {  
       axiosInstance.put('/contracts/pricing', { serviceName: data.serviceName, pricingVersion: data.pricingVersion })
         .then((pricing: any) => {
-          setCurrentSubscription([Object.keys(pricing.plans)[0]]);
+          setCurrentSubscription([Object.keys(pricing.data.plans)[0]]);
           setReloadTrigger(prev => prev + 1);
+        })
+        .catch((error: any) => {
+          console.error('Error updating contract with new pricing:', error);
         });
     };
     const onPricingArchived = async () => {
-      renewToken(tokenService);
       setReloadTrigger(prev => prev + 1);
     };
     spaceClient.on('pricing_created', onPricingCreated);
