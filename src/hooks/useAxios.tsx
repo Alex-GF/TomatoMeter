@@ -16,8 +16,9 @@ export default function useAxios() {
   axiosInstance.interceptors.response.use(
     response => {
       const token = response.headers['pricing-token']; // This must be in lowercase
-      
+
       if (token) {
+        console.log("token updated!");
         tokenService.update(token);
       }
       return response;
