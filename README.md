@@ -22,6 +22,32 @@ This repository presents a demo Pomodoro timer application that integrates with 
 
 Developed by the [ISA-Group](https://github.com/isa-group), this project is part of ongoing research into pricing-driven development and operation.
 
+## Laboratorio integrado: TomatoMeter + SPHERE + SPACE
+
+El repositorio incluye un laboratorio reproducible que arranca las tres aplicaciones y las configura automáticamente. Está pensado para demostrar el ciclo completo de *Pricing-Driven DevOps*: SPHERE publica el pricing de referencia, SPACE lo importa mediante su enlace permanente y TomatoMeter lo consume como fuente de variabilidad.
+
+**Requisitos previos:** Docker Desktop/Engine con Docker Compose v2, y los repositorios hermanos `../SPHERE` y `../space-api` disponibles en el mismo directorio padre que este repositorio. La primera ejecución descarga imágenes y compila los tres proyectos.
+
+```bash
+npm run lab:up
+```
+
+Cuando `lab-bootstrap` indique que el laboratorio está listo, abre:
+
+- TomatoMeter: [http://localhost:5401](http://localhost:5401)
+- SPHERE: [http://localhost:5402](http://localhost:5402)
+- SPACE: [http://localhost:5403](http://localhost:5403)
+
+Las dos plataformas usan la misma cuenta de demostración: `tomato_demo` / `tomato-demo`. El aprovisionamiento crea la organización de laboratorio, deja en SPHERE únicamente el pricing original de `api/resources/TomatoMeter.yml`, lo publica y vincula el servicio `TomatoMeter` de SPACE con política `all_last`. También crea el contrato básico que usa la interfaz de TomatoMeter.
+
+Para reiniciar por completo los datos del laboratorio (incluidos precios, contratos y volúmenes), ejecuta:
+
+```bash
+npm run lab:down
+```
+
+Para la demostración, publica una nueva versión pública del pricing en SPHERE. SPACE la detecta como máximo en un minuto, actualiza el servicio y migra el contrato; tras renovar la página de TomatoMeter, la interfaz refleja las nuevas restricciones. No edites directamente el servicio vinculado desde SPACE: su fuente de verdad es SPHERE.
+
 ## Live Demo with Docker
 
 You can launch the entire demo locally using Docker.

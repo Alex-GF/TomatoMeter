@@ -12,6 +12,8 @@
     "dev:server": "export SPACE_URL=\"http://localhost:3000\" && npx tsx --watch ./api/backend.ts",
     "dev:client": "concurrently \"vite\" \"tailwindcss -i ./src/static/css/app.css -o ./src/static/css/tailwind.css --watch\"",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "lab:up": "docker compose -f docker/lab/docker-compose.yml up --build",
+    "lab:down": "docker compose -f docker/lab/docker-compose.yml down --volumes --remove-orphans",
     "build:client": "vite build",
     "build:server": "tsc -p ./tsconfig.json && tsc-alias --project=\"./tsconfig.json\" --resolve-full-paths",
     "build": "npm run build:server && npm run build:client "
