@@ -1,9 +1,3 @@
-export type PricingToCreate = Omit<Pricing, "createdAt"> & {
-  saasName?: string;
-  syntaxVersion?: string;
-  createdAt?: string;
-}
-
 export interface Pricing {
   id?: string;
   version: string;

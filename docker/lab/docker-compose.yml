@@ -23,6 +23,8 @@ services:
       DATABASE_PASSWORD: testUser
       MONGO_AUTH_SOURCE: sphere_lab
       SERVER_STATICS_FOLDER: public/
+      # Browser-facing static files use the published proxy, not a Docker IP.
+      SERVER_HOST: http://localhost:5402
       REDIS_URL: redis://sphere-redis:6379
       JWT_SECRET: tomato-lab-sphere-jwt-secret
       JWT_EXPIRATION: 24h
@@ -45,6 +47,7 @@ services:
       args:
         VITE_API_URL: /api/v1
         VITE_SECRET_KEY: tomato-lab-sphere-client-secret
+    volumes: [./sphere-client-nginx.conf:/etc/nginx/conf.d/default.conf:ro]
     networks: [lab]
   sphere-nginx:
     image: nginx:1.27.3-alpine
