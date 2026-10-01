@@ -106,7 +106,7 @@ services:
       dockerfile: docker/local/Dockerfile
       # Production frontend behavior: show the real login screen instead of
       # authenticating automatically as devUser.
-      args: { VITE_ENVIRONMENT: production, VITE_SPACE_BASE_URL: http://localhost:5403/api/v1 }
+      args: { VITE_ENVIRONMENT: production, VITE_SPACE_BASE_URL: http://localhost:5403/api/v1, SPHERE_PUBLIC_URL: "${SPHERE_PUBLIC_URL:-http://localhost:5402}" }
     depends_on: [space-server]
     networks: [lab]
   space-nginx:
