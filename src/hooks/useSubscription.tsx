@@ -7,5 +7,5 @@ export function useSubscription() {
     throw new Error("SubscriptionContext not found or not properly initialized");
   }
 
-  return { currentSubscription: subscriptionContext.currentSubscription, setCurrentSubscription: subscriptionContext.setCurrentSubscription };
+  return subscriptionContext;
 }

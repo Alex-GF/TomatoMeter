@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 
 export type TimelineEventType = 'provider' | 'user';
 
@@ -53,19 +53,19 @@ export function TimelineProvider({ children }: { children: ReactNode }) {
     }
   }, [events.length]);
 
-  function addEvent(event: Omit<TimelineEvent, 'id' | 'timestamp' | 'timelineIndex'>) {
-    // El siguiente índice global es el mayor actual + 1
-    const nextIndex = (events.length > 0 ? Math.max(...events.map(e => e.timelineIndex ?? 0)) + 1 : 0);
+  const addEvent = useCallback((event: Omit<TimelineEvent, 'id' | 'timestamp' | 'timelineIndex'>) => {
     const id = `${event.type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const newEvent: TimelineEvent = {
       ...event,
       id,
       timestamp: Date.now(),
-      timelineIndex: nextIndex,
     };
-    setEvents(prev => [...prev, newEvent]);
+    setEvents(prev => [...prev, {
+      ...newEvent,
+      timelineIndex: prev.length > 0 ? Math.max(...prev.map(e => e.timelineIndex ?? 0)) + 1 : 0,
+    }]);
     return id;
-  }
+  }, []);
 
   function clearEvents() {
     setEvents([]);

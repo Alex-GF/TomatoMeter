@@ -1,12 +1,11 @@
-import { useState, useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 import Sidebar from '../../components/sidebar';
 import { SettingsContext } from '../../contexts/settingsContext';
-import { useTokenService, useSpaceClient } from 'space-react-client';
-import { useSubscription } from '../../hooks/useSubscription';
 import { TimelineDual } from '../../components/timeline/TimelineDual';
 import { SIDEBAR_ITEMS } from '../../constants/sidebarItems';
 import { usePage } from '../../contexts/pageContext';
-import useAxios from '../../hooks/useAxios';
+import { useSubscription } from '../../hooks/useSubscription';
+import { useTimeline } from '../../contexts/timelineContext';
 
 // SIDEBAR_ITEMS debe moverse fuera de este archivo para evitar el error de Fast Refresh.
 // Puedes moverlo a un archivo como src/constants/sidebarItems.ts y exportarlo desde allí.
@@ -14,37 +13,27 @@ import useAxios from '../../hooks/useAxios';
 
 export function DemoApp() {
   const { toggles, setToggles } = useContext(SettingsContext);
-  const { setCurrentSubscription } = useSubscription();
   const { selectedPage } = usePage();
-  const [reloadTrigger, setReloadTrigger] = useState<number>(0);
-
-  const spaceClient = useSpaceClient();
-  const tokenService = useTokenService();
-  const axiosInstance = useAxios();
-
-  const settingsValue = useMemo(() => ({ toggles, setToggles }), [toggles, setToggles]);
+  const { pricing } = useSubscription();
+  const { addEvent } = useTimeline();
+  const previousPricingVersion = useRef<string>();
 
   useEffect(() => {
-    const onPricingCreated = async (data: { serviceName: string; pricingVersion: string }) => {  
-      axiosInstance.put('/contracts/pricing', { serviceName: data.serviceName, pricingVersion: data.pricingVersion })
-        .then((pricing: any) => {
-          setCurrentSubscription([Object.keys(pricing.data.plans)[0]]);
-          setReloadTrigger(prev => prev + 1);
-        })
-        .catch((error: any) => {
-          console.error('Error updating contract with new pricing:', error);
-        });
-    };
-    const onPricingArchived = async () => {
-      setReloadTrigger(prev => prev + 1);
-    };
-    spaceClient.on('pricing_created', onPricingCreated);
-    spaceClient.on('pricing_archived', onPricingArchived);
-    return () => {
-      spaceClient.off('pricing_created', onPricingCreated);
-      spaceClient.off('pricing_archived', onPricingArchived);
-    };
-  }, [spaceClient, tokenService, setCurrentSubscription]);
+    if (!pricing) return;
+    const previousVersion = previousPricingVersion.current;
+    previousPricingVersion.current = pricing.version;
+    // Initial load and repeated refreshes are not new activations.
+    if (!previousVersion || previousVersion === pricing.version) return;
+    addEvent({
+      type: 'provider',
+      label: `Pricing v${pricing.version} activated`,
+      details: `TomatoMeter pricing updated from v${previousVersion} to v${pricing.version}.`,
+      plansSnapshot: pricing.plans,
+      addOnsSnapshot: pricing.addOns,
+    });
+  }, [pricing, addEvent]);
+
+  const settingsValue = useMemo(() => ({ toggles, setToggles }), [toggles, setToggles]);
 
   return (
     <SettingsContext.Provider value={settingsValue}>
@@ -59,7 +48,6 @@ export function DemoApp() {
             <div className="flex h-full bg-demo-primary">
               <Sidebar />
               <div
-                key={reloadTrigger}
                 className="my-6 mr-6 flex flex-grow flex-col overflow-hidden rounded-[25px]"
               >
                 <div className={`flex h-full w-full items-center justify-center bg-white`}>

@@ -4,7 +4,6 @@ import { SubscriptionContext } from '../../contexts/subscriptionContext';
 import { SettingsContext } from '../../contexts/settingsContext';
 import { updateContract } from '../../utils/contracts';
 import { useTokenService } from 'space-react-client';
-import { Pricing, Contract } from '../../types';
 import { PlansGrid } from '../../components/pricing/PlansGrid';
 import { AddOnsGrid } from '../../components/pricing/AddOnsGrid';
 import { FeatureTable } from '../../components/pricing/FeatureTable';
@@ -13,12 +12,9 @@ import { useTimeline } from '../../contexts/timelineContext';
 import useAxios from '../../hooks/useAxios';
 
 const PricingPage = () => {
-  const [pricing, setPricing] = useState<Pricing | null>(null);
-  const [userContract, setUserContract] = useState<Contract | null>(null);
-
   const subscription = useContext(SubscriptionContext);
   if (!subscription) throw new Error('SubscriptionContext not found');
-  const { setCurrentSubscription } = subscription;
+  const { setCurrentSubscription, contract: userContract, pricing } = subscription;
   const tokenService = useTokenService();
   const { toggles } = useContext(SettingsContext);
   const { addEvent } = useTimeline();
@@ -27,28 +23,16 @@ const PricingPage = () => {
   // Notification state
   const [notification, setNotification] = useState<string | null>(null);
 
-  // Fetch pricing and contract
-  useEffect(() => {
-    axiosInstance.get('/contracts/test-user-id').then(response => {
-      setUserContract(response.data.contract);
-    });
-    axiosInstance.get('/contracts/pricing').then(response => {
-      setPricing(response.data);
-    });
-  }, []);
-
   // Extract plans/addons from contract
   const userPlan = useMemo(() => {
     if (!userContract || !pricing) return undefined;
-    const service = Object.keys(userContract.subscriptionPlans)[0];
-    const planKey = userContract.subscriptionPlans[service];
+    const planKey = userContract.subscriptionPlans.tomatometer;
     return planKey;
   }, [userContract, pricing]);
 
   const userAddOns = useMemo(() => {
     if (!userContract || !pricing) return {};
-    const service = Object.keys(userContract.subscriptionAddOns)[0];
-    return userContract.subscriptionAddOns[service] ?? {};
+    return userContract.subscriptionAddOns.tomatometer ?? {};
   }, [userContract, pricing]);
 
   // Local state for selection

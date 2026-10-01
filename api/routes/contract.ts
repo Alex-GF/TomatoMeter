@@ -30,6 +30,24 @@ router.get('/contracts/pricing', async (req, res) => {
   }
 });
 
+// Read SPACE's persisted subscription and renew the response token from fresh data.
+router.get('/contracts/subscription', async (req, res) => {
+  try {
+    const userId = getCurrentUser() ?? testUserId;
+    const client = container.spaceClient;
+    if (!client) throw new Error('SPACE client is not initialized');
+    // The SDK does not invalidate its local cache on pricing activation.
+    await client.getCache().invalidateUser(userId);
+    const contract = await client.contracts.getContract(userId);
+    const version = contract.contractedServices.tomatometer;
+    if (!version) return res.status(404).json({ error: 'No pricing version found' });
+    const pricing = await SpaceServiceOperations.getPricing('tomatometer', version);
+    res.status(200).json({ contract, pricing });
+  } catch {
+    res.status(500).json({ error: 'Failed to refresh subscription' });
+  }
+});
+
 // Update user's contract
 router.get('/contracts/:userId', async (req, res) => {
   try {
@@ -40,31 +58,6 @@ router.get('/contracts/:userId', async (req, res) => {
   } catch {
     res.status(500).json({ error: 'Failed to fetch contract' });
   }
-});
-
-router.put('/contracts/pricing', async (req, res) => {
-  
-  const pricing = await SpaceServiceOperations.getPricing(req.body.serviceName, req.body.pricingVersion);
-  
-  if (pricing.version !== "1.0.0"){
-    container.spaceClient?.contracts
-    .getContract(testUserId)
-    .then(async () => {
-      await container.spaceClient?.contracts.updateContractSubscription(testUserId, {
-        contractedServices: {
-          tomatometer: pricing.version,
-        },
-        subscriptionPlans: {
-          tomatometer: Object.keys(pricing?.plans ?? {})[0] || 'basic',
-        },
-        subscriptionAddOns: {},
-      });
-    })
-    
-    return res.status(200).json(pricing);
-  }
-
-  return res.status(400).json({ error: 'The pricing created is 1.0.0, we do not need to update the contract.' });
 });
 
 // Update user's contract

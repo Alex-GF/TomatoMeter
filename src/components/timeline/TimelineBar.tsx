@@ -97,6 +97,8 @@ function DotWithTooltip({ event, idx, type, x, visible, dotSize, timelineHeight 
       animate={visible ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
       transition={{ delay: idx * 0.08, type: 'spring', stiffness: 300, damping: 20 }}
       className="flex flex-col items-center"
+      role={event ? 'img' : undefined}
+      aria-label={event?.label}
       style={{ position: 'absolute', left: x, top: y, width: dotSize, height: dotSize, pointerEvents: 'auto' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

@@ -6,7 +6,6 @@ import { usePage } from '../../contexts/pageContext';
 import { computePriceSplit, revertCamelCaseToString } from '../../utils/helpers';
 import { Plan } from '../../types';
 import { useSubscription } from '../../hooks/useSubscription';
-import useAxios from '../../hooks/useAxios';
 
 const PLAN_ICONS: Record<string, JSX.Element> = {
   expensive: <FaCrown className="inline-block text-yellow-300 mr-2 animate-bounce" size={22} />,
@@ -24,9 +23,8 @@ const Sidebar = () => {
 
   const [plans, setPlans] = useState<Record<string, "cheap" | "medium" | "expensive">>({});
 
-  const {currentSubscription} = useSubscription();
+  const {currentSubscription, pricing} = useSubscription();
   const { selectedPage, setSelectedPage } = usePage();
-  const axiosInstance = useAxios();
 
   // Parse currentSubscription to extract plan and addons
   const planName = currentSubscription[0] || 'basic';
@@ -40,31 +38,25 @@ const Sidebar = () => {
     .filter((item): item is [string, number] => !!item && typeof item[1] === 'number' && item[1] > 0);
 
   useEffect(() => {
-    axiosInstance.get('/contracts/pricing')
-      .then(response => {
-        const pricing = response.data;
-        const priceSplit = computePriceSplit(pricing.plans);
-        const splittedPlans: Record<string, "cheap" | "medium" | "expensive"> = {};
-        Object.entries(pricing.plans).forEach(([planName, planDetails]) => {
-          if (typeof (planDetails as Plan).price === "string"){
-            splittedPlans[planName] = 'expensive';
-          }else if (((planDetails as Plan).price as number) < priceSplit) {
-            splittedPlans[planName] = 'cheap';
-          } else if (((planDetails as Plan).price as number) < priceSplit * 2) {
-            splittedPlans[planName] = 'medium';
-          } else if (((planDetails as Plan).price as number) >= priceSplit * 2) {
-            splittedPlans[planName] = 'expensive';
-          }else{
-            throw new Error(`Invalid price for plan ${planName}: ${(planDetails as Plan).price}`);
-          }
-        });
+    if (!pricing?.plans) return;
+    const priceSplit = computePriceSplit(pricing.plans);
+    const splittedPlans: Record<string, "cheap" | "medium" | "expensive"> = {};
+    Object.entries(pricing.plans).forEach(([planName, planDetails]) => {
+      if (typeof (planDetails as Plan).price === "string"){
+        splittedPlans[planName] = 'expensive';
+      }else if (((planDetails as Plan).price as number) < priceSplit) {
+        splittedPlans[planName] = 'cheap';
+      } else if (((planDetails as Plan).price as number) < priceSplit * 2) {
+        splittedPlans[planName] = 'medium';
+      } else if (((planDetails as Plan).price as number) >= priceSplit * 2) {
+        splittedPlans[planName] = 'expensive';
+      }else{
+        throw new Error(`Invalid price for plan ${planName}: ${(planDetails as Plan).price}`);
+      }
+    });
 
-        setPlans(splittedPlans);
-      })
-      .catch(error => {
-        console.error('Error fetching pricing data:', error);
-      })
-  }, [currentSubscription]);
+    setPlans(splittedPlans);
+  }, [pricing]);
 
   return (
     <div className="flex h-full min-w-72 w-72 flex-col items-center bg-gray-900 px-4 py-10 text-white">
