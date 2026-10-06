@@ -22,31 +22,31 @@ This repository presents a demo Pomodoro timer application that integrates with 
 
 Developed by the [ISA-Group](https://github.com/isa-group), this project is part of ongoing research into pricing-driven development and operation.
 
-## Laboratorio integrado: TomatoMeter + SPHERE + SPACE
+## Integrated Lab: TomatoMeter + SPHERE + SPACE
 
-El repositorio incluye un laboratorio reproducible que arranca las tres aplicaciones y las configura automáticamente. Está pensado para demostrar el ciclo completo de *Pricing-Driven DevOps*: SPHERE publica el pricing de referencia, SPACE lo importa mediante su enlace permanente y TomatoMeter lo consume como fuente de variabilidad.
+The repository includes a reproducible lab that starts the three applications and configures them automatically. It is designed to demonstrate the full *Pricing-Driven DevOps* cycle: SPHERE publishes the reference pricing, SPACE imports it through its permanent link, and TomatoMeter consumes it as a source of variability.
 
-**Requisitos previos:** Docker Desktop/Engine con Docker Compose v2, y los repositorios hermanos `../SPHERE` y `../space-api` disponibles en el mismo directorio padre que este repositorio. La primera ejecución descarga imágenes y compila los tres proyectos.
+**Prerequisites:** Docker Desktop/Engine with Docker Compose v2. SPHERE and SPACE are pulled as public images from GHCR (`ghcr.io/scorelabus/sphere-{api,client}:2.6.0` and `ghcr.io/scorelabus/space-{api,client}:1.7.0`; you can change the versions with the `SPHERE_VERSION` and `SPACE_VERSION` variables), so their repositories are not needed. The first run downloads those images and builds only TomatoMeter.
 
 ```bash
 npm run lab:up
 ```
 
-Cuando `lab-bootstrap` indique que el laboratorio está listo, abre:
+When `lab-bootstrap` reports that the lab is ready, open:
 
 - TomatoMeter: [http://localhost:5401](http://localhost:5401)
 - SPHERE: [http://localhost:5402](http://localhost:5402)
 - SPACE: [http://localhost:5403](http://localhost:5403)
 
-Las dos plataformas usan la misma cuenta de demostración: `tomato_demo` / `tomato-demo`. El aprovisionamiento crea la organización de laboratorio, deja en SPHERE únicamente el pricing original de `api/resources/TomatoMeter.yml`, lo publica y vincula el servicio `TomatoMeter` de SPACE con política `all_last`. También crea el contrato básico que usa la interfaz de TomatoMeter.
+Both platforms use the same demo account: `tomato_demo` / `tomato-demo`. Provisioning creates the lab organization, leaves only the original pricing from `api/resources/TomatoMeter.yml` in SPHERE, publishes it, and links the SPACE `TomatoMeter` service with the `all_last` policy. It also creates the basic contract used by the TomatoMeter interface.
 
-Para reiniciar por completo los datos del laboratorio (incluidos precios, contratos y volúmenes), ejecuta:
+To fully reset the lab data (including pricings, contracts, and volumes), run:
 
 ```bash
 npm run lab:down
 ```
 
-Para la demostración, publica una nueva versión pública del pricing en SPHERE. SPACE la detecta como máximo en un minuto, actualiza el servicio y migra el contrato; tras renovar la página de TomatoMeter, la interfaz refleja las nuevas restricciones. No edites directamente el servicio vinculado desde SPACE: su fuente de verdad es SPHERE.
+For the demo, publish a new public version of the pricing in SPHERE. SPACE detects it within a minute at most, updates the service, and migrates the contract; after refreshing the TomatoMeter page, the interface reflects the new restrictions. Do not edit the linked service directly in SPACE: its source of truth is SPHERE.
 
 ## Live Demo with Docker
 
