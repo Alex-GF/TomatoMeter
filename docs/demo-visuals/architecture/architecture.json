@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Pricing-Driven DevOps · Integrated demo",
+    "quality_profile": "showcase",
+    "animation": "trace",
+    "viewBox": [
+      1380,
+      760
+    ],
+    "locale": "en"
+  },
+  "components": [
+    {
+      "id": "author",
+      "type": "external",
+      "label": "Pricing author",
+      "sublabel": "Edits and publishes versions",
+      "pos": [
+        65,
+        90
+      ],
+      "size": [
+        250,
+        88
+      ]
+    },
+    {
+      "id": "sphere",
+      "type": "backend",
+      "label": "SPHERE",
+      "sublabel": "Public versions + YAML",
+      "tag": "localhost:5402",
+      "pos": [
+        65,
+        320
+      ],
+      "size": [
+        250,
+        104
+      ]
+    },
+    {
+      "id": "space",
+      "type": "backend",
+      "label": "SPACE",
+      "sublabel": "Imports, validates and migrates",
+      "tag": "localhost:5403 · all_last",
+      "pos": [
+        565,
+        320
+      ],
+      "size": [
+        270,
+        104
+      ]
+    },
+    {
+      "id": "contract",
+      "type": "database",
+      "label": "SPACE · MongoDB",
+      "sublabel": "Contracts + applied snapshots",
+      "pos": [
+        565,
+        560
+      ],
+      "size": [
+        270,
+        90
+      ]
+    },
+    {
+      "id": "tomato-api",
+      "type": "backend",
+      "label": "TomatoMeter · API",
+      "sublabel": "SPACE SDK + Pricing-Token",
+      "pos": [
+        1035,
+        320
+      ],
+      "size": [
+        285,
+        104
+      ]
+    },
+    {
+      "id": "tomato-ui",
+      "type": "frontend",
+      "label": "TomatoMeter · UI",
+      "sublabel": "Plans, features and limits",
+      "pos": [
+        1035,
+        90
+      ],
+      "size": [
+        285,
+        88
+      ]
+    },
+    {
+      "id": "sphere-db",
+      "type": "database",
+      "label": "SPHERE · MongoDB",
+      "sublabel": "Pricing identities + versions",
+      "tag": "sphere_lab",
+      "pos": [
+        65,
+        560
+      ],
+      "size": [
+        250,
+        90
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "publish",
+      "from": "author",
+      "to": "sphere",
+      "label": "Publish version",
+      "labelDy": 70
+    },
+    {
+      "id": "poll",
+      "from": "space",
+      "to": "sphere",
+      "label": "Poll every 1 min",
+      "variant": "dashed"
+    },
+    {
+      "id": "persist",
+      "from": "space",
+      "to": "contract",
+      "label": "Migrate · all_last",
+      "labelDy": 70
+    },
+    {
+      "id": "read",
+      "from": "tomato-api",
+      "to": "space",
+      "label": "Read contract + pricing",
+      "variant": "dashed",
+      "labelDy": 32
+    },
+    {
+      "id": "refresh",
+      "from": "tomato-ui",
+      "to": "tomato-api",
+      "label": "REST request",
+      "labelAt": [
+        1100,
+        230
+      ]
+    },
+    {
+      "id": "sphere-storage",
+      "from": "sphere",
+      "to": "sphere-db",
+      "label": "Persist pricing",
+      "labelDy": 70
+    },
+    {
+      "id": "pricing-event",
+      "from": "space",
+      "to": "tomato-ui",
+      "label": "WebSocket · UI SDK",
+      "variant": "emphasis",
+      "fromSide": "top",
+      "toSide": "left"
+    },
+    {
+      "id": "subscription-response",
+      "from": "tomato-api",
+      "to": "tomato-ui",
+      "label": "Data + Pricing-Token",
+      "labelAt": [
+        1248,
+        280
+      ]
+    },
+    {
+      "id": "api-pricing-event",
+      "from": "space",
+      "to": "tomato-api",
+      "label": "WebSocket · Node SDK",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "1 · Publish",
+      "items": [
+        "SPHERE persists pricing identities and versions.",
+        "The /p/{pricingId} link stays permanent."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "2 · Apply",
+      "items": [
+        "SPACE polls the manifest and downloads YAML.",
+        "all_last migrates existing contracts."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "3 · Adapt",
+      "items": [
+        "Both UI and API SDKs connect to SPACE.",
+        "UI ↔ API: REST requests, data and pricing tokens."
+      ]
+    }
+  ]
+}

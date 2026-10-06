@@ -1,0 +1,17 @@
+{
+  "language": "en",
+  "duration_seconds": 42,
+  "width": 1280,
+  "height": 720,
+  "fps": 30,
+  "frames": 1260,
+  "bytes": 2747820,
+  "sha256": "10e046c641f386b5f6cb94970a54e69655e7278f2b0f7e8e32c8ce3d1c4cf20a",
+  "source_sha256": "25538616fa0e551fc15a2d32a7beb0e5ee6960f12d25b2b3c9bf4fcf607cd486",
+  "check": "passed, zero lint/runtime/layout/contrast findings",
+  "render_exit_code": 0,
+  "capture": "screenshot",
+  "gpu": "hardware",
+  "render_seconds": 29.5,
+  "original_files_preserved": true
+}

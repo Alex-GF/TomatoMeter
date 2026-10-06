@@ -1,0 +1,15 @@
+{
+  "diagram_type": "architecture",
+  "output": "/Users/alejandro/Desktop/Proyectos/doctorado/TomatoMeter/docs/demo-visuals/architecture/architecture.html",
+  "specification_sha256": "1a068e3084a1dc184d919e247936f8e617d584a7564cd3b18c4a089cffa32d8a",
+  "artifact_sha256": "a6e8491bc73660543b1df61ce42b6896f93b22cc82a4f8ec673b58a96bcbcb4f",
+  "validation": "9/9 showcase, 0 errors, 0 warnings",
+  "browser_evidence": "passed",
+  "visual_review": "passed",
+  "correction_rounds": 1,
+  "visual_review_scope": [
+    "2048x1320 light",
+    "1440x900 dark"
+  ],
+  "language": "en"
+}

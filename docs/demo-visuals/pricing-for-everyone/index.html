@@ -1,0 +1,331 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1280,height=720"><title>Change the pricing, not the code</title><script src="gsap.min.js"></script><style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Avenir Next","Helvetica Neue",Arial,sans-serif;background:#fbf6ee}
+#root{--bg:#fbf6ee;--surface:#ffffff;--ink:#2a2420;--muted:#6b625b;--rule:#e7dccd;--soft:#f3e6d6;--accent:#c8432b;--accent-ink:#a3361f;--leaf:#4f7d4a;--off:#d9cfc3;--no:#7b746d;
+  width:1280px;height:720px;position:relative;overflow:hidden;background:var(--bg);color:var(--ink)}
+.blob{position:absolute;width:620px;height:620px;border-radius:50%;right:-230px;top:-300px;background:radial-gradient(circle at 40% 60%,var(--soft),transparent 70%)}
+.blob2{position:absolute;width:420px;height:420px;border-radius:50%;left:-180px;bottom:-240px;background:radial-gradient(circle,var(--soft),transparent 70%)}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden}
+.eyebrow{position:absolute;left:70px;top:40px;font:700 15px/1 "Avenir Next",Arial;letter-spacing:3px;color:var(--accent-ink);text-transform:uppercase}
+.headline{position:absolute;left:68px;top:66px;margin:0;width:1150px;font:700 46px/1.15 "Avenir Next",Arial;letter-spacing:-1px}
+.sub{position:absolute;left:70px;top:128px;margin:0;width:1140px;font:500 22px/1.3 "Avenir Next",Arial;color:var(--muted)}
+.window{position:absolute;background:var(--surface);border:1.5px solid var(--rule);border-radius:20px;box-shadow:0 20px 44px rgba(60,30,20,.08)}
+.chrome{height:52px;border-bottom:1.5px solid var(--rule);display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:700 16px "Avenir Next",Arial}
+.chrome .meta{font:600 13px "Avenir Next",Arial;letter-spacing:2px;color:var(--muted)}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--accent);margin-right:9px;vertical-align:-1px}
+.cursor{position:absolute;left:0;top:0;width:32px;height:42px;z-index:20;opacity:0;filter:drop-shadow(1px 3px 3px rgba(0,0,0,.25))}
+/* scene 1 */
+.card{position:absolute;top:200px;width:300px;height:380px;background:var(--surface);border:1.5px solid var(--rule);border-radius:22px;padding:30px 28px}
+.card.hi{border:2.5px solid var(--accent)}
+.card .name{font:700 18px "Avenir Next",Arial;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.card .price{margin-top:12px;font:700 54px/1 "Avenir Next",Arial;letter-spacing:-2px}
+.card .price small{font:500 17px "Avenir Next",Arial;letter-spacing:0;color:var(--muted)}
+.card ul{list-style:none;margin:28px 0 0;padding:0;font:500 19px/1 "Avenir Next",Arial}
+.card li{height:46px;border-top:1.5px solid var(--rule);display:flex;align-items:center;gap:12px}
+.card li b{width:22px;text-align:center;color:var(--leaf)}
+.card li.no{color:var(--no);text-decoration:line-through}.card li.no b{color:var(--no);text-decoration:none}
+.snips{position:absolute;inset:0}
+.snip{position:absolute;padding:9px 14px;border-radius:10px;background:#2a2420;color:#f6d6c8;font:15px Menlo,monospace;white-space:nowrap;box-shadow:0 8px 18px rgba(0,0,0,.18)}
+.snip i{font-style:normal;color:#e98b6f}
+/* scene 2 */
+.doc{position:absolute;left:290px;top:190px;width:700px;height:410px;background:var(--surface);border:2px solid var(--accent);border-radius:22px;padding:0 0 0 0;box-shadow:0 24px 50px rgba(200,67,43,.12)}
+.doc table{position:absolute;left:26px;top:70px;width:648px;border-collapse:collapse;table-layout:fixed;font:500 20px "Avenir Next",Arial}
+.doc th{text-align:left;font:700 15px "Avenir Next",Arial;letter-spacing:2px;text-transform:uppercase;color:var(--muted);height:44px;padding:0 12px}
+.doc th:first-child{width:40%}
+.doc td{height:56px;border-top:1.5px solid var(--rule);padding:0 12px}
+.doc td.y{color:var(--leaf);font-weight:700}.doc td.n{color:var(--no);font-weight:700}
+.doc-note{position:absolute;left:28px;bottom:22px;font:600 16px "Avenir Next",Arial;color:var(--accent-ink)}
+/* scene 3 */
+.node{position:absolute;top:210px;width:320px;text-align:center}
+.disc{margin:0 auto;width:150px;height:150px;border-radius:50%;background:var(--surface);border:2.5px solid var(--rule);display:flex;align-items:center;justify-content:center}
+.disc svg{width:84px;height:84px}
+.node h3{margin:20px 0 4px;font:700 30px "Avenir Next",Arial;letter-spacing:-.5px}
+.node .role{font:700 14px "Avenir Next",Arial;letter-spacing:2.5px;color:var(--accent-ink);text-transform:uppercase}
+.node p{margin:12px auto 0;width:280px;font:500 19px/1.35 "Avenir Next",Arial;color:var(--muted)}
+.wire{position:absolute;top:284px;height:4px;width:242px;background:var(--rule);border-radius:2px;transform-origin:left}
+.pulse{position:absolute;top:276px;left:0;width:20px;height:20px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 7px rgba(200,67,43,.18);opacity:0}
+/* scene 4 & 6: app */
+.app{left:70px;top:200px;width:690px;height:400px}
+.timer-label{position:absolute;left:28px;top:84px;font:600 18px "Avenir Next",Arial;color:var(--muted)}
+.timer{position:absolute;left:26px;top:112px;font:700 92px/1 "Avenir Next",Arial;letter-spacing:-3px;font-variant-numeric:tabular-nums}
+.usage{position:absolute;left:28px;top:226px;font:500 19px "Avenir Next",Arial;color:var(--muted)}
+.meter{position:absolute;left:28px;top:262px;width:300px;height:10px;border-radius:5px;background:var(--soft);overflow:hidden}
+.meter span{display:block;height:100%;width:100%;background:var(--accent);border-radius:5px}
+.settings{position:absolute;left:390px;top:72px;width:274px;height:300px;border-left:1.5px solid var(--rule);padding-left:22px}
+.settings h4{margin:6px 0 0;font:700 15px "Avenir Next",Arial;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.row{position:absolute;left:22px;width:252px;height:44px;font:600 19px "Avenir Next",Arial;display:flex;align-items:center}
+.row .lock{display:flex;align-items:center;gap:5px;margin-top:2px;font:600 13px "Avenir Next",Arial;color:var(--accent-ink)}
+.row .lbl{display:flex;flex-direction:column;justify-content:center}
+.tog{position:absolute;right:0;top:8px;width:50px;height:28px;border-radius:14px;background:var(--off)}
+.tog .knob{position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.tog.on{background:var(--leaf)}.tog.on .knob{left:25px}
+.app-pill{position:absolute;right:20px;top:360px;font:700 13px "Avenir Next",Arial;letter-spacing:2px;color:var(--leaf);opacity:0}
+.chat{position:absolute;left:800px;top:200px;width:410px;height:400px;border-radius:20px;background:var(--soft);padding:26px}
+.chat h4{margin:0;font:700 15px "Avenir Next",Arial;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.bubble{position:absolute;left:26px;width:358px;padding:14px 18px;border-radius:16px;background:var(--surface);font:500 19px/1.35 "Avenir Next",Arial;opacity:0}
+.bubble .who{display:block;font:700 13px "Avenir Next",Arial;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.bubble.ans{border-left:5px solid var(--accent)}
+.bubble.yes{border-left:5px solid var(--leaf)}
+.chat-foot{position:absolute;left:26px;bottom:24px;width:358px;font:500 16px/1.35 "Avenir Next",Arial;color:var(--muted);opacity:0}
+/* scene 5 */
+.sphere{left:70px;top:200px;width:640px;height:400px}
+.sphere table{position:absolute;left:24px;top:66px;width:592px;border-collapse:collapse;table-layout:fixed;font:500 19px "Avenir Next",Arial}
+.sphere th{text-align:left;height:46px;padding:0 12px;font:700 14px "Avenir Next",Arial;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.sphere th:first-child{width:40%}
+.sphere td{height:52px;border-top:1.5px solid var(--rule);padding:0 12px}
+.sphere td.y{color:var(--leaf);font-weight:700}.sphere td.n{color:var(--no);font-weight:700}
+.cellbox{display:inline-block;padding:3px 9px;margin:-5px -11px;border:2px solid transparent;border-radius:8px}
+.publish{position:absolute;right:24px;bottom:22px;width:210px;height:50px;border-radius:12px;background:var(--accent);color:#fff;font:700 18px "Avenir Next",Arial;display:flex;align-items:center;justify-content:center}
+.draft{padding:5px 11px;border-radius:20px;background:var(--soft);color:var(--accent-ink);font:700 12px "Avenir Next",Arial;letter-spacing:2px}
+.flow{position:absolute;left:760px;top:200px;width:450px;height:400px;border-radius:20px;background:var(--soft)}
+.stop{position:absolute;left:30px;width:390px;height:80px}
+.stop .c{position:absolute;left:0;top:0;width:52px;height:52px;border-radius:50%;background:var(--surface);border:2.5px solid var(--rule)}
+.stop .t{position:absolute;left:72px;top:2px;font:700 21px "Avenir Next",Arial}
+.stop .d{position:absolute;left:72px;top:32px;width:318px;font:500 16px/1.35 "Avenir Next",Arial;color:var(--muted);opacity:0}
+.vline{position:absolute;left:55px;width:3px;height:68px;background:var(--rule);border-radius:2px}
+.vpulse{position:absolute;left:46px;top:38px;width:22px;height:22px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 7px rgba(200,67,43,.2);opacity:0}
+/* scene 7 */
+.end-title{position:absolute;left:0;width:1280px;top:190px;text-align:center;margin:0;font:700 64px/1.1 "Avenir Next",Arial;letter-spacing:-2px}
+.end-title em{font-style:normal;color:var(--accent)}
+.trio{position:absolute;left:190px;top:420px;width:900px;display:flex;justify-content:space-between}
+.trio div{width:280px;text-align:center;font:500 21px/1.4 "Avenir Next",Arial;color:var(--muted)}
+.trio b{display:block;font:700 26px "Avenir Next",Arial;color:var(--ink)}
+/* frame */
+.rail{position:absolute;left:70px;top:640px;width:1140px;height:3px;background:var(--rule);border-radius:2px}
+.progress{height:3px;background:var(--accent);transform-origin:left;border-radius:2px}
+.foot{position:absolute;left:70px;top:662px;font:500 14px "Avenir Next",Arial;color:var(--muted)}
+.brand{position:absolute;right:70px;top:660px;font:700 16px "Avenir Next",Arial;color:var(--accent-ink)}
+</style></head><body><div id="root" data-composition-id="pricing-for-everyone" data-start="0" data-duration="48" data-width="1280" data-height="720">
+<div class="blob" data-layout-ignore></div><div class="blob2" data-layout-ignore></div>
+
+<!-- 1 · Every app has a pricing page -->
+<section class="scene" id="s1">
+  <div class="eyebrow">A story about pricing</div>
+  <h1 class="headline" id="h1a">Every app you pay for has a pricing page.</h1>
+  <h1 class="headline" id="h1b" style="opacity:0">Behind it, every plan is wired by hand.</h1>
+  <div class="card" id="c1" style="left:150px"><div class="name">Basic</div><div class="price">$0 <small>/ month</small></div><ul><li><b>✓</b>3 projects a month</li><li class="no"><b>–</b>Dark mode</li><li class="no"><b>–</b>Weekly reports</li></ul></div>
+  <div class="card hi" id="c2" style="left:490px"><div class="name">Advanced</div><div class="price">$3.99 <small>/ month</small></div><ul><li><b>✓</b>10 projects a month</li><li><b>✓</b>Dark mode</li><li><b>✓</b>Weekly reports</li></ul></div>
+  <div class="card" id="c3" style="left:830px"><div class="name">Premium</div><div class="price">$9.99 <small>/ month</small></div><ul><li><b>✓</b>15 projects a month</li><li><b>✓</b>Dark mode</li><li><b>✓</b>Advanced analytics</li></ul></div>
+  <div class="snips" data-layout-ignore>
+    <div class="snip" style="left:110px;top:226px"><i>if</i> (user.plan === "premium") showDarkMode()</div>
+    <div class="snip" style="left:600px;top:252px"><i>if</i> (projects &gt;= 3 &amp;&amp; plan === "basic") block()</div>
+    <div class="snip" style="left:240px;top:318px">plans.basic.limit = 3 <i>// hardcoded!</i></div>
+    <div class="snip" style="left:700px;top:356px"><i>else if</i> (plan === "advanced" || hasAddOn) …</div>
+    <div class="snip" style="left:130px;top:420px"><i>// TODO: update when the pricing changes</i></div>
+    <div class="snip" style="left:620px;top:470px"><i>if</i> (!isPremium) hide(weeklyReports)</div>
+    <div class="snip" style="left:300px;top:528px">deploy(<i>"v2.3.1-hotfix-pricing"</i>)</div>
+  </div>
+</section>
+
+<!-- 2 · The pricing as a single readable document -->
+<section class="scene" id="s2">
+  <div class="eyebrow">A different idea</div>
+  <h1 class="headline">What if the pricing itself ran the app?</h1><p class="sub">One readable document with every plan, feature and limit.</p>
+  <div class="doc" id="doc">
+    <div class="chrome"><span><i class="dot"></i>Your SaaS · pricing</span><span class="meta">ONE DOCUMENT</span></div>
+    <table><thead><tr><th>Feature</th><th>Basic</th><th>Advanced</th><th>Premium</th></tr></thead><tbody>
+      <tr class="drow"><td>Projects a month</td><td>3</td><td>10</td><td>15</td></tr>
+      <tr class="drow"><td>Dark mode</td><td class="n">✗</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr class="drow"><td>Weekly reports</td><td class="n">✗</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr class="drow"><td>Advanced analytics</td><td class="n">✗</td><td class="n">✗</td><td class="y">✓</td></tr>
+    </tbody></table>
+    <div class="doc-note" id="doc-note">Change it here, and the app follows.</div>
+  </div>
+</section>
+
+<!-- 3 · Meet the three pieces -->
+<section class="scene" id="s3">
+  <div class="eyebrow">How it works</div>
+  <h1 class="headline">Three pieces, one simple job each.</h1><p class="sub">The pricing travels from the team, through SPACE, to your screen.</p>
+  <div class="wire" id="w1" style="left:394px"></div><div class="wire" id="w2" style="left:794px"></div>
+  <div class="pulse" id="p3" data-layout-ignore></div>
+  <div class="node" id="n1" style="left:80px"><div class="disc"><svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="32" fill="none" stroke="#c8432b" stroke-width="5"/><ellipse cx="42" cy="42" rx="14" ry="32" fill="none" stroke="#c8432b" stroke-width="4"/><line x1="10" y1="42" x2="74" y2="42" stroke="#c8432b" stroke-width="4"/></svg></div><h3>SPHERE</h3><div class="role">Publishes</div><p>Where the team writes and shares the pricing.</p></div>
+  <div class="node" id="n2" style="left:480px"><div class="disc"><svg viewBox="0 0 84 84"><path d="M42 8L70 19V40C70 57 58 70 42 76C26 70 14 57 14 40V19Z" fill="none" stroke="#c8432b" stroke-width="5" stroke-linejoin="round"/><path d="M29 42L38 51L56 32" fill="none" stroke="#4f7d4a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>SPACE</h3><div class="role">Enforces</div><p>Knows each customer's plan and keeps it up to date.</p></div>
+  <div class="node" id="n3" style="left:880px"><div class="disc"><svg viewBox="0 0 84 84"><rect x="12" y="16" width="60" height="52" rx="10" fill="none" stroke="#c8432b" stroke-width="5"/><line x1="12" y1="31" x2="72" y2="31" stroke="#c8432b" stroke-width="5"/><circle cx="21" cy="23.5" r="2.6" fill="#c8432b"/><circle cx="29" cy="23.5" r="2.6" fill="#c8432b"/><rect x="22" y="40" width="18" height="18" rx="4" fill="#4f7d4a"/><line x1="47" y1="44" x2="63" y2="44" stroke="#c8432b" stroke-width="4" stroke-linecap="round"/><line x1="47" y1="54" x2="58" y2="54" stroke="#c8432b" stroke-width="4" stroke-linecap="round"/></svg></div><h3>Your SaaS</h3><div class="role">Adapts</div><p>Any app you sell. It just asks: “Is this allowed?”</p></div>
+</section>
+
+<!-- 4 · Ana hits a locked feature -->
+<section class="scene" id="s4">
+  <div class="eyebrow">Meet Ana</div>
+  <h1 class="headline">Ana uses a SaaS app on the free plan.</h1><p class="sub">Some features belong to paid plans. Watch what happens when Ana tries one.</p>
+  <div class="window app" id="app4">
+    <div class="chrome"><span><i class="dot"></i>Your SaaS</span><span class="meta">ANA · BASIC PLAN</span></div>
+    <div class="timer-label">Projects this month</div><div class="timer">3 / 3</div>
+    <div class="usage">Basic plan limit reached</div><div class="meter"><span></span></div>
+    <div class="settings"><h4>Settings</h4>
+      <div class="row" style="top:44px"><span>Email alerts</span><div class="tog on"><div class="knob"></div></div></div>
+      <div class="row" style="top:110px"><span class="lbl">Dark mode<span class="lock"><svg width="11" height="13" viewBox="0 0 11 13"><rect x="0.5" y="5.5" width="10" height="7" rx="1.5" fill="#a3361f"/><path d="M2.5 5.5V3.8a3 3 0 0 1 6 0v1.7" fill="none" stroke="#a3361f" stroke-width="1.6"/></svg>Advanced plan</span></span><div class="tog" id="tog4"><div class="knob"></div></div></div>
+      <div class="row" style="top:176px"><span class="lbl">Weekly reports<span class="lock"><svg width="11" height="13" viewBox="0 0 11 13"><rect x="0.5" y="5.5" width="10" height="7" rx="1.5" fill="#a3361f"/><path d="M2.5 5.5V3.8a3 3 0 0 1 6 0v1.7" fill="none" stroke="#a3361f" stroke-width="1.6"/></svg>Advanced plan</span></span><div class="tog"><div class="knob"></div></div></div>
+    </div>
+  </div>
+  <div class="chat"><h4>Behind the scenes</h4>
+    <div class="bubble" id="b41" style="top:66px"><span class="who">Your SaaS → SPACE</span>Can Ana turn on dark mode?</div>
+    <div class="bubble ans" id="b42" style="top:178px"><span class="who">SPACE</span>Not on Basic. It's part of Advanced.</div>
+    <div class="chat-foot" id="f4">No plan logic inside the app. It simply asks, and follows the answer.</div>
+  </div>
+  <svg class="cursor" id="cur4" viewBox="0 0 32 42" data-layout-ignore><path d="M3 2L3 33L11 26L19 40L26 36L18 23L29 22Z" fill="#2a2420" stroke="#fff" stroke-width="2"/></svg>
+</section>
+
+<!-- 5 · The team changes the pricing -->
+<section class="scene" id="s5">
+  <div class="eyebrow">Meanwhile, at the product team</div>
+  <h1 class="headline">The team decides: dark mode for everyone.</h1><p class="sub">One edit in SPHERE. No developers, no new app release.</p>
+  <div class="window sphere" id="sph">
+    <div class="chrome"><span>SPHERE · Your SaaS pricing</span><span class="draft" id="draft">DRAFT</span></div>
+    <table><thead><tr><th>Feature</th><th>Basic</th><th>Advanced</th><th>Premium</th></tr></thead><tbody>
+      <tr><td>Price / month</td><td>$0</td><td>$3.99</td><td>$9.99</td></tr>
+      <tr><td>Projects a month</td><td>3</td><td>10</td><td>15</td></tr>
+      <tr><td>Dark mode</td><td class="n" id="dm-cell"><span class="cellbox" id="dm-box">✗</span></td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td>Weekly reports</td><td class="n">✗</td><td class="y">✓</td><td class="y">✓</td></tr>
+    </tbody></table>
+    <div class="publish" id="pub">Publish new version</div>
+  </div>
+  <div class="flow">
+    <div class="vline" style="top:96px"></div><div class="vline" style="top:216px"></div>
+    <div class="stop" style="top:38px"><div class="c" id="fc1"></div><div class="t">SPHERE</div><div class="d" id="fd1">New version is public.</div></div>
+    <div class="stop" style="top:158px"><div class="c" id="fc2"></div><div class="t">SPACE</div><div class="d" id="fd2">Updates every Basic customer. Ana's 3 projects stay put.</div></div>
+    <div class="stop" style="top:278px"><div class="c" id="fc3"></div><div class="t">Your SaaS</div><div class="d" id="fd3">Gets notified instantly. No new release.</div></div>
+    <div class="vpulse" id="vp" data-layout-ignore></div>
+  </div>
+  <svg class="cursor" id="cur5" viewBox="0 0 32 42" data-layout-ignore><path d="M3 2L3 33L11 26L19 40L26 36L18 23L29 22Z" fill="#2a2420" stroke="#fff" stroke-width="2"/></svg>
+</section>
+
+<!-- 6 · Ana's app adapts -->
+<section class="scene" id="s6">
+  <div class="eyebrow">Back with Ana</div>
+  <h1 class="headline" id="h6">Ana didn't download anything. The app just changed.</h1><p class="sub">SPACE shared the new rules, and the app followed them.</p>
+  <div class="window app" id="app6">
+    <div class="chrome"><span><i class="dot"></i>Your SaaS</span><span class="meta">ANA · BASIC PLAN</span></div>
+    <div class="timer-label">Projects this month</div><div class="timer">3 / 3</div>
+    <div class="usage">Basic plan limit reached</div><div class="meter"><span></span></div>
+    <div class="settings"><h4>Settings</h4>
+      <div class="row" style="top:44px"><span>Email alerts</span><div class="tog on"><div class="knob"></div></div></div>
+      <div class="row" style="top:110px"><span class="lbl">Dark mode<span class="lock" id="lock6"><svg width="11" height="13" viewBox="0 0 11 13"><rect x="0.5" y="5.5" width="10" height="7" rx="1.5" fill="#a3361f"/><path d="M2.5 5.5V3.8a3 3 0 0 1 6 0v1.7" fill="none" stroke="#a3361f" stroke-width="1.6"/></svg>Advanced plan</span></span><div class="tog" id="tog6"><div class="knob" id="knob6"></div></div></div>
+      <div class="row" style="top:176px"><span class="lbl">Weekly reports<span class="lock"><svg width="11" height="13" viewBox="0 0 11 13"><rect x="0.5" y="5.5" width="10" height="7" rx="1.5" fill="#a3361f"/><path d="M2.5 5.5V3.8a3 3 0 0 1 6 0v1.7" fill="none" stroke="#a3361f" stroke-width="1.6"/></svg>Advanced plan</span></span><div class="tog"><div class="knob"></div></div></div>
+    </div>
+    <div class="app-pill" id="pill6">PLAN UPDATED ✓</div>
+  </div>
+  <div class="chat"><h4>Behind the scenes</h4>
+    <div class="bubble" id="b61" style="top:66px"><span class="who">Your SaaS → SPACE</span>Can Ana turn on dark mode?</div>
+    <div class="bubble yes" id="b62" style="top:178px"><span class="who">SPACE</span>Yes. It's included in Basic now.</div>
+    <div class="chat-foot" id="f6">Same app, same code. Only the pricing changed.</div>
+  </div>
+  <svg class="cursor" id="cur6" viewBox="0 0 32 42" data-layout-ignore><path d="M3 2L3 33L11 26L19 40L26 36L18 23L29 22Z" fill="#2a2420" stroke="#fff" stroke-width="2"/></svg>
+</section>
+
+<!-- 7 · End card -->
+<section class="scene" id="s7">
+  <h1 class="end-title">Change the pricing.<br><em>Not the code.</em></h1>
+  <div class="trio"><div><b>SPHERE</b>publishes it</div><div><b>SPACE</b>enforces it</div><div><b>Your SaaS</b>adapts to it</div></div>
+</section>
+
+<div class="rail"><div class="progress" id="prog"></div></div>
+<div class="foot">Illustrative SaaS and pricing · stylized screens · sync wait compressed</div>
+<div class="brand">SPHERE · SPACE</div>
+</div><script>
+window.__timelines=window.__timelines||{};
+const tl=gsap.timeline({paused:true});
+const sceneIn=(id,t)=>tl.fromTo(id,{autoAlpha:0,y:24},{autoAlpha:1,y:0,duration:.6,ease:'power3.out'},t);
+const sceneOut=(id,t)=>tl.to(id,{autoAlpha:0,y:-16,duration:.45,ease:'power2.in'},t);
+const click=(cur,t)=>{tl.to(cur,{scale:.82,duration:.12,ease:'none'},t);tl.to(cur,{scale:1,duration:.35,ease:'back.out(2)'},t+.12);};
+
+tl.fromTo('#prog',{scaleX:0},{scaleX:1,duration:48,ease:'none'},0);
+tl.fromTo('.blob',{rotation:0,scale:1},{rotation:40,scale:1.12,duration:48,ease:'none'},0);
+
+/* 1 · 0–6.2 */
+sceneIn('#s1',0);
+tl.fromTo('#h1a',{opacity:0,x:-20},{opacity:1,x:0,duration:.6,ease:'power2.out'},.2);
+['#c1','#c2','#c3'].forEach((c,i)=>tl.fromTo(c,{opacity:0,y:40},{opacity:1,y:0,duration:.6,ease:'back.out(1.3)'},.6+i*.2));
+tl.to('#h1a',{opacity:0,duration:.3},3.4);
+tl.fromTo('#h1b',{opacity:0,x:-20},{opacity:1,x:0,duration:.5,ease:'power2.out'},3.7);
+tl.to(['#c1','#c2','#c3'],{opacity:.22,duration:.5},3.7);
+tl.fromTo('.snip',{opacity:0,scale:.6,rotation:i=>[-7,5,-4,6,-5,4,-6][i]},{opacity:1,scale:1,rotation:i=>[-3,2,-2,3,-1,2,-3][i],duration:.35,stagger:.16,ease:'back.out(2)'},3.9);
+tl.to('.snip',{x:i=>[5,-6,4,-5,6,-4,5][i],y:i=>[-3,4,-2,3,-4,2,-3][i],duration:.18,repeat:5,yoyo:true,ease:'sine.inOut',stagger:.04},5.1);
+sceneOut('#s1',6.0);
+
+/* 2 · 6.2–12 */
+sceneIn('#s2',6.5);
+tl.fromTo('#doc',{opacity:0,scale:.85},{opacity:1,scale:1,duration:.7,ease:'back.out(1.4)'},6.6);
+tl.fromTo('.drow',{opacity:0,x:-14},{opacity:1,x:0,duration:.4,stagger:.22,ease:'power2.out'},7.3);
+tl.fromTo('#doc-note',{opacity:0},{opacity:1,duration:.5},8.8);
+sceneOut('#s2',11.6);
+
+/* 3 · 12–20 */
+sceneIn('#s3',12);
+tl.fromTo('#n1',{opacity:0,y:30},{opacity:1,y:0,duration:.6,ease:'back.out(1.4)'},12.4);
+tl.fromTo('#w1',{scaleX:0},{scaleX:1,duration:.6,ease:'power2.inOut'},13.4);
+tl.fromTo('#n2',{opacity:0,y:30},{opacity:1,y:0,duration:.6,ease:'back.out(1.4)'},13.8);
+tl.fromTo('#w2',{scaleX:0},{scaleX:1,duration:.6,ease:'power2.inOut'},14.8);
+tl.fromTo('#n3',{opacity:0,y:30},{opacity:1,y:0,duration:.6,ease:'back.out(1.4)'},15.2);
+tl.fromTo('#p3',{opacity:0,x:390},{opacity:1,x:390,duration:.2},16.6);
+tl.to('#p3',{x:870,duration:2,ease:'power1.inOut'},16.8);
+tl.to('#p3',{opacity:0,duration:.25},18.8);
+sceneOut('#s3',19.5);
+
+/* 4 · 20–27.6 */
+sceneIn('#s4',20);
+tl.fromTo('#app4',{opacity:0,y:30},{opacity:1,y:0,duration:.6,ease:'power3.out'},20.2);
+tl.fromTo('#s4 .chat',{opacity:0,x:30},{opacity:1,x:0,duration:.6,ease:'power3.out'},20.6);
+tl.set('#cur4',{x:600,y:590},21.6);tl.to('#cur4',{opacity:1,duration:.3},21.6);
+tl.to('#cur4',{x:709,y:413,duration:1.1,ease:'power3.inOut'},21.9);
+click('#cur4',23.1);
+tl.to('#tog4',{x:-7,duration:.07,repeat:5,yoyo:true,ease:'none'},23.25);
+tl.fromTo('#b41',{opacity:0,y:12},{opacity:1,y:0,duration:.45,ease:'power2.out'},23.5);
+tl.fromTo('#b42',{opacity:0,y:12},{opacity:1,y:0,duration:.45,ease:'power2.out'},24.6);
+tl.fromTo('#f4',{opacity:0},{opacity:1,duration:.5},25.6);
+tl.to('#cur4',{opacity:0,duration:.3},25.4);
+sceneOut('#s4',27.4);
+
+/* 5 · 28–36.8 */
+sceneIn('#s5',27.9);
+tl.fromTo('#sph',{opacity:0,y:30},{opacity:1,y:0,duration:.6,ease:'power3.out'},28.1);
+tl.fromTo('#s5 .flow',{opacity:0,x:30},{opacity:1,x:0,duration:.6,ease:'power3.out'},28.4);
+tl.set('#cur5',{x:640,y:600},29.1);tl.to('#cur5',{opacity:1,duration:.3},29.1);
+tl.to('#cur5',{x:368,y:441,duration:1.1,ease:'power3.inOut'},29.3);
+tl.to('#dm-box',{borderColor:'#c8432b',duration:.2},30.3);
+click('#cur5',30.5);
+tl.set('#dm-box',{innerText:'✓'},30.6);
+tl.to('#dm-cell',{color:'#4f7d4a',duration:.2},30.6);
+tl.to('#cur5',{x:578,y:550,duration:.9,ease:'power3.inOut'},31.2);
+click('#cur5',32.2);
+tl.to('#pub',{scale:.94,duration:.12,ease:'none'},32.2);tl.to('#pub',{scale:1,duration:.4,ease:'back.out(2)'},32.32);
+tl.set('#pub',{innerText:'Published ✓'},32.4);tl.set('#draft',{innerText:'PUBLIC'},32.4);
+tl.to('#cur5',{opacity:0,duration:.3},32.9);
+tl.to('#fc1',{backgroundColor:'#c8432b',borderColor:'#c8432b',duration:.3},32.6);
+tl.fromTo('#fd1',{opacity:0},{opacity:1,duration:.4},32.7);
+tl.set('#vp',{y:0},33.1);tl.to('#vp',{opacity:1,duration:.2},33.1);
+tl.to('#vp',{y:120,duration:.9,ease:'power1.inOut'},33.3);
+tl.to('#fc2',{backgroundColor:'#c8432b',borderColor:'#c8432b',duration:.3},34.2);
+tl.fromTo('#fd2',{opacity:0},{opacity:1,duration:.4},34.3);
+tl.to('#vp',{y:240,duration:.9,ease:'power1.inOut'},35.0);
+tl.to('#fc3',{backgroundColor:'#c8432b',borderColor:'#c8432b',duration:.3},35.9);
+tl.fromTo('#fd3',{opacity:0},{opacity:1,duration:.4},36.0);
+tl.to('#vp',{opacity:0,duration:.2},36.0);
+sceneOut('#s5',37.0);
+
+/* 6 · 37.5–43.6 */
+sceneIn('#s6',37.5);
+tl.fromTo('#app6',{opacity:0,y:30},{opacity:1,y:0,duration:.6,ease:'power3.out'},37.6);
+tl.fromTo('#s6 .chat',{opacity:0,x:30},{opacity:1,x:0,duration:.6,ease:'power3.out'},37.8);
+tl.to('#pill6',{opacity:1,duration:.4},38.5);
+tl.to('#lock6',{opacity:0,duration:.3},38.6);tl.set('#lock6',{innerText:'Included in Basic',color:'#4f7d4a'},38.9);tl.to('#lock6',{opacity:1,duration:.3},38.95);
+tl.fromTo('#b61',{opacity:0,y:12},{opacity:1,y:0,duration:.45,ease:'power2.out'},39.0);
+tl.fromTo('#b62',{opacity:0,y:12},{opacity:1,y:0,duration:.45,ease:'power2.out'},39.8);
+tl.set('#cur6',{x:600,y:590},39.4);tl.to('#cur6',{opacity:1,duration:.3},39.4);
+tl.to('#cur6',{x:709,y:406,duration:1,ease:'power3.inOut'},39.7);
+click('#cur6',40.8);
+tl.to('#knob6',{x:22,duration:.3,ease:'power2.out'},40.95);
+tl.to('#tog6',{backgroundColor:'#4f7d4a',duration:.3},40.95);
+tl.to('#root',{'--bg':'#191615','--surface':'#262120','--ink':'#f4ece3','--muted':'#b5aaa0','--rule':'#3d3531','--soft':'#322a27','--accent-ink':'#ee8a6f','--off':'#5a504a','--no':'#a0968d',duration:1.1,ease:'power2.inOut'},41.1);
+tl.to('#cur6',{opacity:0,duration:.3},41.4);
+tl.to(['#lock6','#pill6'],{color:'#8fc286',duration:1.1,ease:'power2.inOut'},41.1);
+tl.fromTo('#f6',{opacity:0},{opacity:1,duration:.5},42.0);
+sceneOut('#s6',43.6);
+
+/* 7 · 44–48 */
+sceneIn('#s7',44.1);
+tl.fromTo('.end-title',{opacity:0,scale:.94},{opacity:1,scale:1,duration:.7,ease:'back.out(1.3)'},44.2);
+tl.fromTo('.trio div',{opacity:0,y:16},{opacity:1,y:0,duration:.45,stagger:.25,ease:'power2.out'},45.0);
+
+window.__timelines['pricing-for-everyone']=tl;
+</script></body></html>

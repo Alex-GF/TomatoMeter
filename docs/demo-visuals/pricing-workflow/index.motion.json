@@ -1,0 +1,29 @@
+{
+  "duration": 32,
+  "assertions": [
+    {
+      "kind": "appearsBy",
+      "selector": "#published",
+      "bySec": 4.5
+    },
+    {
+      "kind": "appearsBy",
+      "selector": "#contract-new",
+      "bySec": 16
+    },
+    {
+      "kind": "appearsBy",
+      "selector": "#ui-new",
+      "bySec": 27
+    },
+    {
+      "kind": "before",
+      "a": "#contract-new",
+      "b": "#ui-new"
+    },
+    {
+      "kind": "staysInFrame",
+      "selector": "#tomato"
+    }
+  ]
+}

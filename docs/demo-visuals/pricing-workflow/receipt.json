@@ -1,0 +1,18 @@
+{
+  "file": "pricing-workflow.mp4",
+  "sha256": "7549b26c02c4eaf98c41108c008daea7a1f080ffc43faecc34bc820ac018bbc3",
+  "bytes": 1685801,
+  "codec": "h264",
+  "width": 1280,
+  "height": 720,
+  "fps": 30,
+  "frames": 960,
+  "duration_seconds": 32,
+  "audio": false,
+  "composition_check": "passed, zero findings",
+  "render_exit_code": 0,
+  "capture": "screenshot",
+  "gpu": "hardware",
+  "render_seconds": 23.3,
+  "language": "en"
+}
