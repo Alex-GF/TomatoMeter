@@ -24,8 +24,8 @@ Developed by the [SCORE Lab](https://github.com/SCORELabUS), this project is par
 
 - [Docker](https://www.docker.com/get-started) (Desktop or Engine) with Docker Compose.
 - Node.js with npm, only to run the `lab:*` scripts.
-    > [!NOTE]
-    > We recommed using pnpm as the package manager, but npm works too.
+> [!NOTE]
+> We recommed using pnpm as the package manager, but npm works too.
 - Ports `5401`, `5402` and `5403` free on your machine.
 
 ### Start the lab
