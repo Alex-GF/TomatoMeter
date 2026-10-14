@@ -15,13 +15,14 @@ router.post('/pomodoro/session', async (req, res) => {
   const userId = getCurrentUser() ?? 'test-user-id';
 
   try{
-    const canSavePomodoroSession = await container.spaceClient?.features.evaluate(userId, 'tomatometer-pomodoroTimer', {
+    const evaluation = await container.spaceClient?.features.evaluate(userId, 'tomatometer-pomodoroTimer', {
       "tomatometer-maxPomodoroTimers": 1
     }, {
       server: true
     });
 
-    if (!canSavePomodoroSession){
+    // SPACE answers with { eval, limit, used, error }; the object itself is always truthy.
+    if (evaluation && !evaluation.eval){
       return res.status(403).json({ error: 'Feature not enabled for this user. Limit has been reached.' });
     }
   }catch (error) {
