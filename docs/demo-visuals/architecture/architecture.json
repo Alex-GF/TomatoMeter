@@ -7,23 +7,30 @@
     "animation": "trace",
     "viewBox": [
       1380,
-      760
+      600
     ],
-    "locale": "en"
+    "locale": "en",
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "external": {
+          "visible": false
+        }
+      }
+    }
   },
   "components": [
     {
       "id": "author",
       "type": "external",
-      "label": "Pricing author",
-      "sublabel": "Edits and publishes versions",
+      "label": "Stakeholder",
       "pos": [
-        65,
-        90
+        135,
+        69
       ],
       "size": [
-        250,
-        88
+        110,
+        130
       ]
     },
     {
@@ -34,7 +41,7 @@
       "tag": "localhost:5402",
       "pos": [
         65,
-        320
+        330
       ],
       "size": [
         250,
@@ -49,25 +56,11 @@
       "tag": "localhost:5403 · all_last",
       "pos": [
         565,
-        320
+        330
       ],
       "size": [
         270,
         104
-      ]
-    },
-    {
-      "id": "contract",
-      "type": "database",
-      "label": "SPACE · MongoDB",
-      "sublabel": "Contracts + applied snapshots",
-      "pos": [
-        565,
-        560
-      ],
-      "size": [
-        270,
-        90
       ]
     },
     {
@@ -77,7 +70,7 @@
       "sublabel": "SPACE SDK + Pricing-Token",
       "pos": [
         1035,
-        320
+        330
       ],
       "size": [
         285,
@@ -97,21 +90,6 @@
         285,
         88
       ]
-    },
-    {
-      "id": "sphere-db",
-      "type": "database",
-      "label": "SPHERE · MongoDB",
-      "sublabel": "Pricing identities + versions",
-      "tag": "sphere_lab",
-      "pos": [
-        65,
-        560
-      ],
-      "size": [
-        250,
-        90
-      ]
     }
   ],
   "connections": [
@@ -120,7 +98,10 @@
       "from": "author",
       "to": "sphere",
       "label": "Publish version",
-      "labelDy": 70
+      "labelAt": [
+        190,
+        254
+      ]
     },
     {
       "id": "poll",
@@ -128,13 +109,6 @@
       "to": "sphere",
       "label": "Poll every 1 min",
       "variant": "dashed"
-    },
-    {
-      "id": "persist",
-      "from": "space",
-      "to": "contract",
-      "label": "Migrate · all_last",
-      "labelDy": 70
     },
     {
       "id": "read",
@@ -153,13 +127,6 @@
         1100,
         230
       ]
-    },
-    {
-      "id": "sphere-storage",
-      "from": "sphere",
-      "to": "sphere-db",
-      "label": "Persist pricing",
-      "labelDy": 70
     },
     {
       "id": "pricing-event",
@@ -193,7 +160,7 @@
       "dot": "emerald",
       "title": "1 · Publish",
       "items": [
-        "SPHERE persists pricing identities and versions.",
+        "SPHERE stores pricing identities and versions.",
         "The /p/{pricingId} link stays permanent."
       ]
     },

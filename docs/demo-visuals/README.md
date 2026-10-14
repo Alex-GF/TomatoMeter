@@ -4,6 +4,8 @@ Visual material for the demo. Each diagram or video lives in its own folder, tog
 
 | Folder | What it is | Audience | Open |
 | --- | --- | --- | --- |
+| [`blackbox-deck/`](blackbox-deck/) | Animated PowerPoint (2 slides): black box for Pablo, then inside the box step by step | Mixed | `blackbox-deck/blackbox-deck.pptx` |
+| [`architecture-blackbox/`](architecture-blackbox/) | Black-box view: stakeholder → pricing-driven DevOps (SPHERE + SPACE) → TomatoMeter | Non-technical | `architecture-blackbox/architecture.html` |
 | [`architecture/`](architecture/) | Interactive architecture diagram (Archify) of SPHERE, SPACE and TomatoMeter | Technical | `architecture/architecture.html` |
 | [`pricing-workflow/`](pricing-workflow/) | Video v1, 32 s: the SPHERE → SPACE → TomatoMeter workflow | Technical | `pricing-workflow/player.html` |
 | [`pricing-story-v2/`](pricing-story-v2/) | Video v2, 42 s: *Pricing becomes experience*, with screens from the three apps | Mixed | `pricing-story-v2/player.html` |
