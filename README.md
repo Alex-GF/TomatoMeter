@@ -33,7 +33,7 @@ Developed by the [SCORE Lab](https://github.com/SCORELabUS), this project is par
 ### Start the lab
 
 ```bash
-git clone https://github.com/Alex-GF/TomatoMeter.git
+git clone https://github.com/SCORELabUS/TomatoMeter.git
 cd TomatoMeter
 npm run lab:up
 ```
