@@ -1,0 +1,25 @@
+# Tutorial overlay: TomatoMeter starter in development mode, hot-reloading the
+# code in ../tutorial/tomatometer that attendees edit.
+services:
+  lab-bootstrap:
+    volumes:
+      # Lets the bootstrap keep tutorial/tomatometer/.env in step with SPACE.
+      - ../tutorial/tomatometer:/tutorial-app
+  tomatometer:
+    build: { context: ., dockerfile: tomatometer-dev.Dockerfile }
+    environment:
+      # The backend reaches SPACE through the lab network; the browser uses localhost:5403.
+      SPACE_URL: http://space-nginx:5403
+      CHOKIDAR_USEPOLLING: "true"
+      BROWSERSLIST_IGNORE_OLD_DATA: "true"
+    ports: ["5401:5401"]
+    volumes:
+      - ../tutorial/tomatometer:/app
+      - tomatometer-node-modules:/app/node_modules
+      - pnpm-store:/pnpm-store
+    depends_on:
+      lab-bootstrap:
+        condition: service_completed_successfully
+    networks: [lab]
+
+volumes: { tomatometer-node-modules: {}, pnpm-store: {} }

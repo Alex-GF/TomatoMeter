@@ -1,0 +1,17 @@
+{
+  "name": "tomatometer-icsoc2026",
+  "private": true,
+  "description": "ICSOC 2026 tutorial on pricing-driven self-adaptation: SPHERE × SPACE × TomatoMeter lab",
+  "license": "MIT",
+  "scripts": {
+    "demo": "node scripts/lab.mjs demo",
+    "tutorial:1": "node scripts/lab.mjs 1",
+    "tutorial:2": "node scripts/lab.mjs 2",
+    "tutorial:3": "node scripts/lab.mjs 3",
+    "down": "node scripts/lab.mjs down"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SCORELabUS/TomatoMeter.git"
+  }
+}

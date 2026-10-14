@@ -1,10 +1,13 @@
+# SPHERE + SPACE, shared by the demo and every tutorial checkpoint.
+# Start it through `npm run demo` / `npm run tutorial:N` (scripts/lab.mjs), which
+# adds the TomatoMeter overlay and sets LAB_STAGE for the bootstrap.
 name: tomatometer-lab
 
 services:
   sphere-mongodb:
     image: mongo:7.0.16
     environment: { MONGO_INITDB_ROOT_USERNAME: root, MONGO_INITDB_ROOT_PASSWORD: lab-root-password, MONGO_INITDB_DATABASE: sphere_lab, DATABASE_NAME: sphere_lab, DATABASE_USERNAME: testUser, DATABASE_PASSWORD: testUser }
-    volumes: [sphere-data:/data/db, ./sphere-mongo-init.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro]
+    volumes: [sphere-data:/data/db, ./mongo/sphere-init.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro]
     networks: [lab]
   sphere-redis:
     image: redis:7.4.2
@@ -46,14 +49,14 @@ services:
   sphere-nginx:
     image: nginx:1.27.3-alpine
     ports: ["5402:80"]
-    volumes: [./sphere-nginx.conf:/etc/nginx/conf.d/default.conf:ro]
+    volumes: [./nginx/sphere.conf:/etc/nginx/conf.d/default.conf:ro]
     depends_on: [sphere-server, sphere-client]
     networks: [lab]
 
   space-mongodb:
     image: mongo:7.0.16
     environment: { MONGO_INITDB_ROOT_USERNAME: root, MONGO_INITDB_ROOT_PASSWORD: 4dm1n, MONGO_INITDB_DATABASE: space_lab, DATABASE_NAME: space_lab, DATABASE_USERNAME: mongoUser, DATABASE_PASSWORD: mongoPassword }
-    volumes: [space-data:/data/db, ./space-mongo-init.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro]
+    volumes: [space-data:/data/db, ./mongo/space-init.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro]
     healthcheck:
       test: [CMD-SHELL, "mongosh --quiet --username root --password 4dm1n --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" | grep 1"]
       interval: 5s
@@ -75,12 +78,12 @@ services:
       ADMIN_USER: tomato_demo
       ADMIN_PASSWORD: tomato-demo
       ADMIN_ORG_NAME: TomatoMeter Lab
-      # Do not route the server-to-server integration through the UI proxy.
-      # It may not be running yet while the lab is being provisioned.
-      SPHERE_PUBLIC_URL: http://sphere-server:8080
-      SPHERE_API_URL: http://sphere-server:8080/api/v1
+      # SPHERE's UI copies permanent links as http://localhost:5402/p/{id}. SPACE
+      # accepts and fetches exactly those links; space-sphere-link makes that
+      # address reach SPHERE from inside this container.
+      SPHERE_PUBLIC_URL: http://localhost:5402
+      SPHERE_API_URL: http://localhost:5402/api/v1
       SPHERE_ALLOW_LOCAL_HTTP: "true"
-      SPHERE_LOCAL_HTTP_HOSTS: sphere-server
       SPHERE_SYNC_ENABLED: "true"
     depends_on:
       space-mongodb:
@@ -93,6 +96,13 @@ services:
       timeout: 3s
       retries: 30
     networks: [lab]
+  # Shares space-server's network namespace and forwards its localhost:5402 to
+  # SPHERE, so the links attendees copy from SPHERE work as-is in SPACE.
+  space-sphere-link:
+    image: nginx:1.27.3-alpine
+    network_mode: service:space-server
+    volumes: [./nginx/space-sphere-link.conf:/etc/nginx/conf.d/default.conf:ro]
+    depends_on: [space-server, sphere-nginx]
   space-client:
     image: ghcr.io/scorelabus/space-client:${SPACE_VERSION:-1.7.0}
     depends_on: [space-server]
@@ -100,54 +110,40 @@ services:
   space-nginx:
     image: nginx:1.27.3-alpine
     ports: ["5403:5403"]
-    volumes: [./space-nginx.conf:/etc/nginx/conf.d/default.conf:ro]
+    volumes: [./nginx/space.conf:/etc/nginx/conf.d/default.conf:ro]
     depends_on: [space-server, space-client]
     networks: [lab]
 
-  clean-sphere-pricings:
+  verify-sphere-demo-user:
     image: mongo:7.0.16
     depends_on:
       sphere-server:
         condition: service_healthy
-    volumes: [./clean-sphere-pricings.js:/scripts/clean.js:ro]
-    command: [mongosh, "mongodb://root:lab-root-password@sphere-mongodb:27017/sphere_lab?authSource=admin", /scripts/clean.js]
-    networks: [lab]
-  verify-sphere-demo-user:
-    image: mongo:7.0.16
-    depends_on:
-      clean-sphere-pricings:
-        condition: service_completed_successfully
     command: [sh, -c, "until mongosh --quiet 'mongodb://root:lab-root-password@sphere-mongodb:27017/sphere_lab?authSource=admin' --eval \"const user = db.users.findOne({username: 'tomato_demo'}); if (!user) quit(1); const patch = {}; patch[String.fromCharCode(36) + 'set'] = {emailVerified: true, emailVerifiedAt: new Date()}; db.users.updateOne({_id: user._id}, patch);\"; do sleep 1; done"]
     networks: [lab]
+  # Provisions SPHERE and SPACE up to the requested stage:
+  #   empty   -> demo user in SPHERE and SPACE only            (tutorial checkpoint 1)
+  #   pricing -> + TomatoMeter pricing published in SPHERE     (tutorial checkpoint 2)
+  #   linked  -> + SPACE service linked to that pricing        (tutorial checkpoint 3)
+  #   demo    -> + contracts and SPACE config for the demo app
   lab-bootstrap:
     image: node:22-alpine
+    environment:
+      LAB_STAGE: ${LAB_STAGE:-demo}
     depends_on:
-      clean-sphere-pricings:
-        condition: service_completed_successfully
+      sphere-server:
+        condition: service_healthy
       verify-sphere-demo-user:
         condition: service_started
       space-server:
         condition: service_healthy
-    volumes: [../../api/resources/TomatoMeter.yml:/workspace/TomatoMeter.yml:ro, lab-config:/lab, ./bootstrap.mjs:/workspace/bootstrap.mjs:ro]
+      space-sphere-link:
+        condition: service_started
+    volumes:
+      - ../demo/api/resources/TomatoMeter.yml:/workspace/TomatoMeter.yml:ro
+      - ./bootstrap/bootstrap.mjs:/workspace/bootstrap.mjs:ro
+      - lab-config:/lab
     command: [node, /workspace/bootstrap.mjs]
-    networks: [lab]
-  tomatometer-server:
-    build: { context: ../.., dockerfile: api/docker/Dockerfile, args: { VITE_SPACE_URL: http://space-nginx:5403 } }
-    environment: { SPACE_LAB_CONFIGURATION_FILE: /lab/space.json }
-    volumes: [lab-config:/lab:ro]
-    depends_on:
-      lab-bootstrap:
-        condition: service_completed_successfully
-    networks: [lab]
-  tomatometer-client:
-    build: { context: ../.., dockerfile: docker/lab/tomatometer-client.Dockerfile, args: { VITE_SERVER_URL: http://localhost:5401/api } }
-    depends_on: [tomatometer-server]
-    networks: [lab]
-  tomatometer-nginx:
-    image: nginx:1.27.3-alpine
-    ports: ["5401:80"]
-    volumes: [./tomatometer-nginx.conf:/etc/nginx/conf.d/default.conf:ro]
-    depends_on: [tomatometer-server, tomatometer-client]
     networks: [lab]
 
 volumes: { sphere-data: {}, sphere-pricings: {}, space-data: {}, lab-config: {} }
