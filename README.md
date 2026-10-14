@@ -4,6 +4,11 @@
 
 TomatoMeter is a Pomodoro productivity app whose behavior is driven by its pricing. This repository packages it together with [SPHERE](https://github.com/SCORELabUS/sphere) and [SPACE](https://github.com/SCORELabUS/space) in a reproducible lab that demonstrates the full *No-code Pricing-Driven Self-adaptation* cycle: a pricing is designed and published in SPHERE, operated at runtime by SPACE, and enforced by TomatoMeter without redeploying the application.
 
+The repository is also the hands-on material of the **ICSOC 2026 tutorial on pricing-driven self-adaptation**. It offers two ways to start the lab:
+
+- **Demo** (`npm run demo`): TomatoMeter fully integrated with SPHERE and SPACE, ready to show the whole cycle.
+- **Tutorial** (`npm run tutorial:1|2|3`): a TomatoMeter starter with no SPACE integration, in development mode, for attendees to connect it themselves. See the [tutorial guide](tutorial/README.md).
+
 Developed by the [SCORE Lab](https://github.com/SCORELabUS), this project is part of ongoing research into pricing-driven development and operation.
 
 ▶️ **Watch the demo video:** [https://youtu.be/tQYkeKHu9qo](https://youtu.be/tQYkeKHu9qo)
@@ -11,6 +16,7 @@ Developed by the [SCORE Lab](https://github.com/SCORELabUS), this project is par
 ## Table of Contents
 
 1. [Quick Start](#quick-start)
+   - [ICSOC 2026 tutorial](tutorial/README.md)
 2. [How It Works](#how-it-works)
 3. [Lab Internals](#lab-internals)
 4. [About TomatoMeter and its Pricing](#about-tomatometer-and-its-pricing)
@@ -25,20 +31,22 @@ Developed by the [SCORE Lab](https://github.com/SCORELabUS), this project is par
 ### Prerequisites
 
 - [Docker](https://www.docker.com/get-started) (Desktop or Engine) with Docker Compose.
-- Node.js with npm, only to run the `lab:*` scripts.
+- Node.js with npm, only to run the lab scripts.
 > [!NOTE]
 > We recommed using pnpm as the package manager, but npm works too.
 - Ports `5401`, `5402` and `5403` free on your machine.
 
-### Start the lab
+### Start the demo
 
 ```bash
 git clone https://github.com/SCORELabUS/TomatoMeter.git
 cd TomatoMeter
-npm run lab:up
+npm run demo
 ```
 
-The first run downloads the SPHERE and SPACE images and builds TomatoMeter, so it takes a few minutes. The lab is ready when `lab-bootstrap` reports it.
+The first run downloads the SPHERE and SPACE images and builds TomatoMeter, so it takes a few minutes. The command returns when the lab is ready and prints the URLs below.
+
+To follow the tutorial instead, see the [tutorial guide](tutorial/README.md).
 
 ### Services
 
@@ -65,8 +73,10 @@ TomatoMeter needs no login.
 To stop the lab and delete all its data, run the following command in the project root:
 
 ```bash
-npm run lab:down
+npm run down
 ```
+
+Starting the demo or any tutorial checkpoint also resets SPHERE and SPACE first, so every run starts from a known state.
 
 ## How It Works
 
@@ -109,26 +119,29 @@ You can repeat the cycle with any other change, such as removing a feature from 
 
 ## Lab Internals
 
-The lab is a single Docker Compose project ([docker/lab/docker-compose.yml](docker/lab/docker-compose.yml)) on a private network. Each application sits behind its own nginx proxy, which is the only container that publishes a port.
+The lab is a single Docker Compose project on a private network, started by [scripts/lab.mjs](scripts/lab.mjs). SPHERE and SPACE are defined in [infra/compose.base.yml](infra/compose.base.yml); TomatoMeter comes from an overlay: [infra/compose.demo.yml](infra/compose.demo.yml) builds the demo, and [infra/compose.tutorial.yml](infra/compose.tutorial.yml) runs the tutorial starter in development mode. Each application sits behind its own nginx proxy or dev server, which is the only container that publishes a port.
 
 | Application | Containers | Image |
 |-------------|------------|-------|
 | SPHERE | `sphere-server`, `sphere-client`, `sphere-mongodb`, `sphere-redis`, `sphere-nginx` | `ghcr.io/scorelabus/sphere-{api,client}:2.6.0` |
-| SPACE | `space-server`, `space-client`, `space-mongodb`, `space-redis`, `space-nginx` | `ghcr.io/scorelabus/space-{api,client}:1.7.0` |
-| TomatoMeter | `tomatometer-server`, `tomatometer-client`, `tomatometer-nginx` | Built from this repository |
+| SPACE | `space-server`, `space-client`, `space-mongodb`, `space-redis`, `space-nginx`, `space-sphere-link` | `ghcr.io/scorelabus/space-{api,client}:1.7.0` |
+| TomatoMeter (demo) | `tomatometer-server`, `tomatometer-client`, `tomatometer-nginx` | Built from [demo/](demo) |
+| TomatoMeter (tutorial) | `tomatometer` (Vite + API in watch mode) | [tutorial/tomatometer](tutorial/tomatometer), mounted from your disk |
 
-SPHERE and SPACE come as public images, so you do not need their repositories. To use other versions, set `SPHERE_VERSION` and `SPACE_VERSION` before starting the lab. SPACE talks to SPHERE inside the Docker network (`http://sphere-server:8080`), not through the public ports.
+SPHERE and SPACE come as public images, so you do not need their repositories. To use other versions, set `SPHERE_VERSION` and `SPACE_VERSION` before starting the lab. SPACE links services to SPHERE with the same permanent links that the SPHERE UI copies (`http://localhost:5402/p/{pricingId}`). Inside the lab, the `space-sphere-link` proxy shares the SPACE container's network and forwards its `localhost:5402` to SPHERE, so those links work from SPACE too.
 
 ### Provisioning
 
-A one-shot `lab-bootstrap` service ([docker/lab/bootstrap.mjs](docker/lab/bootstrap.mjs)) provisions everything automatically:
+A one-shot `lab-bootstrap` service ([infra/bootstrap/bootstrap.mjs](infra/bootstrap/bootstrap.mjs)) provisions SPHERE and SPACE up to a stage chosen by the launcher. Each stage includes the previous ones:
 
-- Creates the `tomato_demo` user in SPHERE and SPACE, and the `tomatometer-lab` organization in SPACE.
-- Leaves only the original pricing from `api/resources/TomatoMeter.yml` in SPHERE and publishes it.
-- Links the SPACE `TomatoMeter` service to the SPHERE pricing with the `all_last` policy.
-- Creates the basic contract used by the TomatoMeter interface and hands the SPACE configuration to the TomatoMeter server.
+| Stage | Used by | Provisions |
+|-------|---------|------------|
+| `empty` | Tutorial checkpoint 1 | The `tomato_demo` user in SPHERE (verified by `verify-sphere-demo-user`) and in SPACE, with its default `TomatoMeter Lab` organization. |
+| `pricing` | Tutorial checkpoint 2 | + The reference pricing ([demo/api/resources/TomatoMeter.yml](demo/api/resources/TomatoMeter.yml)) published in SPHERE. |
+| `linked` | Tutorial checkpoint 3 | + The SPACE `TomatoMeter` service linked to that pricing with the `all_last` policy, and the organization API key written to `tutorial/tomatometer/.env`. |
+| `demo` | Demo | + The contracts used by the demo interface, and the SPACE configuration handed to the TomatoMeter server. |
 
-Two helper containers run first: `clean-sphere-pricings` leaves SPHERE with only the reference pricing, and `verify-sphere-demo-user` marks the demo user's email as verified. TomatoMeter starts only after the bootstrap finishes successfully.
+TomatoMeter starts only after the bootstrap finishes successfully.
 
 ## About TomatoMeter and its Pricing
 
@@ -136,7 +149,7 @@ TomatoMeter is a productivity management app based on the Pomodoro technique. It
 
 ### Pricing
 
-The reference pricing ([api/resources/TomatoMeter.yml](api/resources/TomatoMeter.yml)) defines three plans (BASIC, ADVANCED, and PREMIUM) and two add-ons (*Extra Timers* and *Export as JSON*).
+The reference pricing ([demo/api/resources/TomatoMeter.yml](demo/api/resources/TomatoMeter.yml)) defines three plans (BASIC, ADVANCED, and PREMIUM) and two add-ons (*Extra Timers* and *Export as JSON*).
 
 **Features:**
 
@@ -158,27 +171,21 @@ The pricing page (see image below) shows which features are enabled or disabled 
 
 ```
 .
-├── api/                # Backend (Express, TypeScript)
-│   ├── config/         # Configuration files
-│   ├── middlewares/    # Express middlewares
-│   ├── resources/      # Reference pricing (TomatoMeter.yml)
-│   ├── routes/         # API routes
-│   └── utils/          # Backend utilities (SPACE integration)
-├── src/                # Frontend (React, Vite, TypeScript)
-│   ├── apps/           # App entry points
-│   ├── components/     # Reusable UI components
-│   ├── contexts/       # React context providers
-│   ├── data/           # Static data (JSON)
-│   ├── lib/            # Frontend libraries/utilities
-│   ├── pages/          # Page components
-│   └── static/         # Static assets (CSS, sounds)
-├── docker/
-│   └── lab/            # SPHERE × SPACE × TomatoMeter lab (compose, bootstrap, nginx)
-├── tests/              # Subscription synchronization tests
-├── images/             # Project screenshots and images
-├── tsconfig.json       # TypeScript configuration
-├── package.json        # Project metadata and scripts
-└── README.md           # This file
+├── package.json          # Lab commands: demo, tutorial:1|2|3, down
+├── scripts/lab.mjs       # Launcher used by those commands
+├── infra/                # Docker Compose files, bootstrap, nginx and MongoDB setup
+├── demo/                 # TomatoMeter fully integrated with SPACE
+│   ├── api/              # Backend (Express, TypeScript); resources/ holds the reference pricing
+│   ├── src/              # Frontend (React, Vite, TypeScript)
+│   ├── docker/           # Images used by the demo
+│   └── tests/            # Subscription synchronization tests
+├── tutorial/             # ICSOC 2026 tutorial
+│   ├── README.md         # Step-by-step guide for attendees
+│   ├── target-pricing.png# Pricing to design during the tutorial
+│   ├── tomatometer/      # Starter app, with the TODOs to connect it to SPACE
+│   └── solution/         # The starter files that change, already solved
+├── images/               # Screenshots used in this README
+└── README.md             # This file
 ```
 
 ---
