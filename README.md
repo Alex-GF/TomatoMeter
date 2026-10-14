@@ -2,157 +2,164 @@
 
 ![Analytics View](images/analytics-view.png)
 
+TomatoMeter is a Pomodoro productivity app whose behavior is driven by its pricing. This repository packages it together with [SPHERE](https://github.com/SCORELabUS/sphere) and [SPACE](https://github.com/SCORELabUS/space) in a reproducible lab that demonstrates the full *No-code Pricing-Driven Self-adaptation* cycle: a pricing is designed and published in SPHERE, operated at runtime by SPACE, and enforced by TomatoMeter without redeploying the application.
+
+Developed by the [SCORE Lab](https://github.com/SCORELabUS), this project is part of ongoing research into pricing-driven development and operation.
+
 ## Table of Contents
 
-1. [Introduction](#introduction)
-2. [Live Demo with Docker](#live-demo-with-docker)
-3. [About the Demo Application & Pricing](#about-the-demo-application--pricing)
-4. [Project Structure](#project-structure)
-5. [Tech Stack](#tech-stack)
-6. [SPACE Load Testing](#space-load-testing)
+1. [Quick Start](#quick-start)
+2. [How It Works](#how-it-works)
+3. [Lab Internals](#lab-internals)
+4. [About TomatoMeter and its Pricing](#about-tomatometer-and-its-pricing)
+5. [Project Structure](#project-structure)
+6. [Tech Stack](#tech-stack)
 7. [Disclaimer & License](#disclaimer--license)
 
 ---
 
-## Introduction
+## Quick Start
 
-Welcome to **TomatoMeter**!  
+### Prerequisites
 
-This repository presents a demo Pomodoro timer application that integrates with [SPACE](https://github.com/Alex-GF/space) as its pricing-driven self-adaptation engine, enabling dynamic behavior based on variability induced by its pricing model. It is designed to test and showcase the functionality and capabilities of SPACE in a practical setting.
+- [Docker](https://www.docker.com/get-started) (Desktop or Engine) with Docker Compose.
+- Node.js with npm, only to run the `lab:*` scripts.
+    > [!NOTE]
+    > We recommed using pnpm as the package manager, but npm works too.
+- Ports `5401`, `5402` and `5403` free on your machine.
 
-Developed by the [ISA-Group](https://github.com/isa-group), this project is part of ongoing research into pricing-driven development and operation.
-
-## Integrated Lab: TomatoMeter + SPHERE + SPACE
-
-The repository includes a reproducible lab that starts the three applications and configures them automatically. It is designed to demonstrate the full *Pricing-Driven DevOps* cycle: SPHERE publishes the reference pricing, SPACE imports it through its permanent link, and TomatoMeter consumes it as a source of variability.
-
-**Prerequisites:** Docker Desktop/Engine with Docker Compose v2. SPHERE and SPACE are pulled as public images from GHCR (`ghcr.io/scorelabus/sphere-{api,client}:2.6.0` and `ghcr.io/scorelabus/space-{api,client}:1.7.0`; you can change the versions with the `SPHERE_VERSION` and `SPACE_VERSION` variables), so their repositories are not needed. The first run downloads those images and builds only TomatoMeter.
+### Start the lab
 
 ```bash
+git clone https://github.com/Alex-GF/TomatoMeter.git
+cd TomatoMeter
 npm run lab:up
 ```
 
-When `lab-bootstrap` reports that the lab is ready, open:
+The first run downloads the SPHERE and SPACE images and builds TomatoMeter, so it takes a few minutes. The lab is ready when `lab-bootstrap` reports it.
 
-- TomatoMeter: [http://localhost:5401](http://localhost:5401)
-- SPHERE: [http://localhost:5402](http://localhost:5402)
-- SPACE: [http://localhost:5403](http://localhost:5403)
+### Services
 
-Both platforms use the same demo account: `tomato_demo` / `tomato-demo`. Provisioning creates the lab organization, leaves only the original pricing from `api/resources/TomatoMeter.yml` in SPHERE, publishes it, and links the SPACE `TomatoMeter` service with the `all_last` policy. It also creates the basic contract used by the TomatoMeter interface.
+Once the bootstrap finishes, you can access the three services in your browser:
 
-To fully reset the lab data (including pricings, contracts, and volumes), run:
+| Service | Role | URL |
+|---------|------|-----|
+| **TomatoMeter** | The SaaS application whose features depend on the pricing | [http://localhost:5401](http://localhost:5401) |
+| **SPHERE** | Pricing design and publication | [http://localhost:5402](http://localhost:5402) |
+| **SPACE** | Runtime pricing enforcement | [http://localhost:5403](http://localhost:5403) |
+
+### Credentials
+
+SPHERE and SPACE share the same demo account:
+
+| Username | Password |
+|----------|----------|
+| `tomato_demo` | `tomato-demo` |
+
+TomatoMeter needs no login.
+
+### Stop and reset
+
+To stop the lab and delete all its data, run the following command in the project root:
 
 ```bash
 npm run lab:down
 ```
 
-For the demo, publish a new public version of the pricing in SPHERE. SPACE detects it within a minute at most, updates the service, and migrates the contract; after refreshing the TomatoMeter page, the interface reflects the new restrictions. Do not edit the linked service directly in SPACE: its source of truth is SPHERE.
+## How It Works
 
-## Live Demo with Docker
+![Pricing update workflow across SPHERE, SPACE and TomatoMeter](images/pricing-workflow.webp)
 
-You can launch the entire demo locally using Docker.
+The figure follows a running example: John, a stakeholder, changes the Basic plan so that it allows **5 pomodoros per day** (instead of 3) and **includes the Daily summary**. The workflow has seven steps. John performs the first two in SPHERE; SPACE and TomatoMeter carry out the other five automatically.
 
-**Requirements:**  
+**Pricing design and release (SPHERE)**
 
-- [Docker](https://www.docker.com/get-started) installed on your machine.
+1. **Pricing editor.** John edits the TomatoMeter pricing in SPHERE, either visually or by modifying its YAML directly.
+2. **Version history.** John publishes the changes as a new version (`v1.2`), which is stored next to the previous ones. SPHERE exposes every published version through a read-only **public API** behind the pricing's permanent link (`/p/{pricingId}`). The API returns a manifest of versions, each with a release date and a content hash, and lets clients download the YAML of any version.
 
-### Run a SPACE instance
+**Runtime enforcement (SPACE)**
 
-Before running the demo, you need to have a SPACE instance running. You can do this by following these steps:
+3. **Sync worker.** The `TomatoMeter` service in SPACE is *linked* to that permanent link instead of holding an uploaded pricing. A sync worker periodically polls the manifest (every minute in this lab; the SPACE default is five minutes) and selects the target version according to the synchronization policy. The lab uses `all_last`, which targets the latest published version.
+4. **Snapshot import.** When a new target appears, SPACE downloads its YAML, checks that it matches the hash in the manifest, validates it, and stores it as an immutable version of the service.
+5. **Contract migration.** SPACE migrates the active contracts to `v1.2`. It keeps their plan, add-ons, billing dates and usage whenever they are still valid, and it falls back to the cheapest valid plan otherwise. If any contract cannot be migrated, none is, and every migration is recorded in the contract history.
+6. **Event service.** SPACE invalidates its cached pricings, contracts and feature evaluations, then broadcasts a *pricing activated* event over WebSockets.
 
-1. Clone the repository, navigate to its folder and run SPACE using docker compose:
+**Adaptation (TomatoMeter)**
 
-```bash
-git clone https://github.com/Alex-GF/space.git
-cd space
-docker compose up -d
-```
-
-Then wait for the SPACE instance to start. If everything is set up correctly, your space instance should be running at [http://localhost:5403](http://localhost:5403).
-
-If you want to explore SPACE, you can log in into the app using the following default credentials:
-
-- **Username:** `admin`
-- **Password:** `space4all`
+7. **Frontend and backend.** Both sides of TomatoMeter listen to these events through the SPACE SDKs. The frontend re-renders its components (the Daily summary unlocks and the counter now reads *3 of 5 pomodoros used*). The backend enforces the new business rules (`limit: 5 pomodoros / day`, `daily summary: enabled`). No code change or redeployment is involved.
 
 > [!NOTE]
-> If you are interested in learning more about SPACE, you can check out the [SPACE documentation](https://github.com/Alex-GF/space#readme) for more details on how to set it up, configure it, and use its features.
+> Linking SPACE to SPHERE is a one-time configuration, and the lab bootstrap does it for you. From then on, SPHERE is the only source of truth: SPACE rejects manual uploads to a linked service, so make every pricing change in SPHERE.
 
-### Run TomatoMeter (demo application)
+## Try it yourself
 
-Now that you have a SPACE instance running, you can launch the TomatoMeter demo application.
+Reproduce the example from the figure in the running lab:
 
-1. Clone the repository
+1. **Check the starting point.** Open TomatoMeter at [http://localhost:5401](http://localhost:5401). The demo user is on the Basic plan: 3 pomodoros per day and no Daily summary. Start pomodoros until the limit blocks you.
+2. **Edit the pricing (step 1).** Log in to SPHERE at [http://localhost:5402](http://localhost:5402) as `tomato_demo` and open the TomatoMeter pricing in the editor. In the Basic plan, raise `maxPomodoroTimers` to `5` and enable `dailySummary`.
+3. **Publish (step 2).** Publish the changes as a new public version.
+4. **Watch SPACE work (steps 3–6).** Within a minute, SPACE detects the version, imports it and migrates the contract. To follow it, open the `TomatoMeter` service in SPACE at [http://localhost:5403](http://localhost:5403): it shows the synchronization status, the applied version and the number of migrated contracts.
+5. **See TomatoMeter adapt (step 7).** Go back to TomatoMeter. Your usage is kept and the limit is now 5, so you can start another session. The Daily summary is also unlocked. If the page was in the background, refresh it.
 
-```bash
-git clone https://github.com/Alex-GF/space-demo.git
-cd space-demo
-```
+You can repeat the cycle with any other change, such as removing a feature from a plan or lowering a limit, and see TomatoMeter apply the new restrictions.
 
-2. Generate a `.env` file that sets the both the domain where SPACE is hosted and the API Key that will be used by the demo application to connect to SPACE. This file is **required** for the demo to work properly.
+## Lab Internals
 
-> [!TIP]
-> For quiker setup, you can run the following command to create a `.env` file with the necessary configuration. This will run a script that rerieves the API key of an admin user from the SPACE instance you started earlier (considering that you used the configuration provided in this tutorial to do so).
+The lab is a single Docker Compose project ([docker/lab/docker-compose.yml](docker/lab/docker-compose.yml)) on a private network. Each application sits behind its own nginx proxy, which is the only container that publishes a port.
 
-```bash
-chmod +x scripts/retrieve-space-api-key.sh
-./scripts/retrieve-space-api-key.sh
-```
+| Application | Containers | Image |
+|-------------|------------|-------|
+| SPHERE | `sphere-server`, `sphere-client`, `sphere-mongodb`, `sphere-redis`, `sphere-nginx` | `ghcr.io/scorelabus/sphere-{api,client}:2.6.0` |
+| SPACE | `space-server`, `space-client`, `space-mongodb`, `space-redis`, `space-nginx` | `ghcr.io/scorelabus/space-{api,client}:1.7.0` |
+| TomatoMeter | `tomatometer-server`, `tomatometer-client`, `tomatometer-nginx` | Built from this repository |
 
-3. Run TomatoMeter using Docker Compose:
+SPHERE and SPACE come as public images, so you do not need their repositories. To use other versions, set `SPHERE_VERSION` and `SPACE_VERSION` before starting the lab. SPACE talks to SPHERE inside the Docker network (`http://sphere-server:8080`), not through the public ports.
 
-```bash
-cd docker
-docker compose up -d
-```
+### Provisioning
 
-Wait for the space-demo-nginx instance to start. If everything is set up correctly, the TomatoMeter SPACE demo should be running at [http://localhost](http://localhost).
+A one-shot `lab-bootstrap` service ([docker/lab/bootstrap.mjs](docker/lab/bootstrap.mjs)) provisions everything automatically:
+
+- Creates the `tomato_demo` user in SPHERE and SPACE, and the `tomatometer-lab` organization in SPACE.
+- Leaves only the original pricing from `api/resources/TomatoMeter.yml` in SPHERE and publishes it.
+- Links the SPACE `TomatoMeter` service to the SPHERE pricing with the `all_last` policy.
+- Creates the basic contract used by the TomatoMeter interface and hands the SPACE configuration to the TomatoMeter server.
+
+Two helper containers run first: `clean-sphere-pricings` leaves SPHERE with only the reference pricing, and `verify-sphere-demo-user` marks the demo user's email as verified. TomatoMeter starts only after the bootstrap finishes successfully.
 
 ## About TomatoMeter and its Pricing
 
-TomatoMeter is a productivity management app based in the pomodoro technique. It allows users to track their work sessions, evaluate their productivity, and review insights about their performance. 
+TomatoMeter is a productivity management app based on the Pomodoro technique. It allows users to track their work sessions, evaluate their productivity, and review insights about their performance.
 
 ### Pricing
 
-Since TomatoMeter has been designed to demonstrate the capabilities of SPACE in managing variability introduced by pricing models, it includes a pricing model with 3 different plans: FREE, ADVANCED, and PREMIUM; along with 2 add-ons.
+The reference pricing ([api/resources/TomatoMeter.yml](api/resources/TomatoMeter.yml)) defines three plans (BASIC, ADVANCED, and PREMIUM) and two add-ons (*Extra Timers* and *Export as JSON*).
 
-**Key features include:**
+**Features:**
 
-- **Pomodoro Timer:** A simple and effective timer to manage work sessions based on the Pomodoro Technique. The pricing also impose an **usage limit** to this feature that restricts the maximum amount of pomodoro timers that can be initiated each day.
-- **Sound Notifications:** Emit sound notifications to signal the end of pomodoros.
-- **Basic analytics:** number of pomodoros completed pomodoros, total time worked and productivity score.
-- **Motivational Quotes:** Display motivational quotes above the timer to keep users inspired.
-- **Daily summary:** Overview of completed pomodoros by day over the last month.
-- **Dark Mode:** A dark mode option for a better user experience in low-light environments.
-- **Custom Pomodoro Duration:** Users can customize the duration of their pomodoros and breaks.
-- **Advanced analytics:** productivity trends, pomodoro streaks, and more
-- **Export Data as JSON:** Ability to export pomodoro data in JSON format for further analysis or backup.
+- **Pomodoro Timer:** A timer to manage work sessions based on the Pomodoro technique, subject to a daily **usage limit** (`maxPomodoroTimers`) on the number of timers that can be started.
+- **Sound Notifications:** Sound notifications that signal the end of each pomodoro.
+- **Basic Analytics:** Number of completed pomodoros, total time worked, and productivity score.
+- **Motivational Quotes:** Motivational quotes shown above the timer.
+- **Daily Summary:** Overview of completed pomodoros by day over the last month.
+- **Dark Mode:** A dark color scheme for low-light environments.
+- **Custom Pomodoro Duration:** Custom durations for pomodoros and breaks.
+- **Advanced Analytics:** Productivity trends, pomodoro streaks, and more.
+- **Export Data as JSON:** Export pomodoro data in JSON format for further analysis or backup.
 
-The pricing page (see image below) showcases how different features must be enabled or disabled regarding the selected subscription (i.e. the selected plan and, optionally, complementary contracted add-ons).
+The pricing page (see image below) shows which features are enabled or disabled for each subscription (i.e., the selected plan and, optionally, contracted add-ons).
 
 ![Pricing Plans](images/pricing-plans.png)
 
-### Purpose of the Demo
-
-Since, as mentioned before, this demo aims to demonstrate the capabilities of SPACE in managing variability introduced by pricing models, you'll find a button behind the TomatoMeter's screen that triggers a **pricing change event.** In short, this event will perform the following changes to the pricing:
-
-- **Change the availability of the basic analytics feature:** In this new version, only users from ADVANCED and PREMIUM plans will be able to access this feature.
-- **Further restricts the amount of daily pomodoro timers for BASIC users:** These will only be able to initiate **1 pomodoro timers per day**.
-
-By clicking the button again, you can revert these changes and return to the original pricing model.
-
 ## Project Structure
-
-The repository is organized as follows:
 
 ```
 .
 ├── api/                # Backend (Express, TypeScript)
 │   ├── config/         # Configuration files
 │   ├── middlewares/    # Express middlewares
-│   ├── resources/      # API resources (YAML, etc.)
+│   ├── resources/      # Reference pricing (TomatoMeter.yml)
 │   ├── routes/         # API routes
-│   └── utils/          # Backend utilities
+│   └── utils/          # Backend utilities (SPACE integration)
 ├── src/                # Frontend (React, Vite, TypeScript)
 │   ├── apps/           # App entry points
 │   ├── components/     # Reusable UI components
@@ -161,8 +168,9 @@ The repository is organized as follows:
 │   ├── lib/            # Frontend libraries/utilities
 │   ├── pages/          # Page components
 │   └── static/         # Static assets (CSS, sounds)
-├── docker/             # Docker and Docker Compose files
-├── nginx/              # Nginx configuration (if used)
+├── docker/
+│   └── lab/            # SPHERE × SPACE × TomatoMeter lab (compose, bootstrap, nginx)
+├── tests/              # Subscription synchronization tests
 ├── images/             # Project screenshots and images
 ├── tsconfig.json       # TypeScript configuration
 ├── package.json        # Project metadata and scripts
@@ -185,96 +193,14 @@ The repository is organized as follows:
 
 ---
 
-## SPACE Load Testing
-
-If you want to replicate the results presented in the paper presenting SPACE (submitted to ICSOC'25), you must follow these steps:
-
-### 1. Deploy SPACE using kubernetes
-
-Before running the demo, you need to have a kubernetes deployment of SPACE running. 
-
-Considering that you already have a cluster (we recommend using kubeadm from docker-desktop if want to run tests locally), you just need to clone the [SPACE repository](https://github.com/Alex-GF/space) and navigate to the `k8s` folder:
-
-```bash
-git clone https://github.com/Alex-GF/space.git
-cd space/k8s
-```
-
-Then, you just need to run the deploy.sh script to deploy SPACE in your kubernetes cluster:
-
-```bash
-chmod +x deploy.sh
-./deploy.sh
-```
-
-Then wait for the SPACE pods to start. If everything is set up correctly, you must have 3 replicas of the `server` pod running, and should be able to access SPACE at [http://localhost](http://localhost).
-
-If you want to explore SPACE, you can log in into the app using the following default credentials (this will be needed for retrieving the API key in the next step):
-
-- **Username:** `admin`
-- **Password:** `space4all`
-
-> [!NOTE]
-> If you are interested in learning more about SPACE, you can check out the [SPACE documentation](https://github.com/Alex-GF/space#readme) for more details on how to set it up, configure it, and use its features.
-
-### 2. Configure the project for load testing
-
-This demo project rely on [artillery](https://www.artillery.io) to develop, run and evaluate load tests. Therefore, in order to ensure a seamless integration between Tomatometer, SPACE and artillery.io (the service where artillery insights are stored), you must follow these steps:
-
-1. Install the dependencies of the project:
-
-    ```bash
-    pnpm install
-    # or
-    npm install
-    # or
-    yarn install
-    ```
-
-2. Connect to [artillery.io](https://www.artillery.io) using your github account and generate an API key. Once logged, you can find your API key in `settings -> API Keys`.
-
-3. Generate a `.env` file following the structure of `.env.example`.
-
-    To retrieve the SPACE API key, you must log in into SPACE and navigate to `Access Control`. Once you are there, you can copy the API key of the admin user.
-
-    Once you have obtained both the SPACE API key and the Artillery.io API key, your `.env` file should look like this:
-
-    ```bash
-    VITE_SPACE_URL=http://localhost
-    VITE_SPACE_API_KEY=96ff87ecdf9df3971ea98f51cc37edd301a34391fd89a7b96a7436246d8f0ac6
-    ARTILLERY_KEY=a9_koizwzxadtywh677t9hwg9pvogmr600f
-    ```
-
-> [!WARNING]
-> The script for retrieving the SPACE API key presented in [Live Demo with Docker](#live-demo-with-docker) will not work in this setup, since SPACE has been deployed through Kubernetes.
-
-### 3. Run the load tests
-
-After configuring the project, you can either run all tests at once, or run them individually.
-
-- **To run all tests at once**, just run on the root folder:
-
-```bash
-pnpm run load-test
-```
-
-- **To run individual tests**, you can use the commands with the `load-test` prefix in the `package.json` file. For example, to run the `tomatometer-renew-only` test, you can run:
-
-```bash
-pnpm run load-test:tomatometer-renew-only
-```
-
->[!IMPORTANT]
-> With this setup, you will run the load tests against the SPACE instance running in your kubernetes cluster, which by default has 3 space-server replicas configured. If you want to increase/decrease the number of replicas, you can do so by modifying the `replicas` field in the `k8s/pods/server-deployment.yaml` file (which can be found on the [SPACE repository](https://github.com/Alex-GF/space/blob/main/k8s/pods/server-deployment.yaml)) and applying the changes with `kubectl apply -f k8s/pods/server-deployment.yaml`.
-
 ## Disclaimer & License
 
-> **License:**  
+> **License:**
 > This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-> **Disclaimer:**  
-> This repository is developed and maintained in a controlled research environment by the [ISA-Group](https://isa-group.es) to demonstrate advances pricing-driven self adaptation solutions.  
-> The ISA-Group is not responsible for any issues, damages, or consequences that may arise if this software is used in other projects or production environments.  
+> **Disclaimer:**
+> This repository is developed and maintained in a controlled research environment by the [SCORE Lab](https://score.us.es) to demonstrate advances in pricing-driven self-adaptation solutions.
+> The SCORE Lab is not responsible for any issues, damages, or consequences that may arise if this software is used in other projects or production environments.
 > Use at your own risk.
 
 If you have any questions or want to contribute, feel free to open an issue or contact the maintainers.

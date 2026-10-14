@@ -133,3 +133,4 @@ dist
 pnpm-workspace.yaml
 
 artillery/data/*.csv
+.DS_Store
