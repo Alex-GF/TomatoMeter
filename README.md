@@ -6,6 +6,8 @@ TomatoMeter is a Pomodoro productivity app whose behavior is driven by its prici
 
 Developed by the [SCORE Lab](https://github.com/SCORELabUS), this project is part of ongoing research into pricing-driven development and operation.
 
+▶️ **Watch the demo video:** [https://youtu.be/tQYkeKHu9qo](https://youtu.be/tQYkeKHu9qo)
+
 ## Table of Contents
 
 1. [Quick Start](#quick-start)
@@ -92,6 +94,8 @@ The figure follows a running example: John, a stakeholder, changes the Basic pla
 > Linking SPACE to SPHERE is a one-time configuration, and the lab bootstrap does it for you. From then on, SPHERE is the only source of truth: SPACE rejects manual uploads to a linked service, so make every pricing change in SPHERE.
 
 ## Try it yourself
+
+Prefer to watch first? The [demo video](https://youtu.be/tQYkeKHu9qo) shows the lab in action.
 
 Reproduce the example from the figure in the running lab:
 
