@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-FROM node:21.1-slim AS build
+FROM node:22-slim AS build
 WORKDIR /usr/src/client
 
 RUN npm install -g pnpm@9
@@ -16,5 +16,5 @@ ENV VITE_SERVER_URL=$VITE_SERVER_URL
 RUN pnpm exec vite build
 
 FROM nginx:1.27.3-alpine
-COPY docker/lab/tomatometer-client-nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/client-nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/client/dist /usr/share/nginx/html

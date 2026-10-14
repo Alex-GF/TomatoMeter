@@ -1,19 +1,12 @@
 {
-  "name": "pricing-driven-feature-toggling-demo",
+  "name": "tomatometer-demo",
   "type": "module",
   "version": "2.0.0",
-  "description": "This is a demo project that uses pricing-driven feature flags driven by different solutions",
+  "description": "TomatoMeter fully integrated with SPACE (ICSOC 2026 tutorial demo)",
   "scripts": {
-    "load-test:tomatometer-renew-only": "source .env && artillery run ./artillery/tests/tomatometer-renew-only.yml --name \"tomatometer-renew-only\" --record --key $ARTILLERY_KEY",
-    "load-test:space-renew-only": "source .env && artillery run ./artillery/tests/space-renew-only.yml --name \"space-renew-only\" --record --key $ARTILLERY_KEY",
-    "load-test:tomatometer-validate-only": "source .env && artillery run ./artillery/tests/tomatometer-validate-only.yml --name \"tomatometer-validate-only\" --record --key $ARTILLERY_KEY",
-    "load-test:space-validate-only": "source .env && artillery run ./artillery/tests/space-validate-only.yml --name \"space-validate-only\" --record --key $ARTILLERY_KEY",
-    "load-test": "cd artillery && chmod +x ./run-load-tests.sh && ./run-load-tests.sh",
     "dev:server": "export SPACE_URL=\"http://localhost:3000\" && npx tsx --watch ./api/backend.ts",
     "dev:client": "concurrently \"vite\" \"tailwindcss -i ./src/static/css/app.css -o ./src/static/css/tailwind.css --watch\"",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "lab:up": "docker compose -f docker/lab/docker-compose.yml up --build",
-    "lab:down": "docker compose -f docker/lab/docker-compose.yml down --volumes --remove-orphans",
     "test:subscription": "node --import tsx --test tests/subscription-synchronization.test.ts",
     "build:client": "vite build",
     "build:server": "tsc -p ./tsconfig.json && tsc-alias --project=\"./tsconfig.json\" --resolve-full-paths",
@@ -21,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Alex-GF/space-demo.git"
+    "url": "git+https://github.com/SCORELabUS/TomatoMeter.git"
   },
   "author": "Alejandro García Fernández",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Alex-GF/space-demo/issues"
+    "url": "https://github.com/SCORELabUS/TomatoMeter/issues"
   },
-  "homepage": "https://github.com/Alex-GF/space-demo#readme",
+  "homepage": "https://github.com/SCORELabUS/TomatoMeter#readme",
   "dependencies": {
     "@faker-js/faker": "^9.8.0",
     "@iconify/react": "^5.0.2",
@@ -56,11 +49,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
-    "@types/artillery": "^1.7.4",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.2",
-    "artillery": "^2.0.23",
     "concurrently": "^9.1.2",
     "eslint": "^9.11.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
@@ -74,5 +65,6 @@
     "typescript-eslint": "^8.7.0",
     "vite": "^5.4.8",
     "vite-plugin-node-polyfills": "^0.22.0"
-  }
+  },
+  "private": true
 }
