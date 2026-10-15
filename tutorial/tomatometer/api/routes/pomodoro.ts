@@ -18,7 +18,7 @@ router.post('/pomodoro/session', async (req, res) => {
   // TODO B2 · Enforce the daily pomodoro limit on the server
   //
   // When `spaceClient` is available, evaluate the 'tomatometer-pomodoroTimer' feature
-  // for `userId` with `spaceClient.features.evaluate(userId, featureId, consumption, { server: true })`,
+  // for `userId` with `spaceClient.features.evaluate(userId, featureId, consumption)`,
   // consuming one unit of the 'tomatometer-maxPomodoroTimers' usage limit:
   //   consumption = { 'tomatometer-maxPomodoroTimers': 1 }
   // SPACE answers { eval, limit, used, error }. If `eval` is false, reply with

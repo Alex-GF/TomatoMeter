@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { type SpaceConfiguration } from 'space-react-client';
+import { SpaceProvider, type SpaceConfiguration } from 'space-react-client';
 import { DemoApp } from './apps/demo';
 import { SubscriptionProvider } from './contexts/subscriptionContext';
 import { SettingsContext, SettingsToggle } from './contexts/settingsContext';

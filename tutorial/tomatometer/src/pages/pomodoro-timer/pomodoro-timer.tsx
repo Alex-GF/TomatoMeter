@@ -6,6 +6,7 @@ import notificationSound from '../../static/sounds/notification.mp3';
 import useAxios from '../../hooks/useAxios';
 import { useSubscription } from '../../hooks/useSubscription';
 import { PomodoroLimitReached } from '../../components/upgrade';
+import { Default, Feature, On } from 'space-react-client';
 
 const PomodoroTimer = () => {
   const { toggles } = useContext(SettingsContext);
@@ -143,31 +144,31 @@ const PomodoroTimer = () => {
               - <Default>: the ready-made <PomodoroLimitReached /> screen.
             The backend (TODO B2) blocks the request anyway; this hides the button.
             ------------------------------------------------------------------------- */}
-        <div className="flex gap-4">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            className="px-6 py-2 rounded-lg bg-purple-600 dark:bg-yellow-400 text-white dark:text-yellow-900 font-bold shadow-lg hover:bg-purple-700 dark:hover:bg-yellow-500 transition"
-            onClick={startTimer}
-            disabled={isRunning}
-          >
-            Start
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            className="px-6 py-2 rounded-lg bg-red-500 dark:bg-yellow-600 text-white dark:text-yellow-100 font-bold shadow-lg hover:bg-red-600 dark:hover:bg-yellow-700 transition"
-            onClick={stopTimer}
-            disabled={!isRunning}
-          >
-            Stop
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            className="px-6 py-2 rounded-lg bg-gray-400 dark:bg-gray-700 text-white dark:text-yellow-200 font-bold shadow-lg hover:bg-gray-500 dark:hover:bg-gray-600 transition"
-            onClick={resetTimer}
-          >
-            Reset
-          </motion.button>
-        </div>
+            <div className="flex gap-4">
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                className="px-6 py-2 rounded-lg bg-purple-600 dark:bg-yellow-400 text-white dark:text-yellow-900 font-bold shadow-lg hover:bg-purple-700 dark:hover:bg-yellow-500 transition"
+                onClick={startTimer}
+                disabled={isRunning}
+              >
+                Start
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                className="px-6 py-2 rounded-lg bg-red-500 dark:bg-yellow-600 text-white dark:text-yellow-100 font-bold shadow-lg hover:bg-red-600 dark:hover:bg-yellow-700 transition"
+                onClick={stopTimer}
+                disabled={!isRunning}
+              >
+                Stop
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                className="px-6 py-2 rounded-lg bg-gray-400 dark:bg-gray-700 text-white dark:text-yellow-200 font-bold shadow-lg hover:bg-gray-500 dark:hover:bg-gray-600 transition"
+                onClick={resetTimer}
+              >
+                Reset
+              </motion.button>
+            </div>
       </motion.div>
       <AnimatePresence>
         {showModal && (

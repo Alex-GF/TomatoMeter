@@ -67,7 +67,7 @@ services:
     image: redis:7.4.2
     networks: [lab]
   space-server:
-    image: ghcr.io/scorelabus/space-api:${SPACE_VERSION:-1.7.0}
+    image: ghcr.io/scorelabus/space-api:${SPACE_VERSION:-1.7.1}
     environment:
       ENVIRONMENT: lab
       SERVER_PORT: 3000
@@ -104,7 +104,7 @@ services:
     volumes: [./nginx/space-sphere-link.conf:/etc/nginx/conf.d/default.conf:ro]
     depends_on: [space-server, sphere-nginx]
   space-client:
-    image: ghcr.io/scorelabus/space-client:${SPACE_VERSION:-1.7.0}
+    image: ghcr.io/scorelabus/space-client:${SPACE_VERSION:-1.7.1}
     depends_on: [space-server]
     networks: [lab]
   space-nginx:

@@ -10,7 +10,7 @@ export type SettingsToggle = {
 
 export const SettingsContext = createContext<{ toggles: SettingsToggle; setToggles: React.Dispatch<React.SetStateAction<SettingsToggle>>; }>({
   toggles: {
-    'Enable sound notifications': true,
+    'Enable sound notifications': false,
     'Dark mode': false,
     'Custom pomodoro duration': false,
     'Motivational quotes': false,

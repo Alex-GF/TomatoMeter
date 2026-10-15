@@ -2,6 +2,9 @@
 
 In this hands-on part of the tutorial you take TomatoMeter, a Pomodoro app that knows nothing about its pricing, and make it **pricing-driven**: you design its pricing in **SPHERE**, operate it at runtime with **SPACE**, and connect TomatoMeter to SPACE so that it enforces the pricing and adapts to every new version you publish, without redeploying.
 
+> [!TIP]
+> **Attending the tutorial? Follow the [Lab Manual](MANUAL.md).** It walks you through every step with screenshots. This page is the quick reference.
+
 ## Contents
 
 1. [Before you start](#before-you-start)
@@ -59,7 +62,7 @@ TomatoMeter's code refers to the pricing by name, so use **exactly these identif
 | Plans | `basic` (0 $/month), `advanced` (3.99 $/month), `premium` (9.99 $/month) |
 | Features | `pomodoroTimer`, `soundNotifications`, `basicAnalytics`, `motivationalQuotes`, `dailySummary`, `darkMode`, `customPomodoroDuration`, `advancedAnalytics`, `exportDataToJson` |
 | Usage limit | `maxPomodoroTimers`: numeric, **renewable every day**, linked to `pomodoroTimer`. 3 / 10 / 15 per plan |
-| Add-on `extraTimers` | 1 $/month, adds **5** `maxPomodoroTimers` per unit (1 to 10 units) |
+| Add-on `extraTimers` | 1 $/month, adds **5** `maxPomodoroTimers` per unit |
 | Add-on `exportAsJson` | 2 $/month, only for `premium`, enables `exportDataToJson` |
 
 In TomatoMeter, the features you will enforce are:

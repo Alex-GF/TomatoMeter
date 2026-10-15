@@ -7,7 +7,7 @@ TomatoMeter is a Pomodoro productivity app whose behavior is driven by its prici
 The repository is also the hands-on material of the **ICSOC 2026 tutorial on pricing-driven self-adaptation**. It offers two ways to start the lab:
 
 - **Demo** (`npm run demo`): TomatoMeter fully integrated with SPHERE and SPACE, ready to show the whole cycle.
-- **Tutorial** (`npm run tutorial:1|2|3`): a TomatoMeter starter with no SPACE integration, in development mode, for attendees to connect it themselves. See the [tutorial guide](tutorial/README.md).
+- **Tutorial** (`npm run tutorial:1|2|3`): a TomatoMeter starter with no SPACE integration, in development mode, for attendees to connect it themselves. See the [lab manual](tutorial/MANUAL.md), a step-by-step guide with screenshots, or the [tutorial quick reference](tutorial/README.md).
 
 Developed by the [SCORE Lab](https://github.com/SCORELabUS), this project is part of ongoing research into pricing-driven development and operation.
 
@@ -124,7 +124,7 @@ The lab is a single Docker Compose project on a private network, started by [scr
 | Application | Containers | Image |
 |-------------|------------|-------|
 | SPHERE | `sphere-server`, `sphere-client`, `sphere-mongodb`, `sphere-redis`, `sphere-nginx` | `ghcr.io/scorelabus/sphere-{api,client}:2.6.0` |
-| SPACE | `space-server`, `space-client`, `space-mongodb`, `space-redis`, `space-nginx`, `space-sphere-link` | `ghcr.io/scorelabus/space-{api,client}:1.7.0` |
+| SPACE | `space-server`, `space-client`, `space-mongodb`, `space-redis`, `space-nginx`, `space-sphere-link` | `ghcr.io/scorelabus/space-{api,client}:1.7.1` |
 | TomatoMeter (demo) | `tomatometer-server`, `tomatometer-client`, `tomatometer-nginx` | Built from [demo/](demo) |
 | TomatoMeter (tutorial) | `tomatometer` (Vite + API in watch mode) | [tutorial/tomatometer](tutorial/tomatometer), mounted from your disk |
 
@@ -180,7 +180,8 @@ The pricing page (see image below) shows which features are enabled or disabled 
 │   ├── docker/           # Images used by the demo
 │   └── tests/            # Subscription synchronization tests
 ├── tutorial/             # ICSOC 2026 tutorial
-│   ├── README.md         # Step-by-step guide for attendees
+│   ├── MANUAL.md         # Step-by-step lab manual with screenshots (manual/images)
+│   ├── README.md         # Quick reference for attendees
 │   ├── target-pricing.png# Pricing to design during the tutorial
 │   ├── tomatometer/      # Starter app, with the TODOs to connect it to SPACE
 │   └── solution/         # The starter files that change, already solved

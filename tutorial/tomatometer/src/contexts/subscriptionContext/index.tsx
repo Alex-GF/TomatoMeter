@@ -4,6 +4,7 @@ import { Contract, Pricing } from '../../types';
 import { toSubscriptionArr } from '../../utils/contracts';
 import useAxios from '../../hooks/useAxios';
 import { USER_ID } from '../../constants/user';
+import { useSpaceClient } from 'space-react-client';
 
 /**
  * - loading: first read in progress
@@ -43,7 +44,9 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
 
   const refresh = useCallback(async () => {
     try {
-      const { data } = await axiosInstance.get<{ contract: Contract; pricing: Pricing }>('/subscription');
+      const { data } = await axiosInstance.get<{ contract: Contract; pricing: Pricing }>(
+        '/subscription'
+      );
       setContract(data.contract);
       setPricing(data.pricing);
       setCurrentSubscription(
@@ -106,6 +109,31 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   // the contracts and emits a 'pricing_actived' event. Add a useEffect that
   // subscribes to it with `spaceClient.on('pricing_actived', ...)` and calls
   // refresh(). Unsubscribe with `spaceClient.off(...)` in the cleanup function.
+  //
+  // New to React? You only need to know three things:
+  //
+  //  · A listener is a function you hand to someone so they call it later. Here
+  //    you hand it to the SPACE client, which calls it on every 'pricing_actived'.
+  //
+  //  · useEffect(setup, deps) runs `setup` after the component renders. If
+  //    `setup` returns a function (the "cleanup"), React calls it before running
+  //    `setup` again and when the component disappears. React runs `setup` again
+  //    whenever a value in the `deps` array changes.
+  //
+  //  · That is why the listener must be removed in the cleanup: otherwise every
+  //    re-run would add one more listener, and a single event would trigger
+  //    several refreshes, some of them through an outdated refresh().
+  //
+  // The useEffect "Read the subscription on load..." above does exactly this
+  // with the browser's 'focus' event: addEventListener in the setup,
+  // removeEventListener in the cleanup. Yours has the same shape:
+  //
+  //   useEffect(() => {
+  //     // 1. Define the listener: a named function that calls refresh().
+  //     //    It needs a name because off() must receive the same function as on().
+  //     // 2. Start listening:  spaceClient.on('pricing_actived', <your listener>);
+  //     // 3. Return the cleanup that stops listening with spaceClient.off(...).
+  //   }, [/* 4. Everything the effect uses from the component: spaceClient, refresh */]);
   // ---------------------------------------------------------------------------
 
   return (

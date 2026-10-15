@@ -27,7 +27,7 @@ export function connectToSpace(): void {
   //
   // 1. Create the client with `connect({ url, apiKey })` from 'space-node-client',
   //    using SPACE_URL and SPACE_API_KEY, and store it in `spaceClient`.
-  // 2. When the client emits the 'synchronized' event, call `onSpaceReady(spaceClient)`.
+  // 2. When the client emits the 'synchronized' event (you can track it using `client.on('synchronized', callback)`), call `onSpaceReady(spaceClient)`.
   //    It is already implemented: it gives the demo user a contract in SPACE.
   // ---------------------------------------------------------------------------
 }
