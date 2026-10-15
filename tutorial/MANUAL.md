@@ -271,7 +271,7 @@ Scroll down to see the two add-ons you declared. *Export As Json* is only availa
 
 ![The add-ons in the Visual editor](manual/images/09b-visual-addons.jpg)
 
-The pricing now matches the [target pricing](demo/api/resources/TomatoMeter.yml).
+The pricing now matches the [target pricing](../demo/api/resources/TomatoMeter.yml).
 
 > [!TIP]
 > Want to see what the Visual editor wrote? Switch to **Code**: the `plans` section now lists the features and limits of each plan.
@@ -378,6 +378,18 @@ Two ideas help you through this part:
 - The frontend never asks SPACE about each feature. It loads a **pricing token**: a signed snapshot with the evaluation of every feature for the user. The `<Feature>` component reads it and re-renders whenever the token changes.
 
 Every time you save a file, TomatoMeter reloads. Keep the terminal with the logs in view.
+
+These are the TODOs, in the order this part follows:
+
+| TODO | File | What to do |
+|------|------|------------|
+| **B1** | [api/space/client.ts](tomatometer/api/space/client.ts) | Connect the backend to SPACE with `space-node-client`. |
+| **F1** | [src/App.tsx](tomatometer/src/App.tsx) | Wrap the app in `<SpaceProvider>` from `space-react-client`. |
+| **F2** | [src/contexts/subscriptionContext/index.tsx](tomatometer/src/contexts/subscriptionContext/index.tsx) | Load the user's pricing token with `spaceClient.setUserId(...)`. |
+| **F3** | [src/contexts/subscriptionContext/index.tsx](tomatometer/src/contexts/subscriptionContext/index.tsx) | Listen to `pricing_actived` and refresh the subscription. |
+| **B2** | [api/routes/pomodoro.ts](tomatometer/api/routes/pomodoro.ts) | Before saving a pomodoro, evaluate `tomatometer-pomodoroTimer` while consuming one `tomatometer-maxPomodoroTimers`; reply 403 if it is not allowed. |
+| **F4** | [src/pages/pomodoro-timer/pomodoro-timer.tsx](tomatometer/src/pages/pomodoro-timer/pomodoro-timer.tsx) | Show the timer controls only while pomodoros are left (`<Feature id="tomatometer-pomodoroTimer">`). |
+| **F5** | [src/pages/daily-summary/daily-summary.tsx](tomatometer/src/pages/daily-summary/daily-summary.tsx) | Restrict the Daily summary to ADVANCED and PREMIUM (`<Feature id="tomatometer-dailySummary">`). |
 
 > [!TIP]
 > Each TODO has a solution below it, hidden in a collapsible block. Try first; open it if you get stuck. The full solution is also in [`tutorial/solution`](solution).
