@@ -1,0 +1,10 @@
+/* The value columns only hold a check or a short value, so they give their width to the
+   feature names and the three plans fit inside TomatoMeter's frame without scrolling sideways. */
+pricing-renderer[data-pr-root] {
+  --pr-table-min-width: 0;
+}
+
+pricing-renderer[data-pr-root] .pr-comparison-table :where(th, td):not(:first-child) {
+  min-inline-size: 96px;
+  padding-inline: var(--pr-space-2);
+}

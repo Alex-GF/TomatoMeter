@@ -41,8 +41,11 @@ router.get('/contracts/subscription', async (req, res) => {
     const contract = await client.contracts.getContract(userId);
     const version = contract.contractedServices.tomatometer;
     if (!version) return res.status(404).json({ error: 'No pricing version found' });
-    const pricing = await SpaceServiceOperations.getPricing('tomatometer', version);
-    res.status(200).json({ contract, pricing });
+    const [pricing, { yaml: pricingYaml }] = await Promise.all([
+      SpaceServiceOperations.getPricing('tomatometer', version),
+      client.pricings.getYaml('tomatometer', version),
+    ]);
+    res.status(200).json({ contract, pricing, pricingYaml });
   } catch {
     res.status(500).json({ error: 'Failed to refresh subscription' });
   }

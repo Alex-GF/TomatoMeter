@@ -29,26 +29,27 @@ Follow the parts in order. Each part ends with a **✅ Check** telling you what 
 
 ### 0.1 Requirements
 
-- **Docker** (Desktop or Engine) with Docker Compose, **running**.
-- **Node.js** with npm.
-- **Git** and a code editor (VS Code or similar).
-- Ports `5401`, `5402` and `5403` free.
+You need what [Before the tutorial](../README.md#before-the-tutorial) describes: **Git** and a code editor, **Docker** with Docker Compose, **running**, **Node.js** with npm, and ports `5401`, `5402` and `5403` free.
 
-### 0.2 Get the code and start the lab
+### 0.2 Start the lab
+
+If you do not have the code yet, get it:
 
 ```bash
-git clone https://github.com/SCORELabUS/TomatoMeter.git
+git clone -b icsoc2026-tutorial https://github.com/Alex-GF/TomatoMeter.git
 ```
 
 ```bash
 cd TomatoMeter
 ```
 
+Then start the first checkpoint from the repository root:
+
 ```bash
 npm run tutorial:1
 ```
 
-The first start downloads several images and installs TomatoMeter's dependencies, so it can take a few minutes. When it is ready, the terminal prints:
+The first start installs TomatoMeter's dependencies, so it can take a few minutes. When it is ready, the terminal prints:
 
 ```text
 Laboratory ready (stage: empty): SPHERE and SPACE only contain the tomato_demo user.
@@ -690,9 +691,16 @@ export default DailySummaryPage;
 
 ### Upgrade the plan
 
-Go to **Pricing** and click **Select ADVANCED** under the comparison table.
+Go to **Pricing**. The page is drawn from the YAML of your pricing, and Basic is marked as **Your plan**. Click **Upgrade** on the **Advanced** plan.
 
-![Select the ADVANCED plan](manual/images/23-tm-select-advanced.jpg)
+![Upgrade to the ADVANCED plan](manual/images/23-tm-select-advanced.jpg)
+
+Nothing changes yet: TomatoMeter first shows you what the new subscription adds and what it costs. Click **Confirm your new subscription**.
+
+![Review the change of subscription](manual/images/23b-tm-review-change.jpg)
+
+> [!TIP]
+> You can also pick a plan or add-ons on the page and click **Review change** in the bar at the bottom. The add-on *Export As Json* is only available on PREMIUM, so the page does not let you add it on another plan.
 
 The sidebar now shows the ADVANCED plan, the Daily Summary unlocks and the timer is available again (10 pomodoros per day).
 
@@ -711,7 +719,7 @@ You will change the BASIC plan in SPHERE so that it includes the **Daily summary
 
 ### 4.1 Prepare TomatoMeter
 
-In TomatoMeter, go back to the **BASIC** plan (Pricing → *Select BASIC*) and open **Daily Summary**. It is locked. Keep this tab open where you can see it.
+In TomatoMeter, go back to the **BASIC** plan (Pricing → **Downgrade** on the **Basic** plan → **Confirm your new subscription**) and open **Daily Summary**. It is locked. Keep this tab open where you can see it.
 
 ![Daily Summary locked on BASIC](manual/images/28-tm-live-before.jpg)
 
@@ -790,6 +798,7 @@ npm run down
 
 | Symptom | What to do |
 |---------|------------|
+| `npm run tutorial:N` stops with *container … is unhealthy* | Your machine is short of memory or CPU: close other applications and run the command again. |
 | The Pricing page says *"not connected to SPACE"* | Check that `VITE_SPACE_API_KEY` is set in `tutorial/tomatometer/.env` and that B1 is done. |
 | The Pricing page says *"Waiting for the TomatoMeter service in SPACE"* | TomatoMeter is connected, but the service does not exist in SPACE yet (Part 2). |
 | SPACE rejects the permanent link | Use the link exactly as SPHERE copies it (`http://localhost:5402/p/…`), and make sure the pricing is **public**. |

@@ -55,7 +55,7 @@ await request(`${sphereApi}/users/register`, {
   body: JSON.stringify({ firstName: 'Tomato', lastName: 'Demo', username, email: 'tomato_demo@example.com', password }),
 }, [201, 400, 409]);
 let sphereLogin;
-for (let attempt = 0; attempt < 30; attempt += 1) {
+for (let attempt = 0; attempt < 120; attempt += 1) {
   sphereLogin = await request(`${sphereApi}/users/login`, {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ loginField: username, password }),
   }, [403]);

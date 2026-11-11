@@ -20,6 +20,8 @@ export interface SubscriptionContextType {
   setCurrentSubscription: (newSubscription: string[]) => void;
   contract: Contract | null;
   pricing: Pricing | null;
+  /** The Pricing2Yaml file behind `pricing`, as SPACE stores it. The Pricing page renders it. */
+  pricingYaml: string | null;
   /** Re-reads the user's subscription. Called on focus, after every pomodoro and after plan changes. */
   refresh: () => Promise<void>;
   updateSubscription: (plan: string, addOns: Record<string, number>) => Promise<void>;
@@ -34,6 +36,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   const [currentSubscription, setCurrentSubscription] = useState<string[]>(['basic']);
   const [contract, setContract] = useState<Contract | null>(null);
   const [pricing, setPricing] = useState<Pricing | null>(null);
+  const [pricingYaml, setPricingYaml] = useState<string | null>(null);
   const axiosInstance = useAxios();
 
   // ---------------------------------------------------------------------------
@@ -44,11 +47,14 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
 
   const refresh = useCallback(async () => {
     try {
-      const { data } = await axiosInstance.get<{ contract: Contract; pricing: Pricing }>(
-        '/subscription'
-      );
+      const { data } = await axiosInstance.get<{
+        contract: Contract;
+        pricing: Pricing;
+        pricingYaml: string;
+      }>('/subscription');
       setContract(data.contract);
       setPricing(data.pricing);
+      setPricingYaml(data.pricingYaml);
       setCurrentSubscription(
         toSubscriptionArr(
           data.contract.subscriptionPlans.tomatometer,
@@ -144,6 +150,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         setCurrentSubscription,
         contract,
         pricing,
+        pricingYaml,
         refresh,
         updateSubscription,
       }}

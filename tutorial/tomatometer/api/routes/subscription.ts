@@ -15,8 +15,12 @@ router.get('/subscription', async (req, res) => {
   if (!client) return res.status(503).json(notConnected);
   try {
     const contract = await client.contracts.getContract(USER_ID);
-    const pricing = await getPricing(client, contract.contractedServices[SERVICE_NAME]);
-    res.status(200).json({ connected: true, contract, pricing });
+    const version = contract.contractedServices[SERVICE_NAME];
+    const [pricing, { yaml: pricingYaml }] = await Promise.all([
+      getPricing(client, version),
+      client.pricings.getYaml(SERVICE_NAME, version),
+    ]);
+    res.status(200).json({ connected: true, contract, pricing, pricingYaml });
   } catch (error) {
     // Typically: the TomatoMeter service or the demo contract does not exist in SPACE yet.
     res.status(404).json({ connected: true, error: (error as Error).message });

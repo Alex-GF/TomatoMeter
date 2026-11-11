@@ -21,50 +21,107 @@ This repository is everything you need during the session. It packages three app
 ## Contents
 
 - [Before the tutorial](#before-the-tutorial)
-- [Schedule](#schedule)
+- [During the tutorial](#during-the-tutorial)
   1. [Welcome and introduction](#1--welcome-and-introduction-5-min)
   2. [First contact: the demo](#2--first-contact-the-demo-30-min)
   3. [Architecture](#3--architecture-10-min)
   4. [Hands-on development](#4--hands-on-development-45-min)
   5. [Conclusions, summary and Q&A](#5--conclusions-summary-and-qa-15-min)
 - [Reference](#reference)
+- [Funding](#funding)
 - [Disclaimer & License](#disclaimer--license)
 
 ---
 
 ## Before the tutorial
 
-### Requirements
+> [!IMPORTANT]
+> **Complete these four steps before the session.** The first run downloads the SPHERE and SPACE images and builds TomatoMeter, which takes a few minutes and a good connection. The tutorial starts with an introduction: there is no time set aside for installing anything.
 
-- **Git** and a code editor (VS Code or similar).
-- **Docker** (Desktop or Engine) with Docker Compose, **running**.
-- **Node.js** with npm, only to run the lab commands.
-- Ports `5401`, `5402` and `5403` free on your machine.
+### 1. Install the tools
 
-Basic knowledge of web applications and REST APIs is enough. No prior experience with React is needed.
+| Tool | Install from | Notes |
+|------|--------------|-------|
+| **Git** | [git-scm.com/install](https://git-scm.com/install/) | |
+| **Docker**, with Docker Compose | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) | Docker must be **running**, not just installed. With Docker Desktop, open the application and wait until it is ready. |
+| **Node.js** LTS | [nodejs.org/en/download](https://nodejs.org/en/download) | Tested with Node.js 22 LTS. npm comes with Node.js. It only runs the lab commands: the applications run inside Docker. |
 
-### Get the code
+You also need a code editor (VS Code or similar). Basic knowledge of web applications and REST APIs is enough. No prior experience with React is needed.
+
+### 2. Verify your environment
+
+Run these commands one by one. None of them should print an error:
 
 ```bash
-git clone https://github.com/SCORELabUS/TomatoMeter.git
+git --version
+```
+
+```bash
+docker compose version
+```
+
+```bash
+docker info
+```
+
+```bash
+node --version
+```
+
+```bash
+npm --version
+```
+
+Then check that ports `5401`, `5402` and `5403` are free. This command works on every operating system and should print `free` three times:
+
+```bash
+node -e "for (const p of [5401, 5402, 5403]) require('net').createServer().once('error', () => console.log(p, 'in use')).once('listening', function () { console.log(p, 'free'); this.close(); }).listen(p)"
+```
+
+If a check fails:
+
+| Check | What to do |
+|-------|------------|
+| `git`, `node` or `npm` is not found | Install it from the table above and open a new terminal. |
+| `docker compose version` fails | Install Docker Desktop, or the Docker Compose plugin if you use Docker Engine. |
+| `docker info` shows an error | Docker is installed but not running. Start Docker Desktop and wait until it is ready, or run `sudo systemctl start docker` on Linux. |
+| A port says `in use` | Stop the program that uses it. If it is an earlier run of this lab, run `npm run down` from the repository. |
+
+### 3. Get the code
+
+```bash
+git clone -b icsoc2026-tutorial https://github.com/Alex-GF/TomatoMeter.git
 ```
 
 ```bash
 cd TomatoMeter
 ```
 
-> [!TIP]
-> **Warm up the lab before the session.** The first start downloads the SPHERE and SPACE images and builds TomatoMeter, which takes a few minutes and a good connection. Run `npm run demo` once at home, wait until it prints the URLs, and stop it with `npm run down`. During the session everything will start in seconds.
+### 4. Do a first run
+
+```bash
+npm run demo
+```
+
+Wait until the command prints the URLs, and check that the three applications open in your browser: [TomatoMeter](http://localhost:5401), [SPHERE](http://localhost:5402) and [SPACE](http://localhost:5403). Then stop the lab:
+
+```bash
+npm run down
+```
+
+The images stay on your machine, so everything starts much faster during the session.
+
+If the command stops with *container … is unhealthy*, your machine is short of memory or CPU: close other applications and run it again.
 
 ---
 
-## Schedule
+## During the tutorial
 
 The tutorial lasts **1h 45min**. All commands run from the repository root.
 
 | Time | Slot | What you do | Command |
 |------|------|-------------|---------|
-| 0:00 – 0:05 | [1 · Welcome and introduction](#1--welcome-and-introduction-5-min) | Check your setup | — |
+| 0:00 – 0:05 | [1 · Welcome and introduction](#1--welcome-and-introduction-5-min) | Quick environment check | `docker info` |
 | 0:05 – 0:35 | [2 · First contact](#2--first-contact-the-demo-30-min) | Release a new pricing version and watch TomatoMeter adapt | `npm run demo` |
 | 0:35 – 0:45 | [3 · Architecture](#3--architecture-10-min) | Follow how SPHERE, SPACE and TomatoMeter close the loop | — |
 | 0:45 – 1:30 | [4 · Hands-on development](#4--hands-on-development-45-min) | Build the pricing-driven workflow from scratch, following the [Lab Manual](tutorial/MANUAL.md) | `npm run tutorial:1` |
@@ -79,21 +136,13 @@ The tutorial lasts **1h 45min**. All commands run from the repository root.
 
 We introduce pricing-driven self-adaptation and what it achieves. For the background, see [*Trends in industry support for pricing-driven DevOps in SaaS*](https://doi.org/10.1109/TSC.2025.3634801) (IEEE Transactions on Services Computing, 2026).
 
-Meanwhile, check that your setup is ready. Each of these commands should print a version:
+Meanwhile, confirm that Docker is running. The command should print the details of the Docker server, with no errors:
 
 ```bash
-git --version
+docker info
 ```
 
-```bash
-docker compose version
-```
-
-```bash
-node --version
-```
-
-If you have not warmed up the lab yet, start the demo now (see the next slot): it will be downloading while we talk.
+If you could not do the [first run](#4-do-a-first-run) before the session, start the demo now (see the next slot): it will be downloading while we talk.
 
 ---
 
@@ -232,12 +281,12 @@ The lab is a single Docker Compose project on a private network, started by [scr
 
 | Application | Containers | Image |
 |-------------|------------|-------|
-| SPHERE | `sphere-server`, `sphere-client`, `sphere-mongodb`, `sphere-redis`, `sphere-nginx` | `ghcr.io/scorelabus/sphere-{api,client}:2.6.0` |
-| SPACE | `space-server`, `space-client`, `space-mongodb`, `space-redis`, `space-nginx`, `space-sphere-link` | `ghcr.io/scorelabus/space-{api,client}:1.7.1` |
+| SPHERE | `sphere-server`, `sphere-client`, `sphere-mongodb`, `sphere-redis`, `sphere-nginx` | `ghcr.io/scorelabus/sphere-{api,client}:2.11.1` |
+| SPACE | `space-server`, `space-client`, `space-mongodb`, `space-redis`, `space-nginx`, `space-sphere-link`, `space-pricing-token-key` | `ghcr.io/scorelabus/space-{api,client}:1.8.1` |
 | TomatoMeter (demo) | `tomatometer-server`, `tomatometer-client`, `tomatometer-nginx` | Built from [demo/](demo) |
 | TomatoMeter (tutorial) | `tomatometer` (Vite + API in watch mode) | [tutorial/tomatometer](tutorial/tomatometer), mounted from your disk |
 
-SPHERE and SPACE come as public images, so you do not need their repositories. To use other versions, set `SPHERE_VERSION` and `SPACE_VERSION` before starting the lab. SPACE links services to SPHERE with the same permanent links that the SPHERE UI copies (`http://localhost:5402/p/{pricingId}`). Inside the lab, the `space-sphere-link` proxy shares the SPACE container's network and forwards its `localhost:5402` to SPHERE, so those links work from SPACE too.
+SPHERE and SPACE come as public images, so you do not need their repositories. To use other versions, set `SPHERE_VERSION` and `SPACE_VERSION` before starting the lab. SPACE links services to SPHERE with the same permanent links that the SPHERE UI copies (`http://localhost:5402/p/{pricingId}`). Inside the lab, the `space-sphere-link` proxy shares the SPACE container's network and forwards its `localhost:5402` to SPHERE, so those links work from SPACE too. SPACE signs pricing tokens with an EC P-256 key: the one-shot `space-pricing-token-key` service generates a throwaway one, which stays in a Docker volume.
 
 A one-shot `lab-bootstrap` service ([infra/bootstrap/bootstrap.mjs](infra/bootstrap/bootstrap.mjs)) provisions SPHERE and SPACE up to a stage chosen by the launcher. Each stage includes the previous ones:
 
@@ -266,7 +315,7 @@ The reference pricing ([demo/api/resources/TomatoMeter.yml](demo/api/resources/T
 - **Advanced Analytics:** Productivity trends, pomodoro streaks, and more.
 - **Export Data as JSON:** Export pomodoro data in JSON format for further analysis or backup.
 
-The pricing page shows which features each subscription (the selected plan and, optionally, contracted add-ons) enables:
+The pricing page shows which features each subscription (the selected plan and, optionally, contracted add-ons) enables. [pricing-renderer](https://github.com/javiercavlop/pricing-renderer) draws it from the same Pricing2Yaml file that SPACE stores, and it shows the differences before a change of subscription is confirmed:
 
 ![Pricing Plans](images/pricing-plans.png)
 
@@ -302,6 +351,12 @@ The pricing page shows which features each subscription (the selected plan and, 
 | ![Framer Motion](https://img.shields.io/badge/-Framer%20Motion-EF008F?logo=framer&logoColor=white&style=for-the-badge) | ![Helmet](https://img.shields.io/badge/-Helmet-000?logo=helmet&logoColor=white&style=for-the-badge) | ![ESLint](https://img.shields.io/badge/-ESLint-4B32C3?logo=eslint&logoColor=white&style=for-the-badge) | ![Prettier](https://img.shields.io/badge/-Prettier-F7B93E?logo=prettier&logoColor=white&style=for-the-badge) |
 
 </div>
+
+---
+
+## Funding
+
+This work has been partially supported by PID2024-155693NB-C44, funded by MICIU/AEI/10.13039/501100011033/FEDER, EU; SOL2024-31777 funded by the PPIT of the Universidad de Sevilla under the Programa Operativo FEDER Andalucía 2021-2027; and the Horizonte 2027 doctoral training program funded by Junta de Andalucía (Consejería de Universidad, Investigación e Innovación).
 
 ---
 

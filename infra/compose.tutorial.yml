@@ -7,10 +7,13 @@ services:
       - ../tutorial/tomatometer:/tutorial-app
   tomatometer:
     build: { context: ., dockerfile: tomatometer-dev.Dockerfile }
+    init: true
     environment:
       # The backend reaches SPACE through the lab network; the browser uses localhost:5403.
       SPACE_URL: http://space-nginx:5403
       CHOKIDAR_USEPOLLING: "true"
+      # The default 100 ms keeps a couple of CPUs busy just watching the mounted code.
+      CHOKIDAR_INTERVAL: "1000"
       BROWSERSLIST_IGNORE_OLD_DATA: "true"
     ports: ["5401:5401"]
     volumes:

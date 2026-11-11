@@ -6,6 +6,8 @@ name: tomatometer-lab
 services:
   sphere-mongodb:
     image: mongo:7.0.16
+    init: true
+    cpus: 2
     environment: { MONGO_INITDB_ROOT_USERNAME: root, MONGO_INITDB_ROOT_PASSWORD: lab-root-password, MONGO_INITDB_DATABASE: sphere_lab, DATABASE_NAME: sphere_lab, DATABASE_USERNAME: testUser, DATABASE_PASSWORD: testUser }
     volumes: [sphere-data:/data/db, ./mongo/sphere-init.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro]
     networks: [lab]
@@ -13,7 +15,7 @@ services:
     image: redis:7.4.2
     networks: [lab]
   sphere-server:
-    image: ghcr.io/scorelabus/sphere-api:${SPHERE_VERSION:-2.6.0}
+    image: ghcr.io/scorelabus/sphere-api:${SPHERE_VERSION:-2.11.1}
     environment:
       ENVIRONMENT: lab
       DATABASE_TECHNOLOGY: mongoDB
@@ -34,17 +36,20 @@ services:
       # Used by SPACE to retrieve manifests from inside the lab network.
       SPHERE_PUBLIC_URL: http://sphere-server:8080
       FRONTEND_URL: http://localhost:5402
+      # 0 turns the login limit off. The bootstrap polls the login until the demo user is
+      # verified, and nobody should be locked out for five minutes in the middle of a session.
+      AUTH_RATE_LIMIT_MAX_REQUESTS: 0
     # Published YAML files must survive a Sphere application-container rebuild.
     volumes: [sphere-pricings:/usr/src/server/public/static/pricings]
     depends_on: [sphere-mongodb, sphere-redis]
     healthcheck:
       test: [CMD-SHELL, "node -e \"require('http').get('http://localhost:8080/api/v1/healthcheck', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
       interval: 5s
-      timeout: 3s
-      retries: 30
+      timeout: 10s
+      retries: 60
     networks: [lab]
   sphere-client:
-    image: ghcr.io/scorelabus/sphere-client:${SPHERE_VERSION:-2.6.0}
+    image: ghcr.io/scorelabus/sphere-client:${SPHERE_VERSION:-2.11.1}
     networks: [lab]
   sphere-nginx:
     image: nginx:1.27.3-alpine
@@ -55,22 +60,35 @@ services:
 
   space-mongodb:
     image: mongo:7.0.16
+    init: true
+    cpus: 2
     environment: { MONGO_INITDB_ROOT_USERNAME: root, MONGO_INITDB_ROOT_PASSWORD: 4dm1n, MONGO_INITDB_DATABASE: space_lab, DATABASE_NAME: space_lab, DATABASE_USERNAME: mongoUser, DATABASE_PASSWORD: mongoPassword }
     volumes: [space-data:/data/db, ./mongo/space-init.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro]
+    # mongosh is a whole Node process, so it only runs until the first success. Docker does not
+    # kill a check that times out: without `timeout` they pile up on a busy laptop, and each one
+    # makes the next slower until Mongo takes the whole machine.
     healthcheck:
-      test: [CMD-SHELL, "mongosh --quiet --username root --password 4dm1n --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" | grep 1"]
+      test: [CMD-SHELL, "test -f /tmp/ready || { timeout -s KILL 30 mongosh --quiet --username root --password 4dm1n --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" && touch /tmp/ready; }"]
       interval: 5s
-      timeout: 3s
-      retries: 30
+      timeout: 40s
+      retries: 40
     networks: [lab]
   space-redis:
     image: redis:7.4.2
     networks: [lab]
+  space-pricing-token-key:
+    image: node:22-alpine
+    network_mode: none
+    volumes:
+      - ./bootstrap/pricing-token-key.mjs:/workspace/pricing-token-key.mjs:ro
+      - space-keys:/keys
+    command: [node, /workspace/pricing-token-key.mjs]
   space-server:
-    image: ghcr.io/scorelabus/space-api:${SPACE_VERSION:-1.7.1}
+    image: ghcr.io/scorelabus/space-api:${SPACE_VERSION:-1.8.1}
     environment:
       ENVIRONMENT: lab
       SERVER_PORT: 3000
+      PRICING_TOKEN_PRIVATE_KEY_FILE: /run/space-keys/pricing-token-key.pem
       MONGO_URI: mongodb://mongoUser:mongoPassword@space-mongodb:27017/space_lab?authSource=space_lab
       REDIS_URL: redis://space-redis:6379
       JWT_SECRET: tomato-lab-space-jwt-secret
@@ -85,16 +103,19 @@ services:
       SPHERE_API_URL: http://localhost:5402/api/v1
       SPHERE_ALLOW_LOCAL_HTTP: "true"
       SPHERE_SYNC_ENABLED: "true"
+    volumes: [space-keys:/run/space-keys:ro]
     depends_on:
       space-mongodb:
         condition: service_healthy
       space-redis:
         condition: service_started
+      space-pricing-token-key:
+        condition: service_completed_successfully
     healthcheck:
       test: [CMD-SHELL, "node -e \"require('http').get('http://localhost:3000/api/v1/healthcheck', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
       interval: 5s
-      timeout: 3s
-      retries: 30
+      timeout: 10s
+      retries: 60
     networks: [lab]
   # Shares space-server's network namespace and forwards its localhost:5402 to
   # SPHERE, so the links attendees copy from SPHERE work as-is in SPACE.
@@ -104,7 +125,7 @@ services:
     volumes: [./nginx/space-sphere-link.conf:/etc/nginx/conf.d/default.conf:ro]
     depends_on: [space-server, sphere-nginx]
   space-client:
-    image: ghcr.io/scorelabus/space-client:${SPACE_VERSION:-1.7.1}
+    image: ghcr.io/scorelabus/space-client:${SPACE_VERSION:-1.8.1}
     depends_on: [space-server]
     networks: [lab]
   space-nginx:
@@ -146,5 +167,5 @@ services:
     command: [node, /workspace/bootstrap.mjs]
     networks: [lab]
 
-volumes: { sphere-data: {}, sphere-pricings: {}, space-data: {}, lab-config: {} }
+volumes: { sphere-data: {}, sphere-pricings: {}, space-data: {}, space-keys: {}, lab-config: {} }
 networks: { lab: {} }

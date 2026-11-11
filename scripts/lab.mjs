@@ -18,7 +18,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const project = 'tomatometer-lab';
 const files = ['compose.base.yml', 'compose.demo.yml', 'compose.tutorial.yml'];
 // Lab state that must start from scratch. Dependency caches survive resets.
-const dataVolumes = ['sphere-data', 'sphere-pricings', 'space-data', 'lab-config'];
+const dataVolumes = ['sphere-data', 'sphere-pricings', 'space-data', 'space-keys', 'lab-config'];
 
 const MODES = {
   demo: { stage: 'demo', overlay: 'compose.demo.yml', title: 'Demo' },
